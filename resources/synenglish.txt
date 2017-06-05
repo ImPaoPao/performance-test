@@ -1,0 +1,6 @@
+com.eebbk.test.performance SyncEglishTestCase syncEnglishOlaAccessBbkMarket syncEnglishOlaAccessBbkMarket 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase syncEnglishFunTest syncEnglishFunTest 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSelfInfo 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 10 com.eebbk.syncenglish cool

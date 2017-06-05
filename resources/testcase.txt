@@ -1,0 +1,11 @@
+com.eebbk.test.performance SyncChineseTestCase launchSyncChinese launchSyncChinese 11 com.eebbk.synchinese cool
+com.eebbk.test.performance BbkMiddleMarketTestCase launchBbkMiddleMarket launchBbkMiddleMarket 11 com.eebbk.bbkmiddlemarket cool
+com.eebbk.test.performance OneSearchDarkTestCase launchOneSearch launchOneSearch 11 com.eebbk.onesearchdark cool
+com.eebbk.test.performance VisionTestCase launchVision launchVision 11 com.eebbk.vision cool
+com.eebbk.test.performance VtrainingTestCase launchVtraining launchVtraining 11 com.eebbk.vtraining cool
+com.eebbk.test.performance SyncMathTestCase launchSynMath launchSynMath 11 com.eebbk.synmath cool
+com.eebbk.test.performance SyncEglishTestCase launchSyncEnglish launchSyncEnglish 11 com.eebbk.syncenglish cool
+com.eebbk.test.performance QuestionDatabaseTestCase launchQuestionDatabase launchQuestionDatabase 11 com.eebbk.questiondatabase cool
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 11 com.eebbk.englishtalk cool
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 11 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 11 com.eebbk.syncenglish cool

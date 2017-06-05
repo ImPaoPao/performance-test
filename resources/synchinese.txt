@@ -1,0 +1,7 @@
+com.eebbk.test.performance SyncChineseTestCase synChineseNewWord synChineseNewWord 5 com.eebbk.synchinese cool
+com.eebbk.test.performance SyncChineseTestCase synChineseRefresh synChineseRefresh 5 com.eebbk.synchinese cool
+com.eebbk.test.performance SyncChineseTestCase addChineseBook addChineseBook 5 com.eebbk.synchinese cool
+com.eebbk.test.performance SyncChineseTestCase showSynChineseBook showSynChineseBook 5 com.eebbk.synchinese cool
+com.eebbk.test.performance SyncChineseTestCase showDetailsSynChineseBook showDetailsSynChineseBook 5 com.eebbk.synchinese cool
+com.eebbk.test.performance SyncChineseTestCase syncChineseAccessDict syncChineseAccessDict 5 com.eebbk.synchinese cool
+com.eebbk.test.performance SyncChineseTestCase synChineseSelfInfo synChineseSelfInfo 5 com.eebbk.synchinese cool

@@ -1,0 +1,9 @@
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 2 com.eebbk.englishtalk cool
+com.eebbk.test.performance SyncChineseTestCase launchSyncChinese launchSyncChinese 2 com.eebbk.synchinese cool
+com.eebbk.test.performance BbkMiddleMarketTestCase launchBbkMiddleMarket launchBbkMiddleMarket 2 com.eebbk.bbkmiddlemarket cool
+com.eebbk.test.performance SyncMathTestCase launchSynMath launchSynMath 2 com.eebbk.synmath cool
+com.eebbk.test.performance OneSearchDarkTestCase launchOneSearch launchOneSearch 2 com.eebbk.onesearchdark cool
+com.eebbk.test.performance QuestionDatabaseTestCase launchQuestionDatabase launchQuestionDatabase 2 com.eebbk.questiondatabase cool
+com.eebbk.test.performance SyncEglishTestCase launchSyncEnglish launchSyncEnglish 2 com.eebbk.syncenglish cool
+com.eebbk.test.performance VisionTestCase launchVision launchVision 2 com.eebbk.vision cool
+com.eebbk.test.performance VtrainingTestCase launchVtraining launchVtraining 2 com.eebbk.vtraining cool

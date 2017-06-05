@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+#__pycache__/
+#*.py[cod]
+
+# Idea project files
+#.idea/
+
+# Sqlite database files
+#*.sqlite3
+
+# Log files
+#*.log
+
+# Text files
+#*.txt
+
+# Lock files
+#*.lock
+
+# Deploy files
+#deploy/
+
+# Migrations files
+#migrations/
+*.pyc
+*.csv

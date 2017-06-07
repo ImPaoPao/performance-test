@@ -2,9 +2,7 @@
 echo on
 workdir=/data/local/tmp/module
 workout=${workdir}/out
-
 mkdir -p ${workout}
-
 trackfile=${workdir}/track
 datadir=/sdcard/performance-test
 exe_log=${workdir}/module_log
@@ -26,12 +24,15 @@ case $1 in
 			test_number=${params[3]}
 			test_count=${params[4]}
 			source_package=${params[5]}
+			test_type=${params[6]}
+			sys_num=${params[7]}
+			app_num=${params[8]}
 			mkdir -p ${datadir}/${test_number}
 			#logcat -s WindowManager:V ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
 			#lpid=$!
 			echo ${pid} ${lpid} > ${workdir}/pid
 			mkdir -p ${workout}/${test_number}
-			am instrument -w -r   -e class ${test_package}.${test_case}\#${test_method} -e number ${test_number} -e count ${test_count} com.eebbk.test.performance.test/android.support.test.runner.AndroidJUnitRunner>${workout}/${test_number}/instrument.txt
+			am instrument -w -r  -e number ${test_number} -e sysnum ${sys_num} -e appnum ${app_num} -e class ${test_package}.${test_case}\#${test_method} -e count ${test_count} com.eebbk.test.performance.test/android.support.test.runner.AndroidJUnitRunner>${workout}/${test_number}/instrument.txt
 			#kill -9 ${lpid}
 			cp -f ${datadir}/${test_number}/* ${workout}/${test_number}
 			#cp -f /sdcard/log.txt ${workout}/${test_number}

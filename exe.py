@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import threading
 import time
-import sys
 
 import adbkit
+from freememory import FreeMemory
 from module import LauncherModule
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
@@ -23,13 +24,15 @@ def stop(adb, types):
     pass
 
 
-
-
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        device = adbkit.Device(serialno=sys.argv[1])
+        serialno =sys.argv[1]
+        device = adbkit.Device(serialno=serialno)
         adb = adbkit.Adb(device)
-        run(adb,sys.argv[1],'module')
+        # run(adb,sys.argv[1],'module')
+        work_out = os.path.join(WORK_OUT, str(serialno),
+                                time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+        FreeMemory(adb, work_out).execute()
     else:
         # get connect devices
         threads = []

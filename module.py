@@ -5,6 +5,7 @@ import datetime
 import os
 import platform
 import re
+
 from runner import Executor
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
@@ -13,7 +14,8 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
-dict1 = {'launchEnglishTalk': '英语听说', 'launchSynChinese': '同步语文', 'launchBbkMiddleMarket': '应用商店','launchSynStudy': '学科同步',
+dict1 = {'launchEnglishTalk': '英语听说', 'launchSynChinese': '同步语文', 'launchBbkMiddleMarket': '应用商店',
+         'launchSynStudy': '学科同步',
          'launchSynMath': '同步数学', 'launchOneSearch': '一键搜', 'launchQuestionDatabase': '好题精练',
          'launchSyncEnglish': '同步英语', 'launchVision': '视力保护', 'launchVtraining': '名师辅导',
          'showSynMathBook': '同步数学:点击书本→书本目录加载完成', 'addMathBook': '同步数学:点击添加按钮→下载界面加载完成',
@@ -60,8 +62,10 @@ def get_exetime(starttime, endtime):
                 exetime = float(endtime_minsec) - float(starttime_minsec)
     return exetime
 
+
 if __name__ == "__main__":
     print "fffffffffffffff"
+
 
 class LauncherModule(Executor):
     def __init__(self, adb, work_out):
@@ -83,8 +87,7 @@ class LauncherModule(Executor):
         self.csv_generate(data, self.id())
 
     def parser_files(self, file_dict):
-        data_time = {}
-        data_displayed = {}
+        data = {}
         for key, value in file_dict.items():
             print u'用例：', key
             result = value
@@ -95,43 +98,62 @@ class LauncherModule(Executor):
                 print(u'读取xml文件异常')
             else:
                 segments = root.findall('Segment')
-                data_time[key] = [[], [], [], [], []]
+                data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
+                             'loadresult': []}
                 for segment in segments:
-                    starttime = segment.get('starttime')
-                    endtime = segment.get('endtime')
-                    loadtime = segment.get('loadtime')
-                    refreshtime = segment.get('refreshtime')
-                    loadresult = segment.get('loadresult')
-                    refreshresult = segment.get('refreshresult')
-                    exe_time = get_exetime(starttime, loadtime)
-                    rexe_time = get_exetime(starttime, refreshtime)
-                    run_time = get_exetime(starttime, endtime)
-                    data_time[key][0].append(exe_time)
-                    data_time[key][1].append(rexe_time)
-                    data_time[key][2].append(loadresult)
-                    data_time[key][3].append(refreshresult)
-                    data_time[key][4].append(run_time)
-        return data_time
+                    memory = segment.get('memory')
+                    if memory != None:
+                        if '/' in memory:
+                            data[key]['memory'].append(memory.split('/')[0])
+                    else:
+                        starttime = segment.get('starttime')
+                        endtime = segment.get('endtime')
+                        loadtime = segment.get('loadtime')
+                        refreshtime = segment.get('refreshtime')
+                        loadresult = segment.get('loadresult')
+                        refreshresult = segment.get('refreshresult')
+                        exe_time = get_exetime(starttime, loadtime)
+                        rexe_time = get_exetime(starttime, refreshtime)
+                        run_time = get_exetime(starttime, endtime)
+                        data[key]['exetime'].append(exe_time)
+                        data[key]['rexetime'].append(rexe_time)
+                        data[key]['loadresult'].append(loadresult)
+                        data[key]['refreshresult'].append(refreshresult)
+                        data[key]['runtime'].append(run_time)
+        return data
 
     def csv_generate(self, data, filename):
-        csvfile = file(os.path.join(self.work_out,filename + '.csv'), 'wb')
+        csvfile = file(os.path.join(self.work_out, filename + '.csv'), 'wb')
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
-        writer.writerow(['应用名称', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
+        writer.writerow(['ID', '应用名称', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         for key, value in data.items():
-            exetime = value[0]
-            rexetime = value[1]
-            loadresult = value[2]
-            refreshresult = value[3]
-            runtime = value[4]
-            writer.writerow([dict1[key] if key in dict1 else key])
+            # 启动时间
+            exetime = value['exetime']
+            rexetime = value['rexetime']
+            loadresult = value['loadresult']
+            refreshresult = value['refreshresult']
+            writer.writerow([key, dict1[key] if key in dict1 else key])
+            print exetime
             if exetime:
-                writer.writerow(['点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
+                writer.writerow(['', '', '点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
             if rexetime:
                 writer.writerow(
-                    ['点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+                    ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
             if loadresult:
-                writer.writerow(['匹配度'] + [0] + loadresult)
+                writer.writerow(['', '', '匹配度'] + [0] + loadresult)
             if refreshresult:
-                writer.writerow(['匹配度'] + [0] + refreshresult)
+                writer.writerow(['', '', '匹配度'] + [0] + refreshresult)
+
+            # 可用内存
+            memory = value['memory']
+            if memory:
+                add = 0
+                for item in memory:
+                    if item:
+                        add += float(item.split(' ')[0].strip())
+                avg = add / len(memory)
+                print avg
+                print memory
+                writer.writerow(['', ''] + memory + [avg])
         csvfile.close()

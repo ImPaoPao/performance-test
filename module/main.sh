@@ -28,16 +28,21 @@ case $1 in
 			sys_num=${params[7]}
 			app_num=${params[8]}
 			mkdir -p ${datadir}/${test_number}
+			top -m 5 >/sdcard/top.txt &
+			tpid=$!
+			#logcat -s ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
 			logcat -s WindowManager:V ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
 			lpid=$!
 			echo ${pid} ${lpid} > ${workdir}/pid
 			mkdir -p ${workout}/${test_number}
 			am instrument -w -r  -e number ${test_number} -e sysnum ${sys_num} -e type ${test_type} -e appnum ${app_num} -e class ${test_package}.${test_case}\#${test_method} -e count ${test_count} com.eebbk.test.performance.test/android.support.test.runner.AndroidJUnitRunner>${workout}/${test_number}/instrument.txt
 			kill -9 ${lpid}
+			kill -9 ${tpid}
 			cp -f ${datadir}/${test_number}/* ${workout}/${test_number}
 			cp -f /sdcard/log.txt ${workout}/${test_number}
+			cp -f /sdcard/top.txt ${workout}/${test_number}
 			sleep 5
-		done < ${workdir}/choice.txt
+		done < ${workdir}/module.txt
 		echo "done end ...." >> ${exe_log}
 		echo "done" >> ${trackfile}
 		;;

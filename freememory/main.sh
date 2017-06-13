@@ -5,7 +5,7 @@ workout=${workdir}/out
 mkdir -p ${workout}
 trackfile=${workdir}/track
 datadir=/sdcard/performance-test
-exe_log=${workdir}/module_log
+exe_log=${workdir}/freememory_log
 touch ${exe_log}
 echo $1
 echo $1 >> ${exe_log}

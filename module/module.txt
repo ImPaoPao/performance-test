@@ -3,6 +3,7 @@ com.eebbk.test.performance SynChineseTestCase addChineseBook addChineseBook 3 co
 com.eebbk.test.performance SynChineseTestCase showSynChineseBook showSynChineseBook 3 com.eebbk.synchinese 0 0 0
 com.eebbk.test.performance SynChineseTestCase showDetailsSynChineseBook showDetailsSynChineseBook 3 com.eebbk.synchinese 0 0 0
 com.eebbk.test.performance SynChineseTestCase syncChineseAccessDict syncChineseAccessDict 3 com.eebbk.synchinese 0 0 0
+<<<<<<< HEAD
 com.eebbk.test.performance SyncMathTestCase addMathBook addMathBook 3 com.eebbk.synmath 0 0 0
 com.eebbk.test.performance SyncMathTestCase showSynMathBook showSynMathBook 3 com.eebbk.synmath 0 0 0
 com.eebbk.test.performance SyncMathTestCase changeSynMathBook changeSynMathBook 3 com.eebbk.synmath 0 0 0
@@ -17,3 +18,30 @@ com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSel
 com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
 com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
 com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 2 com.eebbk.syncenglish 0 0 0
+=======
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayUi showEtPlayUi 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudioContent showEtPlayAudioContent 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudio showEtPlayAudio 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtRanking showEtRanking 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtCourseTeacher showVtCourseTeacher 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtTeacherInfo showVtTeacherInfo 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtRanking showVtRanking 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtJoinCourse showVtJoinCourse 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtDownloadCourse showVtDownloadCourse 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtVideo showVtVideo 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtCourse showVtCourse 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtMoreList showVtMoreList 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionSettings showVisionSettings 10 com.eebbk.vision 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionProtection showVisionProtection 10 com.eebbk.vision 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExample showQdExample 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExamExplanation showQdExamExplanation 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamList showQdRealExamList 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamContent showQdRealExamContent 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRanking showQdRanking 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMAppDetails showBbkMAppDetails 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMClassCh showBbkMClassCh 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMSelfInfo showBbkMSelfInfo 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMCopyright showBbkMCopyright 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMDownloadList showBbkMDownloadList 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkLauncherTestCase loadBbkLauncher loadBbkLauncher 10 com.bbk.studyos.launcher 0 0 0
+>>>>>>> d306169... 页面切换适配H8SM

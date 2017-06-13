@@ -39,9 +39,31 @@ dict1 = {'launchEnglishTalk': '英语听说', 'launchSynChinese': '同步语文'
          'syncChineseAccessDict': '同步语文:点击查字词→调转到词典界面',
          'synChineseSelfInfo': '同步语文:书本内容界面点击头像→个人信息页面加载完成',
          'synChineseNewWord': '同步语文:生字页面，点击一个生字，点击写一写→进入写一写界面',
-         'synChineseRefresh': '同步语文:书架界面10本书，点击刷新→刷新完成'
+         'synChineseRefresh': '同步语文:书架界面10本书，点击刷新→刷新完成',
+         'showEtPlayUi': '选择教材添加后，点击教材目录→进入播放界面',
+         'showEtPlayAudioContent': '播放界面，点击右下角目录按钮→目录加载完成',
+         'showEtPlayAudio': '播放界面，点击目录按钮中任意目录→播放内容加载完成',
+         'showEtRanking': '点击我的排行→排行榜加载完成',
+         'showBbkMAppDetails': '首页点击应用→应用详情加载完成',
+         'showBbkMClassCh': '分类页面，点击语文→内容加载完成',
+         'showBbkMSelfInfo': '个人中心未登录，点击头像→个人中心页面加载完成',
+         'showBbkMCopyright': '点击版权声明→页面加载完成',
+         'showBbkMDownloadList': '下载10个应用，点击下载中心→下载列表加载完成',
+         'showVisionSettings': '点击设置按钮→显示设置界面',
+         'showVisionProtection': '点击护眼小知识→显示不严小知识界面',
+         'showQdExample': '点击智能练习目录→题目加载完成',
+         'showQdExamExplanation': '点击例题讲解目录→题目加载完成',
+         'showQdRealExamList': '点击真题密卷科目→真题目录界面加载完成',
+         'showQdRealExamContent': '点击真题目录界面目录→题目加载完成',
+         'showQdRanking': '点击排行榜→排行榜页面加载完成',
+         'showVtCourseTeacher': '选课界面，点击banner图名师在这里图片→名师页面加载完成',
+         'showVtTeacherInfo': '点击名师头像→名师详情加载完成',
+         'showVtRanking': '我的界面，点击排行榜→排行榜页面，加载完成',
+         'showVtJoinCourse': '已加入5个课程，进入我的界面，点击已加入课程→列表内容加载完成',
+         'showVtDownloadCourse': '已下载5个课程，进入我的界面，点击已下载课程→列表内容加载完成',
+         'showVtCourse': '点击选课→科目→课程包封面，加载完成',
+         'showVtMoreList': '点击首页更多精彩→课程列表页面，加载完成'
          }
-
 
 def get_exetime(starttime, endtime):
     exetime = 0

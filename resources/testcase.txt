@@ -276,3 +276,25 @@ com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMSelfInfo showBbkMSelf
 com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMCopyright showBbkMCopyright 10 com.eebbk.bbkmiddlemarket 0 0 0
 com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMDownloadList showBbkMDownloadList 10 com.eebbk.bbkmiddlemarket 0 0 0
 com.eebbk.test.performance BbkLauncherTestCase loadBbkLauncher loadBbkLauncher 10 com.bbk.studyos.launcher 0 0 0
+
+
+三个同步10次
+com.eebbk.test.performance SynChineseTestCase synChineseRefresh synChineseRefresh 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase addChineseBook addChineseBook 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showSynChineseBook showSynChineseBook 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showDetailsSynChineseBook showDetailsSynChineseBook 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase syncChineseAccessDict syncChineseAccessDict 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SyncMathTestCase addMathBook addMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showSynMathBook showSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase changeSynMathBook changeSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathContent showExplanationSynMathContent 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase downloadExplanatinSynMathContent downloadExplanatinSynMathContent 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase refreshSynMath refreshSynMath 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showDetailsSynMathBook showDetailsSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathBook showExplanationSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishOlaAccessBbkMarket syncEnglishOlaAccessBbkMarket 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishFunTest syncEnglishFunTest 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSelfInfo 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 10 com.eebbk.syncenglish 0 0 0

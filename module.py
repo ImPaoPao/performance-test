@@ -148,24 +148,24 @@ class LauncherModule(Executor):
         csvfile = file(os.path.join(self.work_out, filename + '.csv'), 'wb')
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
-        writer.writerow(['ID', '应用名称', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
+        writer.writerow(['ID', '应用名称','测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         for key, value in data.items():
             # 启动时间
             exetime = value['exetime']
             rexetime = value['rexetime']
             loadresult = value['loadresult']
             refreshresult = value['refreshresult']
-            writer.writerow([key, dict1[key] if key in dict1 else key])
+            writer.writerow([key])
             print exetime
             if exetime:
-                writer.writerow(['', '', '点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
+                writer.writerow(['', [dict1[key] if key in dict1 else key], '点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
-            if loadresult:
-                writer.writerow(['', '', '匹配度'] + [0] + loadresult)
-            if refreshresult:
-                writer.writerow(['', '', '匹配度'] + [0] + refreshresult)
+            # if loadresult:
+            #     writer.writerow(['', '', '匹配度'] + [0] + loadresult)
+            # if refreshresult:
+            #     writer.writerow(['', '', '匹配度'] + [0] + refreshresult)
 
             # 可用内存
             memory = value['memory']

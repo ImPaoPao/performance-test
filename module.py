@@ -158,7 +158,7 @@ class LauncherModule(Executor):
             writer.writerow([key])
             print exetime
             if exetime:
-                writer.writerow(['', [dict1[key] if key in dict1 else key], '点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
+                writer.writerow(['', dict1[key] if key in dict1 else key, '点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])

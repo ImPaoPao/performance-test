@@ -7,6 +7,7 @@ import platform
 import threading
 DATA_LOCAL_TMP='/data/local/tmp'
 
+from common import  workdir
 
 def devices(host=None):
     results = []

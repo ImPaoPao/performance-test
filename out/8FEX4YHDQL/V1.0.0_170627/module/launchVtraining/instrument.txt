@@ -1,0 +1,16 @@
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+com.eebbk.test.performance.VtrainingTestCase:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=launchVtraining
+INSTRUMENTATION_STATUS: class=com.eebbk.test.performance.VtrainingTestCase
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: stream={"1_1loadResult:":2,"1_1end:":"07-01 17:52:19.260","1_2loadResult:":2,"1_2end:":"07-01 17:52:19.464","1_3loadResult:":2,"1_3end:":"07-01 17:52:19.686","1_4loadResult:":2,"1_4end:":"07-01 17:52:19.932","1_5loadResult:":2,"1_5end:":"07-01 17:52:20.189","1_6loadResult:":0,"1_6lastTime:":"07-01 17:52:19.933","1_6startScreenTime:":"07-01 17:52:20.189","1_6end:":"07-01 17:52:20.420","1_7end:":"07-01 17:52:20.660","1_8end:":"07-01 17:52:20.874","1_9end:":"07-01 17:52:21.116","1_10end:":"07-01 17:52:21.357","1_11end:":"07-01 17:52:21.685","1_12end:":"07-01 17:52:22.038","1_13end:":"07-01 17:52:22.329","1_14end:":"07-01 17:52:22.583"}
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: stream={"2_1loadResult:":2,"2_1end:":"07-01 17:52:45.205","2_2loadResult:":2,"2_2end:":"07-01 17:52:45.446","2_3loadResult:":2,"2_3end:":"07-01 17:52:45.656","2_4loadResult:":2,"2_4end:":"07-01 17:52:45.865","2_5loadResult:":2,"2_5end:":"07-01 17:52:46.106","2_6loadResult:":2,"2_6end:":"07-01 17:52:46.350","2_7loadResult:":0,"2_7lastTime:":"07-01 17:52:46.106","2_7startScreenTime:":"07-01 17:52:46.352","2_7end:":"07-01 17:52:46.560","2_8end:":"07-01 17:52:46.787","2_9end:":"07-01 17:52:47.028","2_10end:":"07-01 17:52:47.280","2_11end:":"07-01 17:52:47.576","2_12end:":"07-01 17:52:47.852","2_13end:":"07-01 17:52:48.120","2_14end:":"07-01 17:52:48.401","2_15end:":"07-01 17:52:48.678"}
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: stream={"3_1loadResult:":2,"3_1end:":"07-01 17:53:11.986","3_2loadResult:":2,"3_2end:":"07-01 17:53:12.187","3_3loadResult:":2,"3_3end:":"07-01 17:53:12.454","3_4loadResult:":2,"3_4end:":"07-01 17:53:12.673","3_5loadResult:":2,"3_5end:":"07-01 17:53:12.937","3_6loadResult:":0,"3_6lastTime:":"07-01 17:53:12.673","3_6startScreenTime:":"07-01 17:53:12.938","3_6end:":"07-01 17:53:13.151","3_7end:":"07-01 17:53:13.355","3_8end:":"07-01 17:53:13.552","3_9end:":"07-01 17:53:13.751","3_10end:":"07-01 17:53:13.972","3_11end:":"07-01 17:53:14.215","3_12end:":"07-01 17:53:14.415","3_13end:":"07-01 17:53:14.634","3_14end:":"07-01 17:53:14.856","3_15end:":"07-01 17:53:15.053","3_16end:":"07-01 17:53:15.264","3_17end:":"07-01 17:53:15.544","3_18end:":"07-01 17:53:15.735","3_19end:":"07-01 17:53:15.978","3_20end:":"07-01 17:53:16.195","3_21end:":"07-01 17:53:16.419","3_22end:":"07-01 17:53:16.699","3_23end:":"07-01 17:53:16.934","3_24end:":"07-01 17:53:17.161","3_25end:":"07-01 17:53:17.412","3_26end:":"07-01 17:53:17.707","3_27end:":"07-01 17:53:18.014","3_28end:":"07-01 17:53:18.264"}
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: shortMsg=Process crashed.
+INSTRUMENTATION_CODE: 0

@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 import codecs
+import copy
 import csv
 import datetime
 import os
 
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
 from runner import Executor
+from tools import echo_to_file
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
 try:
@@ -89,15 +94,26 @@ if __name__ == "__main__":
 
 
 class LauncherModule(Executor):
-    def __init__(self, adb, work_out):
-        super(LauncherModule, self).__init__(adb, work_out)
+    # def __init__(self, adb, work_out):
+    #     super(LauncherModule, self).__init__(adb, work_out)
+
+    def __init__(self, child):
+        super(LauncherModule, self).__init__(child)
+        self.module_start = True
+        self.usedpkgs = dict([x for x in self.packages.items() if x[1].get('activities')])
+        self.temppkgs = copy.copy(self.usedpkgs)
+
+    def title(self):
+        return u'启动速度'
+
+    def desc(self):
+        return u'包含BBK自研应用启动速度，和核心模块(三个同步，好题精练，名师辅导，一键搜，视力保护，应用商店，英语听说)内部主要页面切换速度'
 
     def parsers(self):
         print u'应用内部切换时间解析'
-        print 'parsers app module'
         print self.work_out
         dir_dict = {}
-        work_dir = os.path.join(self.work_out, 'module')
+        work_dir = os.path.join(self.work_out, self.id())
         for root, dirs, files in os.walk(work_dir):
             for name in files:
                 if name == 'result.xml':
@@ -106,6 +122,15 @@ class LauncherModule(Executor):
                         dir_dict[os.path.basename(root)] = result
         data = self.parser_files(dir_dict)
         self.csv_generate(data, self.id())
+
+    def import_script(self):
+        super(LauncherModule, self).import_script()
+        package_list = []
+        print u'used packages :',self.usedpkgs
+        for key in self.usedpkgs.keys():
+            package_list.append(key)
+        if len(package_list) > 1:
+            echo_to_file(self.adb, package_list, self.data_work_path + '/choice.txt')
 
     def parser_files(self, file_dict):
         data = {}
@@ -154,7 +179,6 @@ class LauncherModule(Executor):
         writer.writerow(
             ['ID', '应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         for key, value in data.items():
-            # 启动时间
             exetime = value['exetime']
             rexetime = value['rexetime']
             errortime = value['errortime']
@@ -188,3 +212,118 @@ class LauncherModule(Executor):
                 print memory
                 writer.writerow(['', ''] + memory + [avg])
         csvfile.close()
+
+    def setup(self):
+        page = super(LauncherModule, self).setup()
+        # print self.packages
+
+        check = QCheckBox(u'继续上一次的测试,如果执行失败，帮助导出测试结果？')
+        check.setEnabled(False)
+
+        self.radio1 = QRadioButton(u'模块启动速度')
+        self.radio1.setChecked(self.module_start)
+        self.radio1.toggled[bool].connect(self.radio1Toggled)
+        self.radio2 = QRadioButton(u'页面切换速度')
+        self.radio1.toggled[bool].connect(self.radio2Toggled)
+
+        self.radio3 = QRadioButton(u'冷启动')
+        self.radio4 = QRadioButton(u'热启动')
+        self.radio3.setCheckable(False)
+        self.radio4.setCheckable(False)
+        self.radio3.setEnabled(False)
+        self.radio4.setEnabled(False)
+
+        self.edit1 = QLineEdit(str(5))
+        self.edit1.setValidator(QIntValidator())
+        gridLayout = QGridLayout()
+        gridLayout.addWidget(QLabel(u'测试次数'), 0, 0)
+        gridLayout.addWidget(self.edit1, 0, 1)
+        gridLayout.addWidget(self.radio3, 1, 0)
+        gridLayout.addWidget(self.radio4, 2, 0)
+
+        itemLayout = QVBoxLayout()
+        itemLayout.addWidget(self.radio1)
+
+        buttonlayout = QGridLayout()
+        buttonlayout.addWidget(QLabel(u'常用组合:'), 0, 0)
+        selall = QCheckBox(u'全选')
+        selsyn = QCheckBox(u'核心模块')
+        selother = QCheckBox(u'除核心模块外的其它')
+
+        buttonlayout.addWidget(selall, 1, 1)
+        buttonlayout.addWidget(selsyn, 2, 1)
+        buttonlayout.addWidget(selother, 3, 1)
+        itemLayout.addLayout(buttonlayout)
+
+        itemLayout.addWidget(self.radio2)
+        itemLayout.addStretch()
+        itemLayout.addLayout(gridLayout)
+        self.itemGroup = QGroupBox(u'启动速度测试参数')
+        self.itemGroup.setLayout(itemLayout)
+
+        selall.setCheckState(Qt.Checked)
+        selall.stateChanged[int].connect(self.selallChanged)
+        selsyn.stateChanged[int].connect(self.selsynChanged)
+        selother.stateChanged[int].connect(self.selotherChanged)
+        self.list = QListWidget(page.wizard())
+        self.list.itemChanged.connect(self.itemChanged)
+
+        # selall = QListWidgetItem(u'全选')
+        # selall.setData(1, QVariant('selall'))
+        # self.list.addItem(selall)
+        for key in self.temppkgs.keys():
+            item = QListWidgetItem(key)
+            item.setCheckState(Qt.Checked)
+            item.setData(1, QVariant(key))
+            self.list.addItem(item)
+        listLayout = QVBoxLayout()
+        listLayout.addWidget(self.list)
+        self.listGroup = QGroupBox(u'模块启动可选包名')
+        self.listGroup.setLayout(listLayout)
+
+        itemLayout = QHBoxLayout()
+        itemLayout.addWidget(self.itemGroup)
+        itemLayout.addWidget(self.listGroup)
+        itemLayout.setStretch(0, 1)
+        itemLayout.setStretch(1, 3)
+
+        layout = QVBoxLayout()
+        layout.addWidget(check)
+        layout.addLayout(itemLayout)
+        page.setLayout(layout)
+
+        return page
+
+    def itemChanged(self, item):
+        pkg = str(item.data(1).toPyObject())
+        if pkg == 'selall':
+            for i in range(self.list.count()):
+                self.list.item(i).setCheckState(item.checkState())
+        else:
+            if item.checkState() == Qt.Checked:
+                self.usedpkgs[pkg] = self.temppkgs.get(pkg)
+            else:
+                self.usedpkgs.pop(pkg, 'None')
+
+    def radio1Toggled(self, checked):
+        self.module_start = True
+        self.listGroup.setDisabled(checked)
+
+    def radio2Toggled(self, checked):
+        self.module_start = False
+        self.listGroup.setDisabled(not checked)
+
+    def selallChanged(self, state):
+        print state
+        for i in range(self.list.count()):
+            self.list.item(i).setCheckState(state)
+            # print self.list.item(i)
+            # print  self.list.item(i)
+            pkg = str(self.list.item(i).data(1).toPyObject())
+            # print pkg
+
+    def selsynChanged(self, state):
+        print state
+
+    def selotherChanged(self, state):
+        print state

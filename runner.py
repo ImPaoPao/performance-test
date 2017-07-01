@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import adbkit
 import os
 import platform
 import shutil
 import tarfile
 import time
 from abc import ABCMeta, abstractmethod
+
+from PyQt4.QtGui import QWizardPage
 
 from tools import echo_to_file
 
@@ -17,15 +18,38 @@ DATA_LOCAL_TMP = '/data/local/tmp'
 class Executor(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, adb, work_out):
-        self.adb = adb
-        self.work_out = work_out
-        self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
+    def __init__(self, child):
+        self.child = child
+        self.adb = child.adb
+        self.work_out = child.workout
+        self.packages = child.packages
         self.work_dir = WORK_DIR
+        self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
+
+    # def __init__(self, adb, work_out):
+    #     self.adb = adb
+    #     self.work_out = work_out
+    #     self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
+    #     self.work_dir = WORK_DIR
+
+    def setup(self):
+        page = QWizardPage()
+        page.setTitle(self.title())
+        page.setSubTitle(self.desc())
+        page.setFinalPage(True)
+        return page
 
     @classmethod
     def id(cls):
         return cls.__module__.split('.')[-1].strip()
+
+    @abstractmethod
+    def title(self):
+        pass
+
+    @abstractmethod
+    def desc(self):
+        pass
 
     def __kill_track(self):
         self.adb.shell('kill -9 {0}{1}/busybox pidof busybox{0}'.format('`' if DEBUG else '\\`', self.data_work_path))
@@ -36,7 +60,7 @@ class Executor(object):
     def start(self, *args):
         self.shell(('start',) + args + ('>' if DEBUG else '\\>', '%s/nohup.txt' % self.data_work_path), True)
 
-    def execute(self):
+    def execute(self, log):
         print u'正在导入 %s 测试脚本' % self.id()
         self.import_script()
         self.__kill_track()

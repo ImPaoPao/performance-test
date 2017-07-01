@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-import adbkit
 import glob
 import os
-import re
-import subprocess
 import sys
-import time
+
 from runner import Executor
 
 try:
@@ -14,7 +11,7 @@ except ImportError:
     import xml.etree.ElementTree as ET
 import csv
 import codecs
-from tools import get_packages
+from tools import get_packages, echo_to_file
 
 WORK_DIR = os.path.dirname(os.path.abspath(__file__))
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'work-results')
@@ -23,12 +20,21 @@ DATA_WORK_PATH = '/data/local/tmp/launch'
 
 
 class LauncherApp(Executor):
-    def __init__(self,adb,work_out):
-        super(LauncherApp, self).__init__(adb, work_out)
+    def __init__(self, child):
+        super(LauncherApp, self).__init__(child)
+
+    def title(self):
+        return u'XXXXXX功能(待扩展功能)......'
+
+    def desc(self):
+        return u'XXXXXXXX功能说明描述信息。'
+
+    def setup(self):
+        page = super(LauncherApp, self).setup()
+        return page
 
     def import_script(self):
         super(LauncherApp, self).import_script()
-        self.adb.install(os.path.join(self.data_work_path))
         self.generate_launch_file()
 
     def parsers(self):
@@ -38,13 +44,13 @@ class LauncherApp(Executor):
         for dir in dirs:
             if os.path.exists(os.path.join(dir, 'cool.xml')):
                 pkg_name = os.path.basename(dir)
-                xml_data = xml_parser('cool', os.path.join(dir, 'cool.xml'))
-                data += xml_data
+                # xml_data = xml_parser('cool', os.path.join(dir, 'cool.xml'))
+                # data += xml_data
                 print 'cool'
             if os.path.exists(os.path.join(dir, 'warm.xml')):
-                pkg_name = os.path.basename(dir)
-                xml_data = xml_parser('warm', os.path.join(dir, 'warm.xml'))
-                data += xml_data
+                # pkg_name = os.path.basename(dir)
+                # # xml_data = xml_parser('warm', os.path.join(dir, 'warm.xml'))
+                # data += xml_data
                 print 'warm'
         self.csv_generate(data, 'launch')
 
@@ -74,8 +80,6 @@ class LauncherApp(Executor):
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
         writer.writerow(['应用包名', '类名', '应用大小(KB)', '启动类型', '启动时间(默认启动五次，单位：ms)', '平均值(去掉一个最大值、一个最小值再取平均)'])
-        # [{'activname': '.bookshelf.MainBookShelf', 'total': '34368', 'type':'cool',
-        # details': ['2650', '1746', '1837'], 'package': 'com.eebbk.synmath'}]
         for item in data:
             package = item['package']
             type = item['type']
@@ -96,10 +100,8 @@ class LauncherApp(Executor):
         count = 5
         selected_packages = []
         packages = get_packages(self.adb)
-        print packages
+        print u'生成测试文件'
         if len(sys.argv) > 1:
-            print sys.argv[1]
-            print '=================='
             pkg_path = sys.argv[1]
             if os.path.exists(pkg_path):
                 with open(pkg_path, 'r') as f:

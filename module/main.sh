@@ -12,8 +12,8 @@ echo $1 >> ${exe_log}
 case $1 in
 	"start")
 		echo $$ > ${workdir}/pid
-		#pm install -r ${workdir}/performance-test-debug-androidTest.apk
-		#pm install -r ${workdir}/performance-test-debug.apk
+		pm install -r ${workdir}/performance-test-debug-androidTest.apk
+		pm install -r ${workdir}/performance-test-debug.apk
 		while read line
 		do
 			params=(${line})
@@ -28,22 +28,22 @@ case $1 in
 			sys_num=${params[7]}
 			app_num=${params[8]}
 			mkdir -p ${datadir}/${test_number}
-			top -m 5 >/sdcard/top.txt &
-			tpid=$!
+			#top -m 5 >/sdcard/top.txt &
+			#tpid=$!
 			#logcat -s ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
-			logcat -s ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
-			lpid=$!
+			#logcat  -v time -s ActivityStackSupervisor:I ActivityManagerService:I ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
+			#logcat -s ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
+			#lpid=$!
 			echo ${pid} ${lpid} > ${workdir}/pid
 			mkdir -p ${workout}/${test_number}
 			am instrument -w -r  -e number ${test_number} -e mpackage ${source_package} -e type ${test_type} -e appnum ${app_num} -e class ${test_package}.${test_case}\#${test_method} -e count ${test_count} com.eebbk.test.performance.test/android.support.test.runner.AndroidJUnitRunner>${workout}/${test_number}/instrument.txt
-			kill -9 ${lpid}
-			kill -9 ${tpid}
+			#kill -9 ${lpid}
+			#kill -9 ${tpid}
 			cp -f ${datadir}/${test_number}/* ${workout}/${test_number}
-			cp -f /sdcard/log.txt ${workout}/${test_number}
-			cp -f /sdcard/top.txt ${workout}/${test_number}
+			#cp -f /sdcard/log.txt ${workout}/${test_number}
+			#cp -f /sdcard/top.txt ${workout}/${test_number}
 			sleep 5
-		done < ${workdir}/thirdapp.txt
-		echo "done end ...." >> ${exe_log}
+		done < ${workdir}/module.txt
 		echo "done" >> ${trackfile}
 		;;
 	"stop")

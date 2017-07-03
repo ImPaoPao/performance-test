@@ -7,6 +7,8 @@ import tarfile
 import time
 from abc import ABCMeta, abstractmethod
 
+from tools import echo_to_file
+
 DEBUG = platform.system() == 'Windows'
 WORK_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_LOCAL_TMP = '/data/local/tmp'

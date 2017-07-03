@@ -3,10 +3,10 @@ import codecs
 import csv
 import datetime
 import os
-import platform
-import re
-import adbkit
 import sys
+import time
+
+import adbkit
 from runner import Executor
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
@@ -66,6 +66,7 @@ dict1 = {'launchEnglishTalk': '英语听说', 'launchSynChinese': '同步语文'
          'showVtMoreList': '点击首页更多精彩→课程列表页面，加载完成'
          }
 
+
 def get_exetime(starttime, endtime):
     exetime = 0
     if starttime and endtime:
@@ -86,12 +87,9 @@ def get_exetime(starttime, endtime):
     return exetime
 
 
-
 def run(adb, serialno, type):
     work_out = os.path.join(WORK_OUT, str(serialno), time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
     LauncherModule(adb, work_out).execute()
-
-
 
 
 class LauncherModule(Executor):
@@ -126,7 +124,7 @@ class LauncherModule(Executor):
             else:
                 segments = root.findall('Segment')
                 data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
-                             'loadresult': []}
+                             'loadresult': [], 'errortime': []}
                 for segment in segments:
                     memory = segment.get('memory')
                     if memory != None:
@@ -136,34 +134,44 @@ class LauncherModule(Executor):
                         starttime = segment.get('starttime')
                         endtime = segment.get('endtime')
                         loadtime = segment.get('loadtime')
+                        lasttime = segment.get('lasttime')
+                        # rlasttime = segment.get('rlasttime')
                         refreshtime = segment.get('refreshtime')
                         loadresult = segment.get('loadresult')
                         refreshresult = segment.get('refreshresult')
                         exe_time = get_exetime(starttime, loadtime)
                         rexe_time = get_exetime(starttime, refreshtime)
+                        error_time = get_exetime(lasttime, loadtime)
                         run_time = get_exetime(starttime, endtime)
                         data[key]['exetime'].append(exe_time)
                         data[key]['rexetime'].append(rexe_time)
                         data[key]['loadresult'].append(loadresult)
                         data[key]['refreshresult'].append(refreshresult)
                         data[key]['runtime'].append(run_time)
+                        data[key]['errortime'].append(error_time)
         return data
 
     def csv_generate(self, data, filename):
         csvfile = file(os.path.join(self.work_out, filename + '.csv'), 'wb')
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
-        writer.writerow(['ID', '应用名称','测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
+        writer.writerow(
+            ['ID', '应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         for key, value in data.items():
             # 启动时间
             exetime = value['exetime']
             rexetime = value['rexetime']
+            errortime = value['errortime']
             loadresult = value['loadresult']
             refreshresult = value['refreshresult']
             writer.writerow([key])
-            print exetime
+            print u'运行时间:', exetime
+            print u'最大误差:', errortime
             if exetime:
-                writer.writerow(['',dict1[key] if key in dict1 else key, '点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
+                writer.writerow(['', dict1[key] if key in dict1 else key, '点击-页面出现'] + exetime + [
+                    sum(exetime) / (len(exetime) if exetime else 1)])
+            if errortime:
+                writer.writerow(['', '', '最大误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
@@ -193,4 +201,4 @@ if __name__ == "__main__":
     for device in all_connect_devices:
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
-            LauncherModule(adb, r'C:\Users\admin\eebbk-results\H8SM1700000022\2017-06-14-10-59-34').parsers()
+            LauncherModule(adb, r'C:\Users\admin\eebbk-results\8FEX46BES8\2017-07-03-17-21-47').parsers()

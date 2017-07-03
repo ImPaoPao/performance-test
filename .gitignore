@@ -1,12 +1,13 @@
 # Byte-compiled / optimized / DLL files
 #__pycache__/
-#*.py[cod]
+*.py[cod]
 
+*.apk
 # Idea project files
-#.idea/
+.idea/
 
 # Sqlite database files
-#*.sqlite3
+*.sqlite3
 
 # Log files
 #*.log
@@ -15,7 +16,7 @@
 #*.txt
 
 # Lock files
-#*.lock
+*.lock
 
 # Deploy files
 #deploy/

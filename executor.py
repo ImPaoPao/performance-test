@@ -13,9 +13,9 @@ from PyQt4.QtGui import *
 
 import runner
 from common import workdir, getconfig
-
 import module
 import launch
+
 class BuildSetupWizard(QWizard):
     def __init__(self, parent):
         super(BuildSetupWizard, self).__init__(parent)
@@ -55,11 +55,13 @@ class BuildSetupWizard(QWizard):
         page.setTitle(u'测试准备')
         page.setSubTitle(u'选择测试开始前的准备动作。')
         page.setFinalPage(True)
-        edittext = QLabel()
-        edittext.setText(u'待扩展补充.......例如:安装三方应用......')
+        edittext1 = QLabel(u'1.导入三个同步课本资源')
+        edittext2 = QLabel(u'2.模块启动部分应用需要登录BBK账号')
+        edittext3 = QLabel(u'3.核心模块部分用例不需要登录账号')
         layout = QVBoxLayout()
-        layout.addWidget(edittext)
-        layout.addWidget(edittext)
+        layout.addWidget(edittext1)
+        layout.addWidget(edittext2)
+        layout.addWidget(edittext3)
         page.setLayout(layout)
         return page
 
@@ -81,39 +83,23 @@ class SetupExecuteThread(QThread):
 
     def run(self):
         self.log(u'正在设置设备')
-        # self.adb.kit.wakeup()
-        # self.adb.kit.disablekeyguard()
-        # self.adb.kit.keepscreenon()
+        #亮屏 解锁
+        self.adb.kit.wakeup()
 
         start = time.time()
         update = True
-        # if self.executor:
-        #     for item in self.executor.values():
-        #         if item.title() == '系统升级':
-        #             self.log(u'正在执行{0}'.format(item.title()))
-        #             if not item.execute(self.log):
-        #                 update = False
         if update:
             # if self.login:
-            #     self.log(u'正在登录预置的应用帐号')
+            #     self.log(u'登录BBK账号')
             #     loginaccounts(self.adb)
 
             # if self.datatype:
-            #     self.log(u'正在导入预置的用户数据')
+            #     self.log(u'导入书本资源数据')
             #     importdata(self.adb, self.datatype)
-
-            # if self.getlog:
-            #     self.log(u'正在打开离线日志开关')
-            #     common.openlog(self.adb)
-            print 'exeutor run.........'
             if self.executor:
                 for item in self.executor.values():
-                    # if item.title() != '系统升级':
-                    #     self.log(u'正在执行{0}'.format(item.title()))
-                    print 'item',item
                     item.execute(self.log)
         self.log(u'正在生成测试报告')
-        # chart.run(self.workout, 'test')
 
         self.log(u'所有任务完成，共耗时{0}秒'.format(round(time.time() - start, 3)))
 
@@ -149,8 +135,8 @@ class ChildWindow(QWidget):
         self.workout = os.path.join(self.workout, self.info['版本号'])
         if not os.path.exists(self.workout):
             os.mkdir(self.workout)
-        #开始时间
-        self.workout = os.path.join(self.workout,time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+        # 开始时间
+        self.workout = os.path.join(self.workout, time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
         if not os.path.exists(self.workout):
             os.mkdir(self.workout)
 
@@ -192,22 +178,12 @@ class ChildWindow(QWidget):
         self.setWindowTitle(self.userFriendlyCurrentDevice())
 
     def loginAccounts(self):
-        if QMessageBox.question(self, u'登录帐号', u'<p>是否登录预置应用帐号</p><p>如需登录请先切换至英文输入法</p>',
-                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes) == QMessageBox.Yes:
-            self.t = SetupExecuteThread(self.adb, login=True)
-            self.t.logged.connect(self.showMessage)
-            self.t.start()
+        #登录bbk账号
+        pass
 
     def importData(self):
-        datadir = getconfig('datadir')
-        if os.path.exists(datadir):
-            items = os.listdir(datadir)
-            items = [x for x in items if os.path.isdir(os.path.join(datadir, x))]
-            item, ok = QInputDialog.getItem(self, u'导入数据', u'选择数据类型：', items, 0, False)
-            if ok and item:
-                self.t = SetupExecuteThread(self.adb, datatype=str(item))
-                self.t.logged.connect(self.showMessage)
-                self.t.start()
+        #导入资源数据
+        pass
 
     def executeBuildTest(self):
         self.login = False
@@ -247,16 +223,10 @@ class ChildWindow(QWidget):
         self.selallButton.clicked.connect(self.buttonClicked)
         self.disallButton = QPushButton(u'反选')
         self.disallButton.clicked.connect(self.buttonClicked)
-        # self.upButton = QPushButton(u'上移')
-        # self.upButton.clicked.connect(self.buttonClicked)
-        # self.downButton = QPushButton(u'下移')
-        # self.downButton.clicked.connect(self.buttonClicked)
         buttonBox = QDialogButtonBox(Qt.Vertical)
         buttonBox.addButton(self.okButton, QDialogButtonBox.ActionRole)
         buttonBox.addButton(self.selallButton, QDialogButtonBox.ActionRole)
         buttonBox.addButton(self.disallButton, QDialogButtonBox.ActionRole)
-        # buttonBox.addButton(self.upButton, QDialogButtonBox.ActionRole)
-        # buttonBox.addButton(self.downButton, QDialogButtonBox.ActionRole)
 
         layout = QHBoxLayout()
         layout.addWidget(self.listWidget)
@@ -265,14 +235,12 @@ class ChildWindow(QWidget):
 
     def buttonClicked(self):
         sender = self.sender()
-        print u'运行?: ', sender == self.okButton
         if sender == self.okButton:
             self.checkDict = {}
             for i in range(self.listWidget.count()):
                 item = self.listWidget.item(i)
                 if item.checkState() == Qt.Checked:
                     self.checkDict[i] = copy.copy(self.executor.get(item.data(1).toPyObject()))
-            print u'选中的测试项',self.checkDict
             self.executeBuildTest()
         elif sender == self.selallButton:
             for i in range(self.listWidget.count()):

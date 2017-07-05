@@ -43,7 +43,7 @@ case $1 in
 			#cp -f /sdcard/log.txt ${workout}/${test_number}
 			#cp -f /sdcard/top.txt ${workout}/${test_number}
 			sleep 5
-		done < ${workdir}/all.txt
+		done < ${workdir}/choice.txt
 		echo "done" >> ${trackfile}
 		;;
 	"stop")

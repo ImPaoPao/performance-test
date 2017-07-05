@@ -26,12 +26,6 @@ class Executor(object):
         self.work_dir = WORK_DIR
         self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
 
-    # def __init__(self, adb, work_out):
-    #     self.adb = adb
-    #     self.work_out = work_out
-    #     self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
-    #     self.work_dir = WORK_DIR
-
     def setup(self):
         page = QWizardPage()
         page.setTitle(self.title())
@@ -61,9 +55,11 @@ class Executor(object):
         self.shell(('start',) + args + ('>' if DEBUG else '\\>', '%s/nohup.txt' % self.data_work_path), True)
 
     def execute(self, log):
+        log(u'正在导入 %s 测试脚本' % self.title())
         print u'正在导入 %s 测试脚本' % self.id()
         self.import_script()
         self.__kill_track()
+        log(u'正在执行 %s 测试' % self.title())
         print u'正在执行 %s 测试' % self.id()
         self.start()
         self.adb.shell('touch %s/track' % self.data_work_path)
@@ -80,11 +76,13 @@ class Executor(object):
                     self.track(line.strip())
             p.terminate()
             self.__kill_track()
-        print u'%s测试执行完成' % self.id()
+        print u'%s 测试执行完成' % self.id()
+        log(u'%s 测试执行完成' % self.title())
         self.shell(('done',)).wait()
+        log(u'正在导出 %s 测试数据' % self.title())
         print u'正在导出 %s 测试数据' % self.id()
         self.export_result()
-
+        log(u'生成 %s 报告' % self.title())
         print u'生成 %s 报告' % self.id()
         self.parsers()
 
@@ -93,7 +91,6 @@ class Executor(object):
         pass
 
     def shell(self, args, nohup=False):
-        print 'shell====== ', args
         pattern = '{0}{1}/busybox nohup sh {1}/main.sh {2}{0}' if nohup else '{0}sh {1}/main.sh {2}{0}'
         return self.adb.shell_open(pattern.format('"' if DEBUG else '\\"', self.data_work_path, ' '.join(args)))
 

@@ -1,10 +1,11 @@
 # Byte-compiled / optimized / DLL files
 #__pycache__/
 *.py[cod]
-
+out/
 *.apk
 # Idea project files
 .idea/
+.idea/workspace.xml
 
 # Sqlite database files
 *.sqlite3

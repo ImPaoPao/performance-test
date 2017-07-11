@@ -8,6 +8,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from common import workdir
 from runner import Executor
 from tools import echo_to_file
 
@@ -124,11 +125,11 @@ class LauncherModule(Executor):
                         dir_dict[os.path.basename(root)] = result
         data = self.parser_files(dir_dict)
         self.csv_generate(data, self.id())
+        print u'完成'
 
     def import_script(self):
         super(LauncherModule, self).import_script()
         package_list = []
-        print u'used cases :', self.usedcases
         for key, value in self.usedcases.items():
             package_list.append(" ".join(str(i) for i in
                                          ['com.eebbk.test.performance', value['clsname'], key, key, self.count,
@@ -139,7 +140,6 @@ class LauncherModule(Executor):
     def parser_files(self, file_dict):
         data = {}
         for key, value in file_dict.items():
-            print u'用例：', key
             result = value
             try:
                 tree = ET.parse(result)
@@ -149,7 +149,7 @@ class LauncherModule(Executor):
             else:
                 segments = root.findall('Segment')
                 data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
-                             'loadresult': [], 'errortime': []}
+                             'loadresult': [], 'errortime': [], 'lastloadresult': []}
                 for segment in segments:
                     memory = segment.get('memory')
                     if memory != None:
@@ -160,20 +160,39 @@ class LauncherModule(Executor):
                         endtime = segment.get('endtime')
                         loadtime = segment.get('loadtime')
                         lasttime = segment.get('lasttime')
-                        # rlasttime = segment.get('rlasttime')
                         refreshtime = segment.get('refreshtime')
                         loadresult = segment.get('loadresult')
+                        # lastloadresult = segment.get('loadresult')
+                        print u'上一次匹配度', loadresult, type(loadresult)
                         refreshresult = segment.get('refreshresult')
-                        exe_time = get_exetime(starttime, loadtime)
                         error_time = get_exetime(lasttime, loadtime)
-                        rexe_time = get_exetime(starttime, refreshtime)
+                        temptime = get_exetime(starttime, lasttime)
+                        if int(loadresult) <= 10:
+                            print key, 'lasttime ==============='
+                            exe_time = temptime  # + error_time / 4
+                            rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
+                        # elif (int(loadresult) < 15 and int(loadresult) > 10):
+                        #     print key, 'lasttime + 1/4 ==============='
+                        #     exe_time = temptime + error_time * 1 / 4
+                        #     rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                        else:
+                            if ('EnglishTalk' in key or 'launchVtraining' == key) and (
+                                            int(loadresult) < 15 and int(loadresult) > 10):
+                                print 'english talk ==========='
+                                print key, 'lasttime + 1/4 ==============='
+                                exe_time = temptime + error_time * 1 / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                            else:
+                                print key, 'lasttime  1/2 '
+                                exe_time = temptime + error_time / 2
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
                         run_time = get_exetime(starttime, endtime)
                         data[key]['exetime'].append(exe_time)
                         data[key]['rexetime'].append(rexe_time)
                         data[key]['loadresult'].append(loadresult)
                         data[key]['refreshresult'].append(refreshresult)
                         data[key]['runtime'].append(run_time)
-                        data[key]['errortime'].append(error_time)
+                        data[key]['errortime'].append(error_time / 2)
         return data
 
     def csv_generate(self, data, filename):
@@ -181,29 +200,24 @@ class LauncherModule(Executor):
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
         writer.writerow(
-            ['ID', '应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
+            ['ID', '用例名', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         for key, value in data.items():
             exetime = value['exetime']
             rexetime = value['rexetime']
             errortime = value['errortime']
             loadresult = value['loadresult']
+            # lastloadresult = value['lastloadresult']
             refreshresult = value['refreshresult']
-            writer.writerow([key])
-            print u'运行时间:', exetime
-            print u'最大误差:', errortime
             if exetime:
-                writer.writerow(['', dict1[key] if key in dict1 else key, '点击-页面出现'] + exetime + [
+                writer.writerow([key, self.usedcases[key]['label'], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
-            if errortime:
-                writer.writerow(['', '', '最大误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
-            # if loadresult:
-            #     writer.writerow(['', '', '匹配度'] + [0] + loadresult)
-            # if refreshresult:
-            #     writer.writerow(['', '', '匹配度'] + [0] + refreshresult)
-
+            if errortime:
+                writer.writerow(['', '', '最大误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+            if loadresult:
+                writer.writerow(['', '', '上一次匹配度'] + loadresult + [0])
             # 可用内存
             memory = value['memory']
             if memory:
@@ -212,14 +226,12 @@ class LauncherModule(Executor):
                     if item:
                         add += float(item.split(' ')[0].strip())
                 avg = add / len(memory)
-                print avg
-                print memory
                 writer.writerow(['', ''] + memory + [avg])
         csvfile.close()
 
     def setup(self):
         page = super(LauncherModule, self).setup()
-        mfile = r'D:\bbk-test-center\EebbkTestCenter\performance-test\testcase.ini'
+        mfile = os.path.join(workdir, 'testcase.ini')
         self.usedcases = {}
         if os.path.exists(mfile):
             with open(mfile, 'rb') as f:

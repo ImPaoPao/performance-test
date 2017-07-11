@@ -7,7 +7,6 @@ import sys
 import time
 
 import adbkit
-from runner import Executor
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
 try:
@@ -92,9 +91,20 @@ def run(adb, serialno, type):
     LauncherModule(adb, work_out).execute()
 
 
-class LauncherModule(Executor):
+class LauncherModule():
     def __init__(self, adb, work_out):
-        super(LauncherModule, self).__init__(adb, work_out)
+        self.adb = adb
+        self.work_out = work_out
+
+    @classmethod
+    def id(cls):
+        return cls.__module__.split('.')[-1].strip()
+
+    def title(self):
+        pass
+
+    def desc(self):
+        pass
 
     def parsers(self):
         print u'应用内部切换时间解析'
@@ -124,31 +134,45 @@ class LauncherModule(Executor):
             else:
                 segments = root.findall('Segment')
                 data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
-                             'loadresult': [], 'errortime': []}
+                             'loadresult': [], 'errortime': [], 'lastloadresult': []}
                 for segment in segments:
                     memory = segment.get('memory')
                     if memory != None:
                         if '/' in memory:
                             data[key]['memory'].append(memory.split('/')[0])
-                    else:
-                        starttime = segment.get('starttime')
-                        endtime = segment.get('endtime')
-                        loadtime = segment.get('loadtime')
-                        lasttime = segment.get('lasttime')
-                        # rlasttime = segment.get('rlasttime')
-                        refreshtime = segment.get('refreshtime')
-                        loadresult = segment.get('loadresult')
-                        refreshresult = segment.get('refreshresult')
-                        exe_time = get_exetime(starttime, loadtime)
-                        rexe_time = get_exetime(starttime, refreshtime)
-                        error_time = get_exetime(lasttime, loadtime)
-                        run_time = get_exetime(starttime, endtime)
-                        data[key]['exetime'].append(exe_time)
-                        data[key]['rexetime'].append(rexe_time)
-                        data[key]['loadresult'].append(loadresult)
-                        data[key]['refreshresult'].append(refreshresult)
-                        data[key]['runtime'].append(run_time)
-                        data[key]['errortime'].append(error_time)
+                        else:
+                            starttime = segment.get('starttime')
+                            endtime = segment.get('endtime')
+                            loadtime = segment.get('loadtime')
+                            lasttime = segment.get('lasttime')
+                            refreshtime = segment.get('refreshtime')
+                            loadresult = segment.get('loadresult')
+                            lastloadresult = segment.get('lastloadresult')
+                            print u'上一次匹配度', lastloadresult, type(lastloadresult)
+                            refreshresult = segment.get('refreshresult')
+                            error_time = get_exetime(lasttime, loadtime)
+                            temptime = get_exetime(starttime, lasttime)
+                            if int(lastloadresult) <= 5:
+                                print key, 'lasttime  ==============='
+                                exe_time = temptime
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time
+                            elif int(lastloadresult) > 10:
+                                print key, 'lasttime + 3/4 ==============='
+                                exe_time = temptime + error_time * 3 / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 4
+                            else:
+                                print key, 'lasttime  1/2 '
+                                exe_time = temptime + error_time / 2
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                            # rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                            run_time = get_exetime(starttime, endtime)
+                            data[key]['exetime'].append(exe_time)
+                            data[key]['rexetime'].append(rexe_time)
+                            data[key]['loadresult'].append(loadresult)
+                            data[key]['lastloadresult'].append(lastloadresult)
+                            data[key]['refreshresult'].append(refreshresult)
+                            data[key]['runtime'].append(run_time)
+                            data[key]['errortime'].append(error_time / 2)
         return data
 
     def csv_generate(self, data, filename):
@@ -164,6 +188,7 @@ class LauncherModule(Executor):
             errortime = value['errortime']
             loadresult = value['loadresult']
             refreshresult = value['refreshresult']
+            lastloadresult = value['lastloadresult']
             writer.writerow([key])
             print u'运行时间:', exetime
             print u'最大误差:', errortime
@@ -175,6 +200,8 @@ class LauncherModule(Executor):
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+            if loadresult:
+                writer.writerow(['', '', '上一次匹配度'] + lastloadresult + [0])
             # if loadresult:
             #     writer.writerow(['', '', '匹配度'] + [0] + loadresult)
             # if refreshresult:
@@ -198,7 +225,8 @@ if __name__ == "__main__":
     print "fffffffffffffff"
     threads = []
     all_connect_devices = adbkit.devices()
+    print sys.argv[2]
     for device in all_connect_devices:
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
-            LauncherModule(adb, r'C:\Users\admin\eebbk-results\8FEX46BES8\2017-07-03-17-21-47').parsers()
+            LauncherModule(adb, sys.argv[2]).parsers()

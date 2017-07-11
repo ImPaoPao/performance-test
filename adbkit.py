@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 import os
-import re
-import subprocess
-import time
 import platform
+import re
+import signal
+import subprocess
 import threading
-DATA_LOCAL_TMP='/data/local/tmp'
+import time
 
-from common import  workdir
+from tools import get_prop
+
+DATA_LOCAL_TMP = '/data/local/tmp'
+
 
 def devices(host=None):
     results = []

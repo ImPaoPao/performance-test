@@ -36,7 +36,7 @@ if __name__ == "__main__":
         threads = []
         all_connect_devices = adbkit.devices()
         for device in all_connect_devices:
-            if device['serialno'] in sys.argv:
+            if m in sys.argv:
                 adb = adbkit.Adb(device)
                 print device['serialno'], '.......threading...............'
                 t = threading.Thread(target=run, args=(adb, device['serialno'], 'module'))

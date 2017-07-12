@@ -1,4 +1,0 @@
-package:com.eebbk.synmath
-package:com.eebbk.synchinese
-package:com.eebbk.syncenglish
-package:com.eebbk.onesearch

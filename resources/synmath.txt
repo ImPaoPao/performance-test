@@ -1,8 +1,0 @@
-com.eebbk.test.performance SyncMathTestCase addMathBook addMathBook 10 com.eebbk.synmath cool
-com.eebbk.test.performance SyncMathTestCase showSynMathBook showSynMathBook 10 com.eebbk.synmath cool
-com.eebbk.test.performance SyncMathTestCase changeSynMathBook changeSynMathBook 10 com.eebbk.synmath cool
-com.eebbk.test.performance SyncMathTestCase showExplanationSynMathContent showExplanationSynMathContent 10 com.eebbk.synmath cool
-com.eebbk.test.performance SyncMathTestCase downloadExplanatinSynMathContent downloadExplanatinSynMathContent 10 com.eebbk.synmath cool
-com.eebbk.test.performance SyncMathTestCase refreshSynMath refreshSynMath 10 com.eebbk.synmath cool
-com.eebbk.test.performance SyncMathTestCase showDetailsSynMathBook showDetailsSynMathBook 10 com.eebbk.synmath cool
-com.eebbk.test.performance SyncMathTestCase showExplanationSynMathBook showExplanationSynMathBook 10 com.eebbk.synmath cool

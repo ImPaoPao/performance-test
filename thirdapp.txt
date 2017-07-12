@@ -1,6 +1,0 @@
-com.eebbk.test.performance ThirdAppTestCase launchHeadline launchHeadline 3 com.ss.android.article.news 0 0 0
-com.eebbk.test.performance ThirdAppTestCase launchMeiYan launchMeiYan 3 com.meitu.meiyancamera 0 0 0
-com.eebbk.test.performance ThirdAppTestCase launchQiYi launchQiYi 3 com.qiyi.video 0 0 0
-com.eebbk.test.performance ThirdAppTestCase launchTaoBao launchTaoBao 3 com.taobao.taobao 0 0 0
-com.eebbk.test.performance ThirdAppTestCase launchQQMusic launchQQMusic 3 com.tencent.qqmusic 0 0 0
-com.eebbk.test.performance ThirdAppTestCase launchKing launchKing 0 com.tencent.tmgp.sgame 0 0 0

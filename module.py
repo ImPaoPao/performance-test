@@ -176,16 +176,16 @@ class LauncherModule(Executor):
                         #     exe_time = temptime + error_time * 1 / 4
                         #     rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
                         else:
-                            if ('EnglishTalk' in key or 'launchVtraining' == key) and (
-                                            int(loadresult) < 15 and int(loadresult) > 10):
-                                print 'english talk ==========='
-                                print key, 'lasttime + 1/4 ==============='
-                                exe_time = temptime + error_time * 1 / 4
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
-                            else:
-                                print key, 'lasttime  1/2 '
-                                exe_time = temptime + error_time / 2
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                            # if ('EnglishTalk' in key or 'launchVtraining' == key) and (
+                            #                 int(loadresult) < 15 and int(loadresult) > 10):
+                            # print 'english talk ==========='
+                            print key, 'lasttime + 1/4 ==============='
+                            exe_time = temptime + error_time * 1 / 4
+                            rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                            # else:
+                            #     print key, 'lasttime  1/2 '
+                            #     exe_time = temptime + error_time / 2
+                            #     rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
                         run_time = get_exetime(starttime, endtime)
                         data[key]['exetime'].append(exe_time)
                         data[key]['rexetime'].append(rexe_time)

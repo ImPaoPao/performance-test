@@ -12,8 +12,8 @@ echo $1 >> ${exe_log}
 case $1 in
 	"start")
 		echo $$ > ${workdir}/pid
-		pm install -r ${workdir}/performance-test-debug-androidTest.apk
-		pm install -r ${workdir}/performance-test-debug.apk
+		pm install -r ${workdir}/performance-test.apk
+		pm install -r ${workdir}/performance.apk
 		while read line
 		do
 			params=(${line})

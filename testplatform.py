@@ -166,32 +166,7 @@ class MainWindow(QMainWindow):
         if self.activeMdiChild():
             self.activeMdiChild().importData()
 
-    def executeLogAnalyseTool(self):
-        logAnalyse = tlog.LogUI()
-        logAnalyse.exec_()
 
-    def executeLogStatTool(self):
-        analyse = tlogstat.LogAnalyse(self)
-        analyse.exec_()
-
-    def executeRebootTool(self):
-        reboot = rc.Classify(self)
-        reboot.exec_()
-
-    def executeCompatTool(self):
-        compat = tcp.LogAnalyse(self)
-        compat.exec_()
-
-    def executeuiRunnerTool(self):
-        uirunner = udt.UiRunnerDebugTerminal(self)
-        uirunner.thread.start()
-        uirunner.show()
-
-    def uploadFuncTestCase(self):
-        uifunc.uploadfunctestcase(self)
-
-    def uploadPerfTestCase(self):
-        perfor.uploadperftestcase(self)
 
     # def update(self):
     #     self.qut = QueryUpdateThread()

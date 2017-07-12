@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
 import re
+import sys
+
+workdir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
 def get_prop(adb, key):
@@ -20,6 +24,8 @@ def echo_to_file(adb, lines, path, append=True):
 
 
 def get_packages(adb):
+    adb.install(os.path.join(workdir, 'TestKit.apk'))
+    adb.install(os.path.join(workdir, 'TestKitTest.apk'))
     packages = {}
     p = re.compile('INSTRUMENTATION_STATUS: stream=({.*})')
     cmd_str = 'am instrument -w -r   -e class com.eebbk.test.kit.PackageManagerProxy#getPackageList com.eebbk.test.kit.test/android.support.test.runner.AndroidJUnitRunner'

@@ -9,10 +9,9 @@ from abc import ABCMeta, abstractmethod
 from PyQt4.QtGui import QWizardPage
 
 from tools import echo_to_file
-
+from common import  workdir,DATA_LOCAL_TMP
 DEBUG = platform.system() == 'Windows'
-WORK_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_LOCAL_TMP = '/data/local/tmp'
+
 
 
 class Executor(object):
@@ -23,7 +22,8 @@ class Executor(object):
         self.adb = child.adb
         self.work_out = child.workout
         self.packages = child.packages
-        self.work_dir = WORK_DIR
+        self.work_dir = workdir
+        print self.work_dir
         self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
 
     def setup(self):
@@ -97,7 +97,7 @@ class Executor(object):
     def import_script(self):
         self.adb.shell('rm -rf %s' % self.data_work_path)
         self.adb.shell('mkdir -p %s' % self.data_work_path)
-        self.adb.push(os.path.join(WORK_DIR, self.id()), DATA_LOCAL_TMP)
+        self.adb.push(os.path.join(workdir, self.id()), DATA_LOCAL_TMP)
         self.adb.shell('chmod 755 %s/busybox' % self.data_work_path)
 
     def export_result(self):

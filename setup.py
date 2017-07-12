@@ -22,16 +22,7 @@ if sys.argv[1] == 'py2exe':
     options = {
         'py2exe': {
             'includes': [
-                'matplotlib.backends',
-                'matplotlib.backends.backend_qt4agg',
-                'matplotlib.figure',
-                'pylab',
-                'numpy',
-                'PIL.Image',
                 'sip',
-                'scipy.stats',
-                'scipy.special._ufuncs_cxx',
-                'scipy.sparse.csgraph._validation'
             ],
             'excludes': [
                 '_gtkagg',
@@ -63,62 +54,19 @@ if sys.argv[1] == 'py2exe':
         'busybox',
         'config.ini',
         'TestKit.apk',
-        'automator.jar',
+        'TestKitTest.apk',
         'adb.exe',
         'aapt.exe',
         'AdbWinApi.dll',
         'AdbWinUsbApi.dll',
-        'logo.png',
-        'v.txt'
+        'logo.ico',
+        'v.txt',
+        'readme.txt',
+        'testcase.ini'
     ]))
-    data_files.append(('chart', [join('chart', 'performance.xls')]))
-    data_files.append(('chart', [join('chart', 'log.xls')]))
-    data_files.append(('chart', [join('chart', 'fpsconfig.txt')]))
-    data_files.append(('compat', glob(join('compat', '*'))))
-    data_files.append(('memory', glob(join('memory', '*'))))
-    data_files.append(('monkey', glob(join('monkey', '*'))))
-    data_files.append(('perfor', glob(join('perfor', '*'))))
-    data_files.append(('stress', glob(join('stress', '*'))))
-    data_files.append(('update', glob(join('update', '*'))))
-    data_files.append(('compar', glob(join('compar', '*'))))
-    data_files.append(('images', glob(join('images', '*'))))
-    data_files.append(('laustd', glob(join('laustd', '*'))))
-    data_files.append(('uifunc', glob(join('uifunc', '*'))))
-    data_files.append(('smoke', glob(join('smoke', '*'))))
-    data_files.append(('power', glob(join('power', '*'))))
-    data_files.append(('tool', [join('tool', 'log.xls')]))
-    data_files.append(('tool', [join('tool', 'reboot_key.txt')]))
-    data_files.append(('tool', [join('tool', 'reboot.xls')]))
-    data_files.append(('tool', [join('tool', 'cache_path.db')]))
-    data_files.append(('tool', [join('tool', 'log_key.xlsx')]))
-
-    # add simula files
-    data_files.append(('simula', glob(join('simula', '*.*'))))
-    data_files.append((
-        join('simula', 'testcase'),
-        glob(join('simula', 'testcase', '*.*'))
-    ))
-
-    # add matplotlib data files
-    # data_files.extend(matplotlib.get_py2exe_datafiles())
-    matplotlibdir = dirname(matplotlib.__file__)
-    data_files.append((
-        'mpl-data',
-        glob(join(matplotlibdir, 'mpl-data', '*.*'))
-    ))
-    data_files.append((
-        'mpl-data',
-        glob(join(matplotlibdir, 'mpl-data', 'matplotlibrc'))
-    ))
-    data_files.append((
-        join('mpl-data', 'images'),
-        glob(join(matplotlibdir, 'mpl-data', 'images', '*.*'))
-    ))
-    data_files.append((
-        join('mpl-data', 'fonts'),
-        glob(join(matplotlibdir, 'mpl-data', 'fonts', '*.*'))
-    ))
-
+    data_files.append(('module', glob(join('module', '*'))))
+    data_files.append(('freememory', glob(join('freememory', '*'))))
+    data_files.append(('launch', glob(join('launch', '*'))))
     setup(
         name='testplat',
         version=version,
@@ -135,8 +83,8 @@ if sys.argv[1] == 'py2exe':
     )
 
     # rename files
-    shutil.move(join('dist', 'start.exe'), join('dist', 'TestPlatform.exe'))
-    shutil.move(join('dist', 'upgrade.exe'), join('dist', 'PlatformUpdate.exe'))
+    shutil.move(join('dist', 'start.exe'), join('dist', 'BbkTestPlatform.exe'))
+    shutil.move(join('dist', 'upgrade.exe'), join('dist', 'BbkPlatformUpdate.exe'))
 
 if sys.argv[1] in ['dist', 'publish']:
     f = zipfile.ZipFile('dist.zip', 'w', zipfile.ZIP_DEFLATED)

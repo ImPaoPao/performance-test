@@ -8,10 +8,12 @@ import sys
 
 import adbkit
 
-workdir = os.path.dirname(os.path.realpath(sys.argv[0]))
-import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
+workdir = os.path.dirname(os.path.realpath(sys.argv[0]))
+DATA_LOCAL_TMP = '/data/local/tmp'
+
 
 class Apk(object):
     def __init__(self, apkfile):
@@ -84,7 +86,8 @@ def importdata(adb):
             data.append((size, pimdir))
 
     if data:
-        m = re.search('[ ]+(\d+\.\d+)(\S+)[ ]+(\d+\.\d+)(\S+)[ ]+(\d+\.\d+)(\S+)[ ]+\d+', adb.shell_readlines('df sdcard')[-1])
+        m = re.search('[ ]+(\d+\.\d+)(\S+)[ ]+(\d+\.\d+)(\S+)[ ]+(\d+\.\d+)(\S+)[ ]+\d+',
+                      adb.shell_readlines('df sdcard')[-1])
         if m:
             z = lambda x, y: x * pow(1024, 'BKMGT'.find(y))
             g = m.groups()
@@ -99,8 +102,6 @@ def importdata(adb):
     pimdir = '/sdcard/小学/'
     if data:
         adb.push(seldir, pimdir)
-    print seldir
-    print pimdir
 
 
 if __name__ == '__main__':

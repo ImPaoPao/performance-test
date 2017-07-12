@@ -1,9 +1,0 @@
-com.eebbk.test.performance SynChineseTestCase launchSynChinese launchSynChinese 100 com.eebbk.synchinese 0 0 0
-com.eebbk.test.performance VtrainingTestCase launchVtraining launchVtraining 100 com.eebbk.vtraining 0 0 0
-com.eebbk.test.performance VisionTestCase launchVision launchVision 100 com.eebbk.vision 0 0 0
-com.eebbk.test.performance BbkMiddleMarketTestCase launchBbkMiddleMarket launchBbkMiddleMarket 100 com.eebbk.bbkmiddlemarket 0 0 0
-com.eebbk.test.performance SyncMathTestCase launchSynMath launchSynMath 100 com.eebbk.synmath 0 0 0
-com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 100 com.eebbk.englishtalk 0 0 0
-com.eebbk.test.performance OneSearchDarkTestCase launchOneSearch launchOneSearch 100 com.eebbk.onesearchdark 0 0 0
-com.eebbk.test.performance QuestionDatabaseTestCase launchQuestionDatabase launchQuestionDatabase 100 com.eebbk.questiondatabase 0 0 0
-com.eebbk.test.performance SyncEglishTestCase launchSyncEnglish launchSyncEnglish 100 com.eebbk.syncenglish 0 0 0

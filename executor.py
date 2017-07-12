@@ -85,7 +85,7 @@ class SetupExecuteThread(QThread):
 
         if self.datatype:
             self.log(u'导入书本资源数据')
-            importdata(self.adb)
+            #importdata(self.adb)
         if self.executor:
             for item in self.executor.values():
                 item.execute(self.log)

@@ -10,9 +10,7 @@ import adbkit
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
 workdir = os.path.dirname(os.path.realpath(sys.argv[0]))
-DATA_LOCAL_TMP = '/data/local/tmp'
 
 
 class Apk(object):

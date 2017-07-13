@@ -48,7 +48,7 @@ class BuildSetupWizard(QWizard):
         page = QWizardPage()
         page.setTitle(u'测试准备')
         page.setSubTitle(u'选择测试开始前的准备动作。')
-        page.setFinalPage(True)
+        page.setFinalPage(False)
 
         self.importBookData = QCheckBox(u'导入三个同步课本资源')
         self.loginBbkAccount = QCheckBox(u'登录BBK账号(部分模块需要登录账号)')
@@ -56,6 +56,8 @@ class BuildSetupWizard(QWizard):
         self.loginBbkAccount.setChecked(self.parentWidget().login)
         self.importBookData.toggled[bool].connect(self.stateToggled)
         self.loginBbkAccount.toggled[bool].connect(self.stateToggled)
+        self.importBookData.setEnabled(False)
+        self.loginBbkAccount.setEnabled(False)
 
         layout = QVBoxLayout()
         layout.addWidget(self.importBookData)

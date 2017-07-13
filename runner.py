@@ -26,7 +26,7 @@ class Executor(object):
         self.work_out = child.workout
         self.packages = child.packages
         self.work_dir = WORK_DIR
-        print 'init:',self.work_dir
+        print 'init:', self.work_dir
         self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
 
     def setup(self):
@@ -58,6 +58,7 @@ class Executor(object):
         self.shell(('start',) + args + ('>' if DEBUG else '\\>', '%s/nohup.txt' % self.data_work_path), True)
 
     def execute(self, log):
+        self.log = log
         log(u'正在导入 %s 测试脚本' % self.title())
         print u'正在导入 %s 测试脚本' % self.id()
         self.import_script()
@@ -90,7 +91,6 @@ class Executor(object):
         self.parsers()
 
     def stop(self):
-        # stop exec
         pass
 
     def shell(self, args, nohup=False):
@@ -100,15 +100,12 @@ class Executor(object):
     def import_script(self):
         self.adb.shell('rm -rf %s' % self.data_work_path)
         self.adb.shell('mkdir -p %s' % self.data_work_path)
-        # print self.work_dir,self.id(),DATA_LOCAL_TMP
-        print 'import script: ',WORK_DIR, self.data_work_path
-        print 'self.data_work_path:',self.data_work_path
-        print 'push:',os.path.join(WORK_DIR, self.id())
+        print 'push:', os.path.join(WORK_DIR, self.id()), self.data_work_path
         self.adb.push(os.path.join(WORK_DIR, self.id()), self.data_work_path)
         self.adb.shell('chmod 755 %s/busybox' % self.data_work_path)
 
     def export_result(self):
-        print 'export: ', self.work_out
+        print u'导出测试数据: ', self.work_out
         if not os.path.exists(self.work_out):
             os.makedirs(self.work_out)
             time.sleep(3)
@@ -128,4 +125,4 @@ class Executor(object):
                 os.rename(src_file_path, dst_file_path)
 
     def parsers(self):
-        print 'parser test datas out put report'
+        pass

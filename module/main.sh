@@ -35,6 +35,7 @@ case $1 in
 			#logcat -s ActivityManager:I l:s | grep "${source_package}" --line-buffered > /sdcard/log.txt &
 			#lpid=$!
 			echo ${pid} ${lpid} > ${workdir}/pid
+			echo ${test_method} >> ${trackfile}
 			mkdir -p ${workout}/${test_number}
 			am instrument -w -r  -e number ${test_number} -e mpackage ${source_package} -e type ${test_type} -e appnum ${app_num} -e class ${test_package}.${test_case}\#${test_method} -e count ${test_count} com.eebbk.test.performance.test/android.support.test.runner.AndroidJUnitRunner>${workout}/${test_number}/instrument.txt
 			#kill -9 ${lpid}

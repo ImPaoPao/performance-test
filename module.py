@@ -113,6 +113,9 @@ class LauncherModule(Executor):
     def desc(self):
         return u'BBK自研应用启动速度(包含图标和挂件)，和核心模块(三个同步，好题精练，名师辅导，一键搜，视力保护，应用商店，英语听说)内部主要页面切换速度'
 
+    def track(self, data):
+        self.log(u'开始执行 ' + unicode(self.usedcases[data]['label']) + ',执行 ' + str(self.count) + ' 次')
+
     def parsers(self):
         print u'测试数据路径:', self.work_out
         dir_dict = {}

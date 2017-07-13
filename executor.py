@@ -14,10 +14,7 @@ from PyQt4.QtGui import *
 import runner
 from common import workdir
 from tools import get_prop
-from common import login_bbk_account, importdata
 
-import module
-import launch
 
 class BuildSetupWizard(QWizard):
     def __init__(self, parent):
@@ -25,9 +22,9 @@ class BuildSetupWizard(QWizard):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle(u'测试用例设置向导')
-        self.setGeometry(300, 200, 800, 600)
-        self.addPage(self.createPreparePage())
+        # self.setWindowTitle(u'测试用例设置向导')
+        # self.setGeometry(300, 200, 800, 600)
+        # self.addPage(self.createPreparePage())
         for i in self.parentWidget().checkDict.keys():
             page = self.parentWidget().checkDict.get(i).setup()
             if page:
@@ -44,26 +41,26 @@ class BuildSetupWizard(QWizard):
         print 'import data', self.parentWidget().datatype
         print 'login ', self.parentWidget().login
 
-    def createPreparePage(self):
-        page = QWizardPage()
-        page.setTitle(u'测试准备')
-        page.setSubTitle(u'选择测试开始前的准备动作。')
-        page.setFinalPage(False)
-
-        self.importBookData = QCheckBox(u'导入三个同步课本资源')
-        self.loginBbkAccount = QCheckBox(u'登录BBK账号(部分模块需要登录账号)')
-        self.importBookData.setChecked(self.parentWidget().datatype)
-        self.loginBbkAccount.setChecked(self.parentWidget().login)
-        self.importBookData.toggled[bool].connect(self.stateToggled)
-        self.loginBbkAccount.toggled[bool].connect(self.stateToggled)
-        self.importBookData.setEnabled(False)
-        self.loginBbkAccount.setEnabled(False)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.importBookData)
-        layout.addWidget(self.loginBbkAccount)
-        page.setLayout(layout)
-        return page
+        # def createPreparePage(self):
+        #     page = QWizardPage()
+        #     page.setTitle(u'测试准备')
+        #     page.setSubTitle(u'选择测试开始前的准备动作。')
+        #     page.setFinalPage(False)
+        #
+        #     self.importBookData = QCheckBox(u'导入三个同步课本资源')
+        #     self.loginBbkAccount = QCheckBox(u'登录BBK账号(部分模块需要登录账号)')
+        #     self.importBookData.setChecked(self.parentWidget().datatype)
+        #     self.loginBbkAccount.setChecked(self.parentWidget().login)
+        #     self.importBookData.toggled[bool].connect(self.stateToggled)
+        #     self.loginBbkAccount.toggled[bool].connect(self.stateToggled)
+        #     self.importBookData.setEnabled(False)
+        #     self.loginBbkAccount.setEnabled(False)
+        #
+        #     layout = QVBoxLayout()
+        #     layout.addWidget(self.importBookData)
+        #     layout.addWidget(self.loginBbkAccount)
+        #     page.setLayout(layout)
+        #     return page
 
 
 class SetupExecuteThread(QThread):
@@ -82,12 +79,14 @@ class SetupExecuteThread(QThread):
         self.log(u'正在设置设备')
         start = time.time()
         if self.login:
-            self.log(u'登录BBK账号')
-            login_bbk_account(self.adb)
+            # self.log(u'登录BBK账号')
+            # login_bbk_account(self.adb)
+            pass
 
         if self.datatype:
-            self.log(u'导入书本资源数据')
-            #importdata(self.adb)
+            # self.log(u'导入书本资源数据')
+            # importdata(self.adb)
+            pass
         if self.executor:
             for item in self.executor.values():
                 item.execute(self.log)

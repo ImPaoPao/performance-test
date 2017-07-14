@@ -114,10 +114,13 @@ class LauncherModule(Executor):
         return u'BBK自研应用启动速度(包含图标和挂件)，和核心模块(三个同步，好题精练，名师辅导，一键搜，视力保护，应用商店，英语听说)内部主要页面切换速度'
 
     def track(self, data):
-        self.log(u'开始执行 ' + unicode(self.usedcases[data]['label']) + ',执行 ' + str(self.count) + ' 次')
+        if self.module_start:
+            self.log(u'开始执行 ' + unicode(self.usedcases[data]['label']) + ',执行 ' + str(self.count) + ' 次')
+        else:
+            self.log(u'开始执行 ' + unicode(self.mousedcases[data]['label']) + ',执行 ' + str(self.count) + ' 次')
 
     def parsers(self):
-        print u'测试数据路径:', self.work_out
+        print u'datas::', self.work_out
         dir_dict = {}
         work_dir = os.path.join(self.work_out, self.id())
         for root, dirs, files in os.walk(work_dir):
@@ -128,13 +131,22 @@ class LauncherModule(Executor):
                         dir_dict[os.path.basename(root)] = result
         data = self.parser_files(dir_dict)
         self.csv_generate(data, self.id())
-        self.log(self.title()+u'报告路径:'+self.work_out)
-        print u'完成'
+        self.log(self.title() + u'报告路径:' + self.work_out)
 
     def import_script(self):
         super(LauncherModule, self).import_script()
         package_list = []
-        for key, value in self.usedcases.items():
+        print self.module_start
+        if self.module_start:
+            cases = self.usedcases
+        else:
+            # 模块切换
+            print '00000000000000000'
+            cases = self.mousedcases
+            print len(self.mousedcases)
+            for i in self.mousedcases.keys():
+                print "key:",i
+        for key, value in cases.items():
             package_list.append(" ".join(str(i) for i in
                                          ['com.eebbk.test.performance', value['clsname'], key, key, self.count,
                                           value['pkg'], 0 if self.mtype else 1, 0, 0]))
@@ -166,30 +178,15 @@ class LauncherModule(Executor):
                         lasttime = segment.get('lasttime')
                         refreshtime = segment.get('refreshtime')
                         loadresult = segment.get('loadresult')
-                        # lastloadresult = segment.get('loadresult')
-                        print u'上一次匹配度', loadresult, type(loadresult)
                         refreshresult = segment.get('refreshresult')
                         error_time = get_exetime(lasttime, loadtime)
                         temptime = get_exetime(starttime, lasttime)
                         if int(loadresult) <= 10:
-                            print key, 'lasttime ==============='
                             exe_time = temptime  # + error_time / 4
                             rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
-                        # elif (int(loadresult) < 15 and int(loadresult) > 10):
-                        #     print key, 'lasttime + 1/4 ==============='
-                        #     exe_time = temptime + error_time * 1 / 4
-                        #     rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
                         else:
-                            # if ('EnglishTalk' in key or 'launchVtraining' == key) and (
-                            #                 int(loadresult) < 15 and int(loadresult) > 10):
-                            # print 'english talk ==========='
-                            print key, 'lasttime + 1/4 ==============='
                             exe_time = temptime + error_time * 1 / 4
                             rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
-                            # else:
-                            #     print key, 'lasttime  1/2 '
-                            #     exe_time = temptime + error_time / 2
-                            #     rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
                         run_time = get_exetime(starttime, endtime)
                         data[key]['exetime'].append(exe_time)
                         data[key]['rexetime'].append(rexe_time)
@@ -210,8 +207,7 @@ class LauncherModule(Executor):
             rexetime = value['rexetime']
             errortime = value['errortime']
             loadresult = value['loadresult']
-            # lastloadresult = value['lastloadresult']
-            refreshresult = value['refreshresult']
+            # refreshresult = value['refreshresult']
             if exetime:
                 writer.writerow([key, self.usedcases[key]['label'], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
@@ -236,8 +232,9 @@ class LauncherModule(Executor):
     def setup(self):
         page = super(LauncherModule, self).setup()
         mfile = os.path.join(workdir, 'testcase.ini')
+        mofile = os.path.join(workdir, 'modulecase.txt')
         self.usedcases = {}
-        print self.usedcases,'setup '
+        self.mousedcases = {}
         if os.path.exists(mfile):
             with open(mfile, 'rb') as f:
                 for line in f:
@@ -251,7 +248,21 @@ class LauncherModule(Executor):
                     label = list[3]
                     if pkg in self.temppkgs.keys():
                         self.usedcases[metname] = {'label': label, 'pkg': pkg, 'clsname': clsname}
+        if os.path.exists(mofile):
+            with open(mofile, 'rb') as f:
+                for line in f:
+                    if line.startswith('#'):
+                        continue
+                    line = line.strip('')
+                    list = line.split(' ')
+                    clsname = list[0]
+                    metname = list[1]
+                    pkg = list[2]
+                    label = list[3]
+                    if pkg in self.temppkgs.keys():
+                        self.mousedcases[metname] = {'label': label, 'pkg': pkg, 'clsname': clsname}
         self.tempcases = copy.copy(self.usedcases)
+        self.motempcases = copy.copy(self.mousedcases)
 
         check = QCheckBox(u'继续上一次的测试,如果执行失败，帮助导出测试结果？')
         check.setEnabled(False)
@@ -407,7 +418,6 @@ class LauncherModule(Executor):
                 self.selsyn.setCheckState(not state)
         for i in range(self.list.count()):
             self.list.item(i).setCheckState(state)
-            # metname = str(self.list.item(i).data(1).toPyObject())
 
     def selsynChanged(self, state):
         print u'9个核心模块:', state

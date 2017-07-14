@@ -42,8 +42,8 @@ class BuildSetupWizard(QWizard):
         elif sender == self.importBookData:
             self.parentWidget().datatype = state
 
-        print 'import data', self.parentWidget().datatype
-        print 'login ', self.parentWidget().login
+        #self.parentWidget().datatype
+        #self.parentWidget().login
 
         # def createPreparePage(self):
         #     page = QWizardPage()
@@ -177,8 +177,6 @@ class ChildWindow(QWidget):
         pass
 
     def updateResultButton(self, path):
-        print path
-        print 'updateResultButton'
         self.reportButton.setEnabled(True)
 
     def executeBuildTest(self):
@@ -220,7 +218,7 @@ class ChildWindow(QWidget):
         self.selallButton.clicked.connect(self.buttonClicked)
         self.disallButton = QPushButton(u'反选')
         self.disallButton.clicked.connect(self.buttonClicked)
-        self.reportButton = QPushButton(u'结果查看')
+        self.reportButton = QPushButton(u'查看报告')
         self.reportButton.clicked.connect(self.buttonClicked)
         self.reportButton.setEnabled(False)
         buttonBox = QDialogButtonBox(Qt.Vertical)

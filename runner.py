@@ -64,31 +64,28 @@ class Executor(object):
         self.import_script()
         self.__kill_track()
         log(u'正在执行 %s 测试' % self.title())
-        print u'正在执行 %s 测试' % self.id()
-        self.start()
-        self.adb.shell('touch %s/track' % self.data_work_path)
-        while 1:
-            if self.adb.shell_readline('{0}/busybox tail -1 {0}/track'.format(self.data_work_path)) == 'done':
-                break
-            p = self.adb.shell_open('{0}/busybox tail -1 -F {0}/track'.format(self.data_work_path))
-            while 1:
-                line = p.stdout.readline()
-                if not line or line.strip() == 'done':
-                    break
-                elif line.strip():
-                    echo_to_file(self.adb, '', '%s/track' % self.data_work_path)
-                    self.track(line.strip())
-            p.terminate()
-            self.__kill_track()
-        print u'%s 测试执行完成' % self.id()
+        # print u'正在执行 %s 测试' % self.id()
+        # self.start()
+        # self.adb.shell('touch %s/track' % self.data_work_path)
+        # while 1:
+        #     if self.adb.shell_readline('{0}/busybox tail -1 {0}/track'.format(self.data_work_path)) == 'done':
+        #         break
+        #     p = self.adb.shell_open('{0}/busybox tail -1 -F {0}/track'.format(self.data_work_path))
+        #     while 1:
+        #         line = p.stdout.readline()
+        #         if not line or line.strip() == 'done':
+        #             break
+        #         elif line.strip():
+        #             echo_to_file(self.adb, '', '%s/track' % self.data_work_path)
+        #             self.track(line.strip())
+        #     p.terminate()
+        #     self.__kill_track()
         log(u'%s 测试执行完成' % self.title())
-        self.shell(('done',)).wait()
+        # self.shell(('done',)).wait()
         log(u'正在导出 %s 测试数据' % self.title())
-        print u'正在导出 %s 测试数据' % self.id()
-        self.export_result()
+        # self.export_result()
         log(u'生成 %s 报告' % self.title())
-        print u'生成 %s 报告' % self.id()
-        self.parsers()
+        # self.parsers()
 
     def stop(self):
         pass

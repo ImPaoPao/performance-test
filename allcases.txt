@@ -1,0 +1,298 @@
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 10 com.eebbk.englishtalk 0 0 0
+
+
+测试包名 类名 用例名 结果文件夹名 执行次数 测试目标包名 测试类型(冷启动/热启动) 系统应用个数 三方应用个数
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 10 com.eebbk.englishtalk 0 5 5
+测试包名 类名 用例名 用例名 执行次数 测试目标包名 测试类型 应用个数 应用类型(app ：三方，system ：系统)
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 10 com.eebbk.englishtalk 0 5  //冷启动
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 10 com.eebbk.englishtalk 1 5//热启动
+
+
+com.eebbk.test.performance SyncChineseTestCase launchSyncChinese launchSyncChinese 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase launchBbkMiddleMarket launchBbkMiddleMarket 3 com.eebbk.bbkmiddlemarket 0 0 0
+
+
+
+#核心模块启动
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance SyncChineseTestCase launchSyncChinese launchSyncChinese 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase launchBbkMiddleMarket launchBbkMiddleMarket 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance SyncMathTestCase launchSynMath launchSynMath 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance OneSearchDarkTestCase launchOneSearch launchOneSearch 10 com.eebbk.onesearchdark 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase launchQuestionDatabase launchQuestionDatabase 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance SyncEglishTestCase launchSyncEnglish launchSyncEnglish 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance VisionTestCase launchVision launchVision 10 com.eebbk.vision 0 0 0
+com.eebbk.test.performance VtrainingTestCase launchVtraining launchVtraining 10 com.eebbk.vtraining 0 0 0
+
+
+
+
+
+
+#英语听说
+com.eebbk.test.performance EnglishTalkTestCase launchEnglishTalk launchEnglishTalk 3 com.eebbk.englishtalk 0 0 0
+
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayUi showEtPlayUi 3 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudioContent showEtPlayAudioContent 3 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudio showEtPlayAudio 3 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtRanking showEtRanking 3 com.eebbk.englishtalk 0 0 0
+选择教材添加后，点击教材目录→进入播放界面
+播放界面，点击右下角目录按钮→目录加载完成
+播放界面，点击目录按钮中任意目录→播放内容加载完成
+点击我的排行→排行榜加载完成
+#点击banner口语达人→界面内容加载完成
+
+
+#应用商店
+com.eebbk.test.performance BbkMiddleMarketTestCase launchBbkMiddleMarket launchBbkMiddleMarket 2 com.eebbk.bbkmiddlemarket 0 0 0
+
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMAppDetails showBbkMAppDetails 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMClassCh showBbkMClassCh 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMSelfInfo showBbkMSelfInfo 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMCopyright showBbkMCopyright 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMDownloadList showBbkMDownloadList 3 com.eebbk.bbkmiddlemarket 0 0 0
+
+首页点击应用→应用详情加载完成
+分类页面，点击语文→内容加载完成
+个人中心未登录，点击头像→个人中心页面加载完成
+点击版权声明→页面加载完成
+下载10个应用，点击下载中心→下载列表加载完成
+//进入专题，点击APP竞品推荐→界面加载完成
+
+
+
+#一键搜
+com.eebbk.test.performance OneSearchDarkTestCase launchOneSearch launchOneSearch 2 com.eebbk.onesearchdark 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase launchQuestionDatabase launchQuestionDatabase 2 com.eebbk.questiondatabase 0 0 0
+
+#视力保护
+com.eebbk.test.performance VisionTestCase launchVision launchVision 2 com.eebbk.vision 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionSettings showVisionSettings 2 com.eebbk.vision 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionProtection showVisionProtection 2 com.eebbk.vision 0 0 0
+
+
+#点击眼保健操→显示眼保健操界面
+点击设置按钮→显示设置界面
+点击护眼小知识→显示不严小知识界面
+
+
+#同步数学
+com.eebbk.test.performance SyncMathTestCase addMathBook addMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showSynMathBook showSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase changeSynMathBook changeSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathContent showExplanationSynMathContent 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase downloadExplanatinSynMathContent downloadExplanatinSynMathContent 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase refreshSynMath refreshSynMath 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showDetailsSynMathBook showDetailsSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathBook showExplanationSynMathBook 3 com.eebbk.synmath 0 0 0
+
+点击添加按钮→下载界面加载完成
+点击书本→书本目录加载完成
+进入课本目录界面，点击左边换书按钮→书架界面显示完成
+进入课本目录界面，点击动画讲解→动画讲解界面加载完成
+进入课本目录界面，点击动画讲解右边的下载按钮→下载页面加载完成
+点击教辅目录→进入课本详情
+书本内容界面，点击左上角目录按钮，点击知识讲解→知识讲解内容加载完成
+书架界面10本书，点击刷新→刷新完成
+
+#同步语文
+com.eebbk.test.performance SynChineseTestCase synChineseRefresh synChineseRefresh 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase addChineseBook addChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showSynChineseBook showSynChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showDetailsSynChineseBook showDetailsSynChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase syncChineseAccessDict syncChineseAccessDict 3 com.eebbk.synchinese 0 0 0
+
+#同步英语
+com.eebbk.test.performance SyncEglishTestCase syncEnglishOlaAccessBbkMarket syncEnglishOlaAccessBbkMarket 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishFunTest syncEnglishFunTest 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSelfInfo 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 2 com.eebbk.syncenglish 0 0 0
+
+
+
+
+#同步英语
+com.eebbk.test.performance SyncEglishTestCase syncEnglishOlaAccessBbkMarket syncEnglishOlaAccessBbkMarket 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase syncEnglishFunTest syncEnglishFunTest 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSelfInfo 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 10 com.eebbk.syncenglish cool
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 10 com.eebbk.syncenglish cool
+点击添加按钮→下载界面加载完成
+点击书本→书本内容界面显示完成
+书本内容界面点击头像→个人信息页面加载完成
+书本内容界面点击趣味测验→测验页面内容加载完成
+趣味测验点击欧拉学英语→跳转到商店页面加载完成
+书架界面10本书，点击刷新→刷新完成
+//书本内容界面点击flash按钮→flas页面加载完成
+//点读页面，点击句子选择单词--查，点击反查→词典列表弹出框加载完成
+
+
+#名师辅导
+com.eebbk.test.performance VtrainingTestCase launchVtraining launchVtraining 10 com.eebbk.vtraining 0 0 0
+
+com.eebbk.test.performance VtrainingTestCase showVtCourseTeacher showVtCourseTeacher 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtTeacherInfo showVtTeacherInfo 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtRanking showVtRanking 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtJoinCourse showVtJoinCourse 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtDownloadCourse showVtDownloadCourse 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtVideo showVtVideo 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtCourse showVtCourse 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtMoreList showVtMoreList 3 com.eebbk.vtraining 0 0 0
+
+
+
+点击首页更多精彩→课程列表页面，加载完成
+点击首页视频缩略图→视频播放加载完成
+点击选课→科目→课程包封面，加载完成
+选课界面，点击banner图名师在这里图片→名师页面加载完成
+点击名师头像→名师详情加载完成
+已加入5个课程，进入我的界面，点击已加入课程→列表内容加载完成
+已下载5个课程，进入我的界面，点击已下载课程→列表内容加载完成
+我的界面，点击排行榜→排行榜页面，加载完成
+
+//点击课程包封面→视频播放界面加载完成
+
+
+
+#好题精练
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExample showQdExample 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExamExplanation showQdExamExplanation 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamList showQdRealExamList 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamContent showQdRealExamContent 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRanking showQdRanking 3 com.eebbk.questiondatabase 0 0 0
+
+点击智能练习目录→题目加载完成
+点击例题讲解目录→题目加载完成
+点击真题密卷科目→真题目录界面加载完成
+点击真题目录界面目录→题目加载完成
+点击排行榜→排行榜页面加载完成
+//有做题记录，点击做题概况→做题概况页面加载完成
+//有错题记录，点击错题本→错题界面加载完成
+
+
+
+
+
+
+#桌面加载速度
+com.eebbk.test.performance BbkLauncherTestCase loadBbkLauncher loadBbkLauncher 3 com.bbk.studyos.launcher 0 0 0
+
+#三个同步 需要下载书本资料
+com.eebbk.test.performance SynChineseTestCase synChineseRefresh synChineseRefresh 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase addChineseBook addChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showSynChineseBook showSynChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showDetailsSynChineseBook showDetailsSynChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase syncChineseAccessDict syncChineseAccessDict 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SyncMathTestCase addMathBook addMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showSynMathBook showSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase changeSynMathBook changeSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathContent showExplanationSynMathContent 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase downloadExplanatinSynMathContent downloadExplanatinSynMathContent 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase refreshSynMath refreshSynMath 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showDetailsSynMathBook showDetailsSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathBook showExplanationSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishOlaAccessBbkMarket syncEnglishOlaAccessBbkMarket 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishFunTest syncEnglishFunTest 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSelfInfo 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 2 com.eebbk.syncenglish 0 0 0
+
+
+
+#三个同步
+com.eebbk.test.performance SynChineseTestCase synChineseRefresh synChineseRefresh 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase addChineseBook addChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showSynChineseBook showSynChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showDetailsSynChineseBook showDetailsSynChineseBook 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase syncChineseAccessDict syncChineseAccessDict 3 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SyncMathTestCase addMathBook addMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showSynMathBook showSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase changeSynMathBook changeSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathContent showExplanationSynMathContent 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase downloadExplanatinSynMathContent downloadExplanatinSynMathContent 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase refreshSynMath refreshSynMath 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showDetailsSynMathBook showDetailsSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathBook showExplanationSynMathBook 3 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishOlaAccessBbkMarket syncEnglishOlaAccessBbkMarket 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishFunTest syncEnglishFunTest 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSelfInfo 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 2 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 2 com.eebbk.syncenglish 0 0 0
+#其它全部 除了三个同步和学科同步
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayUi showEtPlayUi 3 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudioContent showEtPlayAudioContent 3 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudio showEtPlayAudio 3 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtRanking showEtRanking 3 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtCourseTeacher showVtCourseTeacher 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtTeacherInfo showVtTeacherInfo 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtRanking showVtRanking 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtJoinCourse showVtJoinCourse 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtDownloadCourse showVtDownloadCourse 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtVideo showVtVideo 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtCourse showVtCourse 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtMoreList showVtMoreList 3 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionSettings showVisionSettings 3 com.eebbk.vision 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionProtection showVisionProtection 3 com.eebbk.vision 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExample showQdExample 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExamExplanation showQdExamExplanation 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamList showQdRealExamList 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamContent showQdRealExamContent 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRanking showQdRanking 3 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMAppDetails showBbkMAppDetails 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMClassCh showBbkMClassCh 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMSelfInfo showBbkMSelfInfo 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMCopyright showBbkMCopyright 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMDownloadList showBbkMDownloadList 3 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkLauncherTestCase loadBbkLauncher loadBbkLauncher 3 com.bbk.studyos.launcher 0 0 0
+
+
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayUi showEtPlayUi 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudioContent showEtPlayAudioContent 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtPlayAudio showEtPlayAudio 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance EnglishTalkTestCase showEtRanking showEtRanking 10 com.eebbk.englishtalk 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtCourseTeacher showVtCourseTeacher 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtTeacherInfo showVtTeacherInfo 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtRanking showVtRanking 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtJoinCourse showVtJoinCourse 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtDownloadCourse showVtDownloadCourse 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtVideo showVtVideo 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtCourse showVtCourse 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VtrainingTestCase showVtMoreList showVtMoreList 10 com.eebbk.vtraining 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionSettings showVisionSettings 10 com.eebbk.vision 0 0 0
+com.eebbk.test.performance VisionTestCase showVisionProtection showVisionProtection 10 com.eebbk.vision 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExample showQdExample 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdExamExplanation showQdExamExplanation 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamList showQdRealExamList 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRealExamContent showQdRealExamContent 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance QuestionDatabaseTestCase showQdRanking showQdRanking 10 com.eebbk.questiondatabase 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMAppDetails showBbkMAppDetails 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMClassCh showBbkMClassCh 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMSelfInfo showBbkMSelfInfo 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMCopyright showBbkMCopyright 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkMiddleMarketTestCase showBbkMDownloadList showBbkMDownloadList 10 com.eebbk.bbkmiddlemarket 0 0 0
+com.eebbk.test.performance BbkLauncherTestCase loadBbkLauncher loadBbkLauncher 10 com.bbk.studyos.launcher 0 0 0
+三个同步10次
+com.eebbk.test.performance SynChineseTestCase synChineseRefresh synChineseRefresh 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase addChineseBook addChineseBook 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showSynChineseBook showSynChineseBook 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase showDetailsSynChineseBook showDetailsSynChineseBook 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SynChineseTestCase syncChineseAccessDict syncChineseAccessDict 10 com.eebbk.synchinese 0 0 0
+com.eebbk.test.performance SyncMathTestCase addMathBook addMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showSynMathBook showSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase changeSynMathBook changeSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathContent showExplanationSynMathContent 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase downloadExplanatinSynMathContent downloadExplanatinSynMathContent 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase refreshSynMath refreshSynMath 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showDetailsSynMathBook showDetailsSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncMathTestCase showExplanationSynMathBook showExplanationSynMathBook 10 com.eebbk.synmath 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishOlaAccessBbkMarket syncEnglishOlaAccessBbkMarket 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishFunTest syncEnglishFunTest 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase syncEnglishSelfInfo syncEnglishSelfInfo 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase showSyncEnglishBook showSyncEnglishBook 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase addSyncEnglishBook addSyncEnglishBook 10 com.eebbk.syncenglish 0 0 0
+com.eebbk.test.performance SyncEglishTestCase synEnglishRefresh synEnglishRefresh 10 com.eebbk.syncenglish 0 0 0

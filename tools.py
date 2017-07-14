@@ -19,7 +19,6 @@ def echo_to_file(adb, lines, path, append=True):
     for line in lines if type(lines) == list else [lines]:
         adb.shell(cmd % (line, path))
     else:
-        print 'else touch'
         adb.shell('touch %s' % path)
 
 

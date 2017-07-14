@@ -20,7 +20,6 @@ def devices(host=None):
         if m:
             g = m.groups()
             results.append(Device(g[0], g[3], g[4], g[5]))
-    # filter available device serialno
     return tuple(sorted([i for i in results if i['serialno'] != i['model'].replace('_', '')]))
 
 

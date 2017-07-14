@@ -139,13 +139,10 @@ class LauncherModule(Executor):
         print self.module_start
         if self.module_start:
             cases = self.usedcases
+            print u'模块启动选中:', len(self.usedcases.keys())
         else:
-            # 模块切换
-            print '00000000000000000'
             cases = self.mousedcases
-            print len(self.mousedcases)
-            for i in self.mousedcases.keys():
-                print "key:",i
+            print u'页面切换选中:', len(self.mousedcases.keys())
         for key, value in cases.items():
             package_list.append(" ".join(str(i) for i in
                                          ['com.eebbk.test.performance', value['clsname'], key, key, self.count,
@@ -290,26 +287,22 @@ class LauncherModule(Executor):
         gridLayout.addWidget(self.edit1, 0, 1)
         gridLayout.addWidget(self.checbox3, 1, 0)
         gridLayout.addWidget(self.checbox4, 2, 0)
-
         itemLayout = QVBoxLayout()
         itemLayout.addWidget(self.radio1)
-
         buttonlayout = QGridLayout()
         self.buttonwidget = QWidget()
 
-        buttonlayout.addWidget(QLabel(u'常用组合:'), 0, 0)
+        # buttonlayout.addWidget(QLabel(u'常用组合:'), 0, 0)
         self.selall = QCheckBox(u'全选')
         self.selsyn = QCheckBox(u'9个核心模块')
         self.selpendant = QCheckBox(u'挂件')
         self.selother = QCheckBox(u'其它(不包含挂件和核心模块)')
-
         self.checkbox_list = [self.selall, self.selsyn, self.selpendant, self.selother]
 
         buttonlayout.addWidget(self.selall, 1, 1)
         buttonlayout.addWidget(self.selsyn, 2, 1)
         buttonlayout.addWidget(self.selpendant, 3, 1)
         buttonlayout.addWidget(self.selother, 4, 1)
-
         self.buttonwidget.setLayout(buttonlayout)
 
         # itemLayout.addLayout(buttonlayout)
@@ -328,10 +321,14 @@ class LauncherModule(Executor):
         self.selpendant.stateChanged[int].connect(self.selpendantChanged)
         self.list = QListWidget(page.wizard())
         self.list.itemChanged.connect(self.itemChanged)
-
-        # selall = QListWidgetItem(u'全选')
-        # selall.setData(1, QVariant('selall'))
-        # self.list.addItem(selall)
+        self.list2 = QListWidget(page.wizard())
+        self.list2.itemChanged.connect(self.itemChanged2)
+        self.list.setEnabled(self.module_start)
+        self.list2.setDisabled(self.module_start)
+        self.selallin = QListWidgetItem(u'全选')
+        self.selallin.setCheckState(Qt.Checked)
+        self.selallin.setData(1, QVariant('selall'))
+        self.list.addItem(self.selallin)
         # for key in self.temppkgs.keys():
         #     item = QListWidgetItem(key)
         #     item.setCheckState(Qt.Checked)
@@ -343,9 +340,16 @@ class LauncherModule(Executor):
             item.setCheckState(Qt.Checked)
             item.setData(1, QVariant(key))
             self.list.addItem(item)
+        for key in self.motempcases.keys():
+            label = self.motempcases[key]['label'].replace("\n", "")
+            item = QListWidgetItem(unicode(label))
+            item.setCheckState(Qt.Checked)
+            item.setData(1, QVariant(key))
+            self.list2.addItem(item)
 
         listLayout = QVBoxLayout()
         listLayout.addWidget(self.list)
+        listLayout.addWidget(self.list2)
         self.listGroup = QGroupBox(u'模块启动可选用例')
         self.listGroup.setLayout(listLayout)
 
@@ -362,6 +366,9 @@ class LauncherModule(Executor):
 
         return page
 
+    def itemChanged2(self, item):
+        print 'itemchanged 2 '
+
     def itemChanged(self, item):
         pkg = str(item.data(1).toPyObject())
         if pkg == 'selall':
@@ -377,12 +384,16 @@ class LauncherModule(Executor):
         self.module_start = checked
         if checked:
             self.buttonwidget.setEnabled(checked)
-            self.listGroup.setEnabled(checked)
+            # self.listGroup.setEnabled(checked)
+            self.list.setEnabled(checked)
+            self.list2.setDisabled(checked)
 
     def radio2Toggled(self, checked):
         if checked:
             self.buttonwidget.setDisabled(checked)
-            self.listGroup.setDisabled(checked)
+            # self.listGroup.setDisabled(checked)
+            self.list.setDisabled(checked)
+            self.list2.setEnabled(checked)
 
     def checbox3Toggled(self, state):
         print 'checbox3', state

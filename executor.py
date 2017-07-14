@@ -27,7 +27,7 @@ class BuildSetupWizard(QWizard):
 
     def initUI(self):
         # self.setWindowTitle(u'测试用例设置向导')
-        # self.setGeometry(300, 200, 800, 600)
+        self.setGeometry(300, 200, 800, 800)
         # self.addPage(self.createPreparePage())
         for i in self.parentWidget().checkDict.keys():
             page = self.parentWidget().checkDict.get(i).setup()

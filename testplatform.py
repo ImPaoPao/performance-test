@@ -166,8 +166,6 @@ class MainWindow(QMainWindow):
         if self.activeMdiChild():
             self.activeMdiChild().importData()
 
-
-
     # def update(self):
     #     self.qut = QueryUpdateThread()
     #     self.qut.queryUpdateDone.connect(self.onUpdateQuery)

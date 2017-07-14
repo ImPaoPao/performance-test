@@ -128,6 +128,7 @@ class LauncherModule(Executor):
                         dir_dict[os.path.basename(root)] = result
         data = self.parser_files(dir_dict)
         self.csv_generate(data, self.id())
+        self.log(self.title()+u'报告路径:'+self.work_out)
         print u'完成'
 
     def import_script(self):
@@ -137,7 +138,7 @@ class LauncherModule(Executor):
             package_list.append(" ".join(str(i) for i in
                                          ['com.eebbk.test.performance', value['clsname'], key, key, self.count,
                                           value['pkg'], 0 if self.mtype else 1, 0, 0]))
-        if len(package_list) > 1:
+        if len(package_list) > 0:
             echo_to_file(self.adb, package_list, self.data_work_path + '/choice.txt')
 
     def parser_files(self, file_dict):
@@ -236,6 +237,7 @@ class LauncherModule(Executor):
         page = super(LauncherModule, self).setup()
         mfile = os.path.join(workdir, 'testcase.ini')
         self.usedcases = {}
+        print self.usedcases,'setup '
         if os.path.exists(mfile):
             with open(mfile, 'rb') as f:
                 for line in f:

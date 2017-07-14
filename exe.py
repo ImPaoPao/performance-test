@@ -36,13 +36,14 @@ if __name__ == "__main__":
         threads = []
         all_connect_devices = adbkit.devices()
         for device in all_connect_devices:
-            if m in sys.argv:
+            if device['serialno'] in sys.argv:
                 adb = adbkit.Adb(device)
                 print device['serialno'], '.......threading...............'
                 t = threading.Thread(target=run, args=(adb, device['serialno'], 'module'))
                 t.setDaemon(True)
                 threads.append(t)
                 t.start()
+                print u'在这里能知道执行完成吗？'
         for t in threads:
             t.join()
     else:

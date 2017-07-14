@@ -15,6 +15,10 @@ import runner
 from common import workdir
 from tools import get_prop
 
+import subprocess
+
+import module
+
 
 class BuildSetupWizard(QWizard):
     def __init__(self, parent):
@@ -65,6 +69,7 @@ class BuildSetupWizard(QWizard):
 
 class SetupExecuteThread(QThread):
     logged = pyqtSignal(unicode, str)
+    setupExecuteDone = pyqtSignal(str)
 
     def __init__(self, adb, **args):
         super(SetupExecuteThread, self).__init__()
@@ -85,12 +90,12 @@ class SetupExecuteThread(QThread):
 
         if self.datatype:
             # self.log(u'导入书本资源数据')
-            # importdata(self.adb)
             pass
         if self.executor:
             for item in self.executor.values():
                 item.execute(self.log)
         self.log(u'所有任务完成，共耗时{0}秒'.format(round(time.time() - start, 3)))
+        self.setupExecuteDone.emit(self.workout)
 
     def log(self, text, color='black'):
         self.logged.emit(text, color)
@@ -171,6 +176,11 @@ class ChildWindow(QWidget):
         # 导入资源数据
         pass
 
+    def updateResultButton(self, path):
+        print path
+        print 'updateResultButton'
+        self.reportButton.setEnabled(True)
+
     def executeBuildTest(self):
         self.login = False
         self.datatype = True
@@ -179,6 +189,7 @@ class ChildWindow(QWidget):
             self.t = SetupExecuteThread(self.adb, executor=self.checkDict, login=self.login,
                                         datatype=self.datatype, getlog=self.getlog, workout=self.workout)
             self.t.logged.connect(self.showMessage)
+            self.t.setupExecuteDone.connect(self.updateResultButton)
             self.t.start()
 
     def userFriendlyCurrentDevice(self):
@@ -209,10 +220,14 @@ class ChildWindow(QWidget):
         self.selallButton.clicked.connect(self.buttonClicked)
         self.disallButton = QPushButton(u'反选')
         self.disallButton.clicked.connect(self.buttonClicked)
+        self.reportButton = QPushButton(u'结果查看')
+        self.reportButton.clicked.connect(self.buttonClicked)
+        self.reportButton.setEnabled(False)
         buttonBox = QDialogButtonBox(Qt.Vertical)
         buttonBox.addButton(self.okButton, QDialogButtonBox.ActionRole)
         buttonBox.addButton(self.selallButton, QDialogButtonBox.ActionRole)
         buttonBox.addButton(self.disallButton, QDialogButtonBox.ActionRole)
+        buttonBox.addButton(self.reportButton, QDialogButtonBox.ActionRole)
 
         layout = QHBoxLayout()
         layout.addWidget(self.listWidget)
@@ -222,6 +237,8 @@ class ChildWindow(QWidget):
     def buttonClicked(self):
         sender = self.sender()
         if sender == self.okButton:
+            if self.reportButton.isEnabled():
+                self.reportButton.setEnabled(False)
             self.checkDict = {}
             for i in range(self.listWidget.count()):
                 item = self.listWidget.item(i)
@@ -234,3 +251,5 @@ class ChildWindow(QWidget):
         elif sender == self.disallButton:
             for i in range(self.listWidget.count()):
                 self.listWidget.item(i).setCheckState(Qt.Unchecked)
+        elif sender == self.reportButton:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(self.workout))

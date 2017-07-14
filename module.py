@@ -297,9 +297,9 @@ class LauncherModule(Executor):
         self.selsyn = QCheckBox(u'9个核心模块')
         self.selpendant = QCheckBox(u'挂件')
         self.selother = QCheckBox(u'其它(不包含挂件和核心模块)')
-        self.checkbox_list = [self.selall, self.selsyn, self.selpendant, self.selother]
+        self.checkbox_list =[] #[self.selall, self.selsyn, self.selpendant, self.selother]
 
-        buttonlayout.addWidget(self.selall, 1, 1)
+        # buttonlayout.addWidget(self.selall, 1, 1)
         buttonlayout.addWidget(self.selsyn, 2, 1)
         buttonlayout.addWidget(self.selpendant, 3, 1)
         buttonlayout.addWidget(self.selother, 4, 1)
@@ -314,11 +314,18 @@ class LauncherModule(Executor):
         self.itemGroup = QGroupBox(u'启动速度测试参数')
         self.itemGroup.setLayout(itemLayout)
 
-        self.selall.setCheckState(Qt.Checked)
-        self.selall.stateChanged[int].connect(self.selallChanged)
-        self.selsyn.stateChanged[int].connect(self.selsynChanged)
-        self.selother.stateChanged[int].connect(self.selotherChanged)
-        self.selpendant.stateChanged[int].connect(self.selpendantChanged)
+        # self.selall.setCheckState(Qt.Checked)
+        # self.selall.stateChanged[int].connect(self.selallChanged)
+        # self.selsyn.stateChanged[int].connect(self.selsynChanged)
+        # self.selother.stateChanged[int].connect(self.selotherChanged)
+        # self.selpendant.stateChanged[int].connect(self.selpendantChanged)
+        # self.selall.setCheckState(Qt.Checked)
+        # self.selall.stateChanged[int].connect(self.selallChanged)
+        self.selsyn.stateChanged[int].connect(self.selcheckboxChanged)
+        self.selother.stateChanged[int].connect(self.selcheckboxChanged)
+        self.selpendant.stateChanged[int].connect(self.selcheckboxChanged)
+
+
         self.list = QListWidget(page.wizard())
         self.list.itemChanged.connect(self.itemChanged)
         self.list2 = QListWidget(page.wizard())
@@ -380,6 +387,23 @@ class LauncherModule(Executor):
             else:
                 self.usedcases.pop(pkg, 'None')
 
+    def selcheckboxChanged(self,state):
+        print u'9个:',self.selsyn.isChecked(),state
+        if self.selsyn.isChecked():
+            pass
+        else:
+            pass
+        print u'挂件:', self.selpendant.isChecked(), state
+        if self.selpendant.isChecked():
+            pass
+        else:
+            pass
+        print u'其它:', self.selother.isChecked(), state
+        if self.selother.isChecked():
+            pass
+        else:
+            pass
+
     def radio1Toggled(self, checked):
         self.module_start = checked
         if checked:
@@ -415,6 +439,8 @@ class LauncherModule(Executor):
 
     def selallChanged(self, state):
         print u'全选:', state
+        print self.sender()
+        print '==========='
         if state:
             self.selpendant.setChecked(not state)
             self.selother.setChecked(not state)

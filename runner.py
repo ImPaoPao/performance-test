@@ -64,28 +64,28 @@ class Executor(object):
         self.import_script()
         self.__kill_track()
         log(u'正在执行 %s 测试' % self.title())
-        # print u'正在执行 %s 测试' % self.id()
-        # self.start()
-        # self.adb.shell('touch %s/track' % self.data_work_path)
-        # while 1:
-        #     if self.adb.shell_readline('{0}/busybox tail -1 {0}/track'.format(self.data_work_path)) == 'done':
-        #         break
-        #     p = self.adb.shell_open('{0}/busybox tail -1 -F {0}/track'.format(self.data_work_path))
-        #     while 1:
-        #         line = p.stdout.readline()
-        #         if not line or line.strip() == 'done':
-        #             break
-        #         elif line.strip():
-        #             echo_to_file(self.adb, '', '%s/track' % self.data_work_path)
-        #             self.track(line.strip())
-        #     p.terminate()
-        #     self.__kill_track()
+        print u'正在执行 %s 测试' % self.id()
+        self.start()
+        self.adb.shell('touch %s/track' % self.data_work_path)
+        while 1:
+            if self.adb.shell_readline('{0}/busybox tail -1 {0}/track'.format(self.data_work_path)) == 'done':
+                break
+            p = self.adb.shell_open('{0}/busybox tail -1 -F {0}/track'.format(self.data_work_path))
+            while 1:
+                line = p.stdout.readline()
+                if not line or line.strip() == 'done':
+                    break
+                elif line.strip():
+                    echo_to_file(self.adb, '', '%s/track' % self.data_work_path)
+                    self.track(line.strip())
+            p.terminate()
+            self.__kill_track()
         log(u'%s 测试执行完成' % self.title())
-        # self.shell(('done',)).wait()
+        self.shell(('done',)).wait()
         log(u'正在导出 %s 测试数据' % self.title())
-        # self.export_result()
+        self.export_result()
         log(u'生成 %s 报告' % self.title())
-        # self.parsers()
+        self.parsers()
 
     def stop(self):
         pass
@@ -98,7 +98,7 @@ class Executor(object):
         self.adb.shell('rm -rf %s' % self.data_work_path)
         self.adb.shell('mkdir -p %s' % self.data_work_path)
         print 'push:', os.path.join(WORK_DIR, self.id()), self.data_work_path
-        self.adb.push(os.path.join(WORK_DIR, self.id()), self.data_work_path)
+        self.adb.push(os.path.join(WORK_DIR, self.id()), DATA_LOCAL_TMP)
         self.adb.shell('chmod 755 %s/busybox' % self.data_work_path)
 
     def export_result(self):

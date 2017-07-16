@@ -8,8 +8,6 @@ from distutils.core import setup
 from glob import glob
 from os.path import dirname, join
 
-import matplotlib
-
 from common import getconfig
 
 if len(sys.argv) == 1:

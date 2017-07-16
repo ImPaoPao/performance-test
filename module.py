@@ -136,7 +136,6 @@ class LauncherModule(Executor):
     def import_script(self):
         super(LauncherModule, self).import_script()
         package_list = []
-        print self.module_start
         if self.module_start:
             cases = self.usedcases
             print u'模块启动选中:', len(self.usedcases.keys())
@@ -245,6 +244,7 @@ class LauncherModule(Executor):
                     label = list[3]
                     if pkg in self.temppkgs.keys():
                         self.usedcases[metname] = {'label': label, 'pkg': pkg, 'clsname': clsname}
+
         if os.path.exists(mofile):
             with open(mofile, 'rb') as f:
                 for line in f:
@@ -289,42 +289,84 @@ class LauncherModule(Executor):
         gridLayout.addWidget(self.checbox4, 2, 0)
         itemLayout = QVBoxLayout()
         itemLayout.addWidget(self.radio1)
+
         buttonlayout = QGridLayout()
         self.buttonwidget = QWidget()
 
         # buttonlayout.addWidget(QLabel(u'常用组合:'), 0, 0)
-        self.selall = QCheckBox(u'全选')
-        self.selsyn = QCheckBox(u'9个核心模块')
+        # self.selall = QCheckBox(u'全选')
+        self.selsyn = QCheckBox(u'核心模块(图标)')
         self.selpendant = QCheckBox(u'挂件')
         self.selother = QCheckBox(u'其它(不包含挂件和核心模块)')
-        self.checkbox_list =[] #[self.selall, self.selsyn, self.selpendant, self.selother]
+        self.selsyn.setChecked(True)
+        self.selpendant.setChecked(True)
+        self.selother.setChecked(True)
 
         # buttonlayout.addWidget(self.selall, 1, 1)
         buttonlayout.addWidget(self.selsyn, 2, 1)
         buttonlayout.addWidget(self.selpendant, 3, 1)
         buttonlayout.addWidget(self.selother, 4, 1)
         self.buttonwidget.setLayout(buttonlayout)
-
-        # itemLayout.addLayout(buttonlayout)
         itemLayout.addWidget(self.buttonwidget)
 
         itemLayout.addWidget(self.radio2)
+
+        buttonlayout2 = QGridLayout()
+        self.buttonwidget2 = QWidget()
+        self.selm1 = QCheckBox(u'同步语文')
+        self.selm2 = QCheckBox(u'同步数学')
+        self.selm3 = QCheckBox(u'同步英语')
+        self.selm4 = QCheckBox(u'应用商店')
+        self.selm5 = QCheckBox(u'好题精炼')
+        self.selm6 = QCheckBox(u'名师辅导')
+        self.selm7 = QCheckBox(u'视力保护')
+        self.selm8 = QCheckBox(u'学科同步')
+        self.selm9 = QCheckBox(u'英语听说')
+        self.selm1.setChecked(True)
+        self.selm2.setChecked(True)
+        self.selm3.setChecked(True)
+        self.selm4.setChecked(True)
+        self.selm5.setChecked(True)
+        self.selm6.setChecked(True)
+        self.selm7.setChecked(True)
+        self.selm8.setChecked(True)
+        self.selm9.setChecked(True)
+
+        self.selm1.stateChanged[int].connect(self.selm1Changed)
+        self.selm2.stateChanged[int].connect(self.selm2Changed)
+        self.selm3.stateChanged[int].connect(self.selm3Changed)
+        self.selm4.stateChanged[int].connect(self.selm4Changed)
+        self.selm5.stateChanged[int].connect(self.selm5Changed)
+        self.selm6.stateChanged[int].connect(self.selm6Changed)
+        self.selm7.stateChanged[int].connect(self.selm7Changed)
+        self.selm8.stateChanged[int].connect(self.selm8Changed)
+        self.selm9.stateChanged[int].connect(self.selm9Changed)
+
+        buttonlayout2.addWidget(self.selm1, 2, 1)
+        buttonlayout2.addWidget(self.selm2, 3, 1)
+        buttonlayout2.addWidget(self.selm3, 1, 1)
+        buttonlayout2.addWidget(self.selm4, 4, 1)
+        buttonlayout2.addWidget(self.selm5, 5, 1)
+        buttonlayout2.addWidget(self.selm6, 6, 1)
+        buttonlayout2.addWidget(self.selm7, 7, 1)
+        buttonlayout2.addWidget(self.selm8, 8, 1)
+        buttonlayout2.addWidget(self.selm9, 9, 1)
+        self.buttonwidget2.setLayout(buttonlayout2)
+        itemLayout.addWidget(self.buttonwidget2)
+        self.buttonwidget.setEnabled(self.module_start)
+        self.buttonwidget2.setDisabled(self.module_start)
+
         itemLayout.addStretch()
         itemLayout.addLayout(gridLayout)
+
         self.itemGroup = QGroupBox(u'启动速度测试参数')
         self.itemGroup.setLayout(itemLayout)
 
         # self.selall.setCheckState(Qt.Checked)
         # self.selall.stateChanged[int].connect(self.selallChanged)
-        # self.selsyn.stateChanged[int].connect(self.selsynChanged)
-        # self.selother.stateChanged[int].connect(self.selotherChanged)
-        # self.selpendant.stateChanged[int].connect(self.selpendantChanged)
-        # self.selall.setCheckState(Qt.Checked)
-        # self.selall.stateChanged[int].connect(self.selallChanged)
-        self.selsyn.stateChanged[int].connect(self.selcheckboxChanged)
-        self.selother.stateChanged[int].connect(self.selcheckboxChanged)
-        self.selpendant.stateChanged[int].connect(self.selcheckboxChanged)
-
+        self.selsyn.stateChanged[int].connect(self.selsynChanged)
+        self.selother.stateChanged[int].connect(self.selotherChanged)
+        self.selpendant.stateChanged[int].connect(self.selpendantChanged)
 
         self.list = QListWidget(page.wizard())
         self.list.itemChanged.connect(self.itemChanged)
@@ -332,15 +374,17 @@ class LauncherModule(Executor):
         self.list2.itemChanged.connect(self.itemChanged2)
         self.list.setEnabled(self.module_start)
         self.list2.setDisabled(self.module_start)
+
         self.selallin = QListWidgetItem(u'全选')
         self.selallin.setCheckState(Qt.Checked)
         self.selallin.setData(1, QVariant('selall'))
         self.list.addItem(self.selallin)
-        # for key in self.temppkgs.keys():
-        #     item = QListWidgetItem(key)
-        #     item.setCheckState(Qt.Checked)
-        #     item.setData(1, QVariant(key))
-        #     self.list.addItem(item)
+
+        self.selallmodule = QListWidgetItem(u'全选')
+        self.selallmodule.setCheckState(Qt.Checked)
+        self.selallmodule.setData(1, QVariant('selallmodule'))
+        self.list2.addItem(self.selallmodule)
+
         for key in self.tempcases.keys():
             label = self.tempcases[key]['label'].replace("\n", "")
             item = QListWidgetItem(unicode(label))
@@ -370,44 +414,48 @@ class LauncherModule(Executor):
         layout.addWidget(check)
         layout.addLayout(itemLayout)
         page.setLayout(layout)
-
         return page
 
     def itemChanged2(self, item):
-        print 'itemchanged 2 '
+        pkg = str(item.data(1).toPyObject())
+        if pkg == 'selallmodule':
+            for i in range(self.list2.count()):
+                self.list2.item(i).setCheckState(item.checkState())
+            self.selm1.setChecked(item.checkState())
+            self.selm2.setChecked(item.checkState())
+            self.selm3.setChecked(item.checkState())
+            self.selm4.setChecked(item.checkState())
+            self.selm5.setChecked(item.checkState())
+            self.selm6.setChecked(item.checkState())
+            self.selm7.setChecked(item.checkState())
+            self.selm8.setChecked(item.checkState())
+            self.selm9.setChecked(item.checkState())
+        else:
+            if item.checkState() == Qt.Checked:
+                self.mousedcases[pkg] = self.motempcases.get(pkg)
+            else:
+                self.mousedcases.pop(pkg, 'None')
 
     def itemChanged(self, item):
         pkg = str(item.data(1).toPyObject())
         if pkg == 'selall':
             for i in range(self.list.count()):
                 self.list.item(i).setCheckState(item.checkState())
+            self.selsyn.setChecked(item.checkState())
+            self.selother.setChecked(item.checkState())
+            self.selpendant.setChecked(item.checkState())
         else:
             if item.checkState() == Qt.Checked:
                 self.usedcases[pkg] = self.tempcases.get(pkg)
             else:
                 self.usedcases.pop(pkg, 'None')
-
-    def selcheckboxChanged(self,state):
-        print u'9个:',self.selsyn.isChecked(),state
-        if self.selsyn.isChecked():
-            pass
-        else:
-            pass
-        print u'挂件:', self.selpendant.isChecked(), state
-        if self.selpendant.isChecked():
-            pass
-        else:
-            pass
-        print u'其它:', self.selother.isChecked(), state
-        if self.selother.isChecked():
-            pass
-        else:
-            pass
+        print u'选中：',len(self.usedcases.keys())
 
     def radio1Toggled(self, checked):
         self.module_start = checked
         if checked:
             self.buttonwidget.setEnabled(checked)
+            self.buttonwidget2.setDisabled(checked)
             # self.listGroup.setEnabled(checked)
             self.list.setEnabled(checked)
             self.list2.setDisabled(checked)
@@ -415,6 +463,7 @@ class LauncherModule(Executor):
     def radio2Toggled(self, checked):
         if checked:
             self.buttonwidget.setDisabled(checked)
+            self.buttonwidget2.setEnabled(checked)
             # self.listGroup.setDisabled(checked)
             self.list.setDisabled(checked)
             self.list2.setEnabled(checked)
@@ -439,85 +488,121 @@ class LauncherModule(Executor):
 
     def selallChanged(self, state):
         print u'全选:', state
-        print self.sender()
-        print '==========='
-        if state:
-            self.selpendant.setChecked(not state)
-            self.selother.setChecked(not state)
-            self.selsyn.setChecked(not state)
-        else:
-            i = 0
-            for box in self.checkbox_list:
-                if not box.isChecked():
-                    i += 1
-            if i == len(self.checkbox_list):
-                self.selsyn.setChecked(not state)
-                self.selsyn.setCheckState(not state)
         for i in range(self.list.count()):
             self.list.item(i).setCheckState(state)
 
     def selsynChanged(self, state):
-        print u'9个核心模块:', state
-        if state:
-            self.selpendant.setChecked(not state)
-            self.selother.setChecked(not state)
-            self.selall.setChecked(not state)
-        else:
-            i = 0
-            for box in self.checkbox_list:
-                if not box.isChecked():
-                    i += 1
-            if i == len(self.checkbox_list):
-                self.selall.setChecked(not state)
-                self.selall.setCheckState(not state)
-        for i in range(self.list.count()):
-            metname = str(self.list.item(i).data(1).toPyObject())
-            # pkg = str(self.list.item(i).data(2).toPyObject())
-            if metname in center_module:
-                self.list.item(i).setCheckState(state)
-            else:
-                self.list.item(i).setCheckState(not state)
-                # pkg = str(self.list.item(i).data(1).toPyObject())
-                # print pkg
+        print u'核心模块:', state
+        self.checkboxToggled1(self.selsyn, state)
+        # for i in range(self.list.count()):
+        #     metname = str(self.list.item(i).data(1).toPyObject())
+        #     if metname in center_module:
+        #         if self.list.item(i).checkState() != state:
+        #             self.list.item(i).setCheckState(state)
+        # print u'选中:', len(self.usedcases.keys())
 
     def selotherChanged(self, state):
         print u'其它不包含挂件和核心:', state
-        if state:
-            self.selpendant.setChecked(not state)
-            self.selall.setChecked(not state)
-            self.selsyn.setChecked(not state)
-        else:
-            i = 0
-            for box in self.checkbox_list:
-                if not box.isChecked():
-                    i += 1
-            if i == len(self.checkbox_list):
-                self.selsyn.setChecked(not state)
-                self.selsyn.setCheckState(not state)
-        for i in range(self.list.count()):
-            metname = str(self.list.item(i).data(1).toPyObject())
-            if 'Pendant' not in metname and metname not in center_module:
-                self.list.item(i).setCheckState(state)
-            else:
-                self.list.item(i).setCheckState(not state)
+        self.checkboxToggled1(self.selother, state)
+        # if self.list.item(0).checkState() == state:
+        #     print u'和全选状态一样，不做任何操作'
+        #     return
+        # for i in range(self.list.count()):
+        #     metname = str(self.list.item(i).data(1).toPyObject())
+        #     if metname == 'selall':
+        #         continue
+        #     if 'Pendant' not in metname and metname not in center_module:
+        #         if self.list.item(i).checkState() != state:
+        #             self.list.item(i).setCheckState(state)
+        # print u'选中:', len(self.usedcases.keys())
 
     def selpendantChanged(self, state):
         print u'挂件:', state
-        if state:
-            self.selother.setChecked(not state)
-            self.selall.setChecked(not state)
-            self.selsyn.setChecked(not state)
-        else:
-            i = 0
-            for box in self.checkbox_list:
-                if not box.isChecked():
-                    i += 1
-            if i == len(self.checkbox_list):
-                self.selsyn.setChecked(not state)
-                self.selsyn.setCheckState(not state)
+        self.checkboxToggled1(self.selpendant,state)
+        # if self.list.item(0).checkState() == state:
+        #     print u'和全选状态一样，不做任何操作'
+        #     return
+        # for i in range(self.list.count()):
+        #     metname = str(self.list.item(i).data(1).toPyObject())
+        #     if 'Pendant' in metname:
+        #         if self.list.item(i).checkState() != state:
+        #             self.list.item(i).setCheckState(state)
+        # print u'选中:', len(self.usedcases.keys())
+        # print len(self.usedcases.keys()),self.list.count()
+        # if len(self.usedcases.keys())==self.list.count()-1:
+        #     self.list.item(0).setCheckState(Qt.Checked)
+        # if len(self.usedcases.keys())==0:
+        #     self.list.item(0).setCheckState(Qt.Unchecked)
+    # 页面切换速度
+    def selm1Changed(self, state):
+        print 'selm1Changed', state
+        self.checkboxToggled('com.eebbk.synchinese', state)
+
+    def selm2Changed(self, state):
+        print 'selm2Changed'
+        self.checkboxToggled('com.eebbk.synmath', state)
+
+    def selm3Changed(self, state):
+        print 'selm3Changed'
+        self.checkboxToggled('com.eebbk.syncenglish', state)
+
+    def selm4Changed(self, state):
+        print 'selm4Changed'
+        self.checkboxToggled('com.eebbk.bbkmiddlemarket', state)
+
+    def selm5Changed(self, state):
+        print 'selm5Changed'
+        self.checkboxToggled('com.eebbk.questiondatabase', state)
+
+    def selm6Changed(self, state):
+        print 'selm6Changed'
+        self.checkboxToggled('com.eebbk.vtraining', state)
+
+    def selm7Changed(self, state):
+        print 'selm7Changed'
+        self.checkboxToggled('com.eebbk.vision', state)
+
+    def selm8Changed(self, state):
+        print 'selm8Changed'
+        self.checkboxToggled('com.eebbk.synstudy', state)
+
+    def selm9Changed(self, state):
+        print 'selm9Changed'
+        self.checkboxToggled('com.eebbk.englishtalk', state)
+
+    def checkboxToggled(self, pkg, state):
+        for i in range(self.list2.count()):
+            metname = str(self.list2.item(i).data(1).toPyObject())
+            if metname == 'selallmodule':
+                continue
+            if self.motempcases[metname]['pkg'] == pkg:
+                if self.list2.item(i).checkState() != state:
+                    self.list2.item(i).setCheckState(state)
+        print u'选中:', len(self.mousedcases.keys())
+        print len(self.mousedcases.keys()),self.list2.count()
+        if len(self.mousedcases.keys())==self.list2.count()-1:
+            self.list2.item(0).setCheckState(Qt.Checked)
+        if len(self.mousedcases.keys())==0:
+            self.list2.item(0).setCheckState(Qt.Unchecked)
+
+    def checkboxToggled1(self, sender, state):
         for i in range(self.list.count()):
             metname = str(self.list.item(i).data(1).toPyObject())
-            if 'Pendant' in metname:
-                self.list.item(i).setCheckState(state)
-            else:
-                self.list.item(i).setCheckState(not state)
+            if sender==self.selpendant:
+                if 'Pendant' in metname:
+                    if self.list.item(i).checkState() != state:
+                        self.list.item(i).setCheckState(state)
+            elif sender==self.selsyn:
+                if metname in center_module:
+                    if self.list.item(i).checkState() != state:
+                        self.list.item(i).setCheckState(state)
+            elif sender==self.selother:
+                if 'Pendant' not in metname and metname not in center_module and metname!='selall':
+                    if self.list.item(i).checkState() != state:
+                        self.list.item(i).setCheckState(state)
+        print u'选中:', len(self.usedcases.keys())
+        print len(self.usedcases.keys()),self.list.count()
+        if len(self.usedcases.keys())==self.list.count()-1:
+            self.list.item(0).setCheckState(Qt.Checked)
+        if len(self.usedcases.keys())==0:
+            self.list.item(0).setCheckState(Qt.Unchecked)

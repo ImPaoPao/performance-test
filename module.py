@@ -189,7 +189,7 @@ class LauncherModule(Executor):
                         data[key]['loadresult'].append(loadresult)
                         data[key]['refreshresult'].append(refreshresult)
                         data[key]['runtime'].append(run_time)
-                        data[key]['errortime'].append(error_time / 2)
+                        data[key]['errortime'].append(error_time)
         return data
 
     def csv_generate(self, data, filename):

@@ -129,6 +129,8 @@ class LauncherModule(Executor):
                     result = os.path.join(root, 'result.xml')
                     if os.path.exists(result):
                         dir_dict[os.path.basename(root)] = result
+            if os.path.basename(root) not in dir_dict.keys():
+                dir_dict[os.path.basename(root)] = ''
         data = self.parser_files(dir_dict)
         self.csv_generate(data, self.id())
         self.log(self.title() + u'报告路径:' + self.work_out)
@@ -153,15 +155,22 @@ class LauncherModule(Executor):
         data = {}
         for key, value in file_dict.items():
             result = value
+            data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
+                         'loadresult': [], 'errortime': []}
+            if not os.path.exists(result):
+                data[key] = {'exetime': [0], 'rexetime': [0], 'runtime': [0], 'refreshresult': [0], 'memory': [0],
+                             'loadresult': [0], 'errortime': [0]}
+                continue
             try:
                 tree = ET.parse(result)
                 root = tree.getroot()
             except Exception as e:
                 print(u'读取xml文件异常')
+                data[key] = {'exetime': [0], 'rexetime': [0], 'runtime': [0], 'refreshresult': [0], 'memory': [0],
+                             'loadresult': [0], 'errortime': [0]}
+                continue
             else:
                 segments = root.findall('Segment')
-                data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
-                             'loadresult': [], 'errortime': [], 'lastloadresult': []}
                 for segment in segments:
                     memory = segment.get('memory')
                     if memory != None:
@@ -180,16 +189,17 @@ class LauncherModule(Executor):
                         if int(loadresult) <= 10:
                             exe_time = temptime  # + error_time / 4
                             rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
+                            data[key]['errortime'].append(error_time)
                         else:
-                            exe_time = temptime + error_time * 1 / 4
-                            rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                            exe_time = temptime + error_time / 2
+                            rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                            data[key]['errortime'].append(error_time / 2)
                         run_time = get_exetime(starttime, endtime)
                         data[key]['exetime'].append(exe_time)
                         data[key]['rexetime'].append(rexe_time)
                         data[key]['loadresult'].append(loadresult)
                         data[key]['refreshresult'].append(refreshresult)
                         data[key]['runtime'].append(run_time)
-                        data[key]['errortime'].append(error_time)
         return data
 
     def csv_generate(self, data, filename):
@@ -203,7 +213,6 @@ class LauncherModule(Executor):
             rexetime = value['rexetime']
             errortime = value['errortime']
             loadresult = value['loadresult']
-            # refreshresult = value['refreshresult']
             if exetime:
                 writer.writerow([key, self.usedcases[key]['label'], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
@@ -211,9 +220,9 @@ class LauncherModule(Executor):
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
             if errortime:
-                writer.writerow(['', '', '最大误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+                writer.writerow(['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if loadresult:
-                writer.writerow(['', '', '上一次匹配度'] + loadresult + [0])
+                writer.writerow(['', '', '上一次匹配度'] + loadresult)
             # 可用内存
             memory = value['memory']
             if memory:
@@ -449,7 +458,7 @@ class LauncherModule(Executor):
                 self.usedcases[pkg] = self.tempcases.get(pkg)
             else:
                 self.usedcases.pop(pkg, 'None')
-        print u'选中：',len(self.usedcases.keys())
+        print u'选中：', len(self.usedcases.keys())
 
     def radio1Toggled(self, checked):
         self.module_start = checked
@@ -518,7 +527,7 @@ class LauncherModule(Executor):
 
     def selpendantChanged(self, state):
         print u'挂件:', state
-        self.checkboxToggled1(self.selpendant,state)
+        self.checkboxToggled1(self.selpendant, state)
         # if self.list.item(0).checkState() == state:
         #     print u'和全选状态一样，不做任何操作'
         #     return
@@ -533,6 +542,7 @@ class LauncherModule(Executor):
         #     self.list.item(0).setCheckState(Qt.Checked)
         # if len(self.usedcases.keys())==0:
         #     self.list.item(0).setCheckState(Qt.Unchecked)
+
     # 页面切换速度
     def selm1Changed(self, state):
         print 'selm1Changed', state
@@ -579,30 +589,30 @@ class LauncherModule(Executor):
                 if self.list2.item(i).checkState() != state:
                     self.list2.item(i).setCheckState(state)
         print u'选中:', len(self.mousedcases.keys())
-        print len(self.mousedcases.keys()),self.list2.count()
-        if len(self.mousedcases.keys())==self.list2.count()-1:
+        print len(self.mousedcases.keys()), self.list2.count()
+        if len(self.mousedcases.keys()) == self.list2.count() - 1:
             self.list2.item(0).setCheckState(Qt.Checked)
-        if len(self.mousedcases.keys())==0:
+        if len(self.mousedcases.keys()) == 0:
             self.list2.item(0).setCheckState(Qt.Unchecked)
 
     def checkboxToggled1(self, sender, state):
         for i in range(self.list.count()):
             metname = str(self.list.item(i).data(1).toPyObject())
-            if sender==self.selpendant:
+            if sender == self.selpendant:
                 if 'Pendant' in metname:
                     if self.list.item(i).checkState() != state:
                         self.list.item(i).setCheckState(state)
-            elif sender==self.selsyn:
+            elif sender == self.selsyn:
                 if metname in center_module:
                     if self.list.item(i).checkState() != state:
                         self.list.item(i).setCheckState(state)
-            elif sender==self.selother:
-                if 'Pendant' not in metname and metname not in center_module and metname!='selall':
+            elif sender == self.selother:
+                if 'Pendant' not in metname and metname not in center_module and metname != 'selall':
                     if self.list.item(i).checkState() != state:
                         self.list.item(i).setCheckState(state)
         print u'选中:', len(self.usedcases.keys())
-        print len(self.usedcases.keys()),self.list.count()
-        if len(self.usedcases.keys())==self.list.count()-1:
+        print len(self.usedcases.keys()), self.list.count()
+        if len(self.usedcases.keys()) == self.list.count() - 1:
             self.list.item(0).setCheckState(Qt.Checked)
-        if len(self.usedcases.keys())==0:
+        if len(self.usedcases.keys()) == 0:
             self.list.item(0).setCheckState(Qt.Unchecked)

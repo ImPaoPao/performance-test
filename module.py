@@ -191,8 +191,13 @@ class LauncherModule(Executor):
                         refreshtime = segment.get('refreshtime')
                         loadresult = segment.get('loadresult')
                         refreshresult = segment.get('refreshresult')
-                        error_time = get_exetime(lasttime, loadtime)
-                        temptime = get_exetime(starttime, lasttime)
+
+                        if lasttime is not '':
+                            temptime = get_exetime(starttime, lasttime)
+                            error_time = get_exetime(lasttime, loadtime)
+                        else:
+                            temptime = get_exetime(starttime, loadtime)
+                            error_time = 0
                         if int(loadresult) <= 10:
                             exe_time = temptime  # + error_time / 4
                             rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4

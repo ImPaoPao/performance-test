@@ -98,7 +98,7 @@ class Executor(object):
         self.adb.shell('rm -rf %s' % self.data_work_path)
         self.adb.shell('mkdir -p %s' % self.data_work_path)
         print 'push:', os.path.join(WORK_DIR, self.id()), self.data_work_path
-        self.adb.push(os.path.join(WORK_DIR, self.id()), DATA_LOCAL_TMP)
+        self.adb.push(os.path.join(WORK_DIR, self.id()), self.data_work_path)
         self.adb.shell('chmod 755 %s/busybox' % self.data_work_path)
 
     def export_result(self):

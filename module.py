@@ -129,8 +129,11 @@ class LauncherModule(Executor):
                     result = os.path.join(root, 'result.xml')
                     if os.path.exists(result):
                         dir_dict[os.path.basename(root)] = result
-            if os.path.basename(root) not in dir_dict.keys():
-                dir_dict[os.path.basename(root)] = ''
+                    break
+                if name == 'instrument.txt':
+                    result = os.path.join(root, 'instrument.txt')
+                    if os.path.exists(result) and os.path.basename(root) not in dir_dict.keys():
+                        dir_dict[os.path.basename(root)] = ''
         data = self.parser_files(dir_dict)
         self.csv_generate(data, self.id())
         self.log(self.title() + u'报告路径:' + self.work_out)
@@ -171,6 +174,10 @@ class LauncherModule(Executor):
                 continue
             else:
                 segments = root.findall('Segment')
+                if len(segments) < 1:
+                    data[key] = {'exetime': [0], 'rexetime': [0], 'runtime': [0], 'refreshresult': [0], 'memory': [0],
+                                 'loadresult': [0], 'errortime': [0]}
+                    continue
                 for segment in segments:
                     memory = segment.get('memory')
                     if memory != None:
@@ -213,14 +220,19 @@ class LauncherModule(Executor):
             rexetime = value['rexetime']
             errortime = value['errortime']
             loadresult = value['loadresult']
+            if self.module_start:
+                cases = self.usedcases
+            else:
+                cases = self.mousedcases
             if exetime:
-                writer.writerow([key, self.usedcases[key]['label'], '点击-页面出现'] + exetime + [
+                writer.writerow([key, cases[key]['label'], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
             if errortime:
-                writer.writerow(['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+                writer.writerow(
+                    ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if loadresult:
                 writer.writerow(['', '', '上一次匹配度'] + loadresult)
             # 可用内存

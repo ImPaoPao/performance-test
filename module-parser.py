@@ -118,61 +118,71 @@ class LauncherModule():
                     result = os.path.join(root, 'result.xml')
                     if os.path.exists(result):
                         dir_dict[os.path.basename(root)] = result
+                    break
+                if name == 'instrument.txt':
+                    result = os.path.join(root, 'instrument.txt')
+                    if os.path.exists(result) and os.path.basename(root) not in dir_dict.keys():
+                        dir_dict[os.path.basename(root)] = ''
         data = self.parser_files(dir_dict)
-        self.csv_generate(data, self.id())
+        self.csv_generate(data, 'temp')
 
     def parser_files(self, file_dict):
         data = {}
         for key, value in file_dict.items():
-            print u'用例：', key
+            print u'用例：', key, value
             result = value
+            data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
+                         'loadresult': [], 'errortime': []}
+            if not os.path.exists(result):
+                data[key] = {'exetime': [0], 'rexetime': [0], 'runtime': [0], 'refreshresult': [0], 'memory': [0],
+                             'loadresult': [0], 'errortime': [0]}
+                print 'not result '
+                continue
             try:
                 tree = ET.parse(result)
                 root = tree.getroot()
             except Exception as e:
                 print(u'读取xml文件异常')
+                data[key] = {'exetime': [0], 'rexetime': [0], 'runtime': [0], 'refreshresult': [0], 'memory': [0],
+                             'loadresult': [0], 'errortime': [0]}
+                print 'xml xceprion '
+                continue
             else:
+                print 'else==='
                 segments = root.findall('Segment')
-                data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
-                             'loadresult': [], 'errortime': [], 'lastloadresult': []}
+                if len(segments) < 1:
+                    data[key] = {'exetime': [0], 'rexetime': [0], 'runtime': [0], 'refreshresult': [0], 'memory': [0],
+                                 'loadresult': [0], 'errortime': [0]}
+                    continue
                 for segment in segments:
                     memory = segment.get('memory')
                     if memory != None:
                         if '/' in memory:
                             data[key]['memory'].append(memory.split('/')[0])
+                    else:
+                        starttime = segment.get('starttime')
+                        endtime = segment.get('endtime')
+                        loadtime = segment.get('loadtime')
+                        lasttime = segment.get('lasttime')
+                        refreshtime = segment.get('refreshtime')
+                        loadresult = segment.get('loadresult')
+                        refreshresult = segment.get('refreshresult')
+                        error_time = get_exetime(lasttime, loadtime)
+                        temptime = get_exetime(starttime, lasttime)
+                        if int(loadresult) <= 10:
+                            exe_time = temptime  # + error_time / 4
+                            rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
+                            data[key]['errortime'].append(error_time)
                         else:
-                            starttime = segment.get('starttime')
-                            endtime = segment.get('endtime')
-                            loadtime = segment.get('loadtime')
-                            lasttime = segment.get('lasttime')
-                            refreshtime = segment.get('refreshtime')
-                            loadresult = segment.get('loadresult')
-                            lastloadresult = segment.get('lastloadresult')
-                            print u'上一次匹配度', lastloadresult, type(lastloadresult)
-                            refreshresult = segment.get('refreshresult')
-                            error_time = get_exetime(lasttime, loadtime)
-                            temptime = get_exetime(starttime, lasttime)
-                            if int(lastloadresult) <= 5:
-                                print key, 'lasttime  ==============='
-                                exe_time = temptime
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time
-                            elif int(lastloadresult) > 10:
-                                print key, 'lasttime + 3/4 ==============='
-                                exe_time = temptime + error_time * 3 / 4
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 4
-                            else:
-                                print key, 'lasttime  1/2 '
-                                exe_time = temptime + error_time / 2
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
-                            # rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
-                            run_time = get_exetime(starttime, endtime)
-                            data[key]['exetime'].append(exe_time)
-                            data[key]['rexetime'].append(rexe_time)
-                            data[key]['loadresult'].append(loadresult)
-                            data[key]['lastloadresult'].append(lastloadresult)
-                            data[key]['refreshresult'].append(refreshresult)
-                            data[key]['runtime'].append(run_time)
+                            exe_time = temptime + error_time / 2
+                            rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
                             data[key]['errortime'].append(error_time / 2)
+                        run_time = get_exetime(starttime, endtime)
+                        data[key]['exetime'].append(exe_time)
+                        data[key]['rexetime'].append(rexe_time)
+                        data[key]['loadresult'].append(loadresult)
+                        data[key]['refreshresult'].append(refreshresult)
+                        data[key]['runtime'].append(run_time)
         return data
 
     def csv_generate(self, data, filename):
@@ -187,25 +197,21 @@ class LauncherModule():
             rexetime = value['rexetime']
             errortime = value['errortime']
             loadresult = value['loadresult']
-            refreshresult = value['refreshresult']
-            lastloadresult = value['lastloadresult']
-            writer.writerow([key])
-            print u'运行时间:', exetime
-            print u'最大误差:', errortime
+            # if self.module_start:
+            #     cases = self.usedcases
+            # else:
+            #     cases = self.mousedcases
             if exetime:
-                writer.writerow(['', dict1[key] if key in dict1 else key, '点击-页面出现'] + exetime + [
+                writer.writerow([key, dict1[key], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
-            if errortime:
-                writer.writerow(['', '', '最大误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+            if errortime:
+                writer.writerow(
+                    ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if loadresult:
-                writer.writerow(['', '', '上一次匹配度'] + lastloadresult + [0])
-            # if loadresult:
-            #     writer.writerow(['', '', '匹配度'] + [0] + loadresult)
-            # if refreshresult:
-            #     writer.writerow(['', '', '匹配度'] + [0] + refreshresult)
+                writer.writerow(['', '', '上一次匹配度'] + loadresult)
 
             # 可用内存
             memory = value['memory']
@@ -223,6 +229,7 @@ class LauncherModule():
 
 if __name__ == "__main__":
     print "fffffffffffffff"
+    print sys.argv[1]
     threads = []
     all_connect_devices = adbkit.devices()
     print sys.argv[2]

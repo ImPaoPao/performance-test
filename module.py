@@ -199,9 +199,14 @@ class LauncherModule(Executor):
                             temptime = get_exetime(starttime, loadtime)
                             error_time = 0
                         if int(loadresult) <= 10:
-                            exe_time = temptime  # + error_time / 4
-                            rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
-                            data[key]['errortime'].append(error_time)
+                            if key == 'launchVision':
+                                exe_time = temptime + error_time / 2
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                data[key]['errortime'].append(error_time / 2)
+                            else:
+                                exe_time = temptime  # + error_time / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
+                                data[key]['errortime'].append(error_time)
                         else:
                             exe_time = temptime + error_time / 2
                             rexe_time = get_exetime(starttime, refreshtime) - error_time / 2

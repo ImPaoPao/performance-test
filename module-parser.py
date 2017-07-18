@@ -167,12 +167,21 @@ class LauncherModule():
                         refreshtime = segment.get('refreshtime')
                         loadresult = segment.get('loadresult')
                         refreshresult = segment.get('refreshresult')
-                        error_time = get_exetime(lasttime, loadtime)
-                        temptime = get_exetime(starttime, lasttime)
+                        if lasttime is not '':
+                            temptime = get_exetime(starttime, lasttime)
+                            error_time = get_exetime(lasttime, loadtime)
+                        else:
+                            temptime = get_exetime(starttime, loadtime)
+                            error_time = 0
                         if int(loadresult) <= 10:
-                            exe_time = temptime  # + error_time / 4
-                            rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
-                            data[key]['errortime'].append(error_time)
+                            if key =='launchVision':
+                                exe_time = temptime + error_time
+                                rexe_time = get_exetime(starttime, refreshtime)
+                                data[key]['errortime'].append(error_time)
+                            else:
+                                exe_time = temptime  # + error_time / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
+                                data[key]['errortime'].append(error_time)
                         else:
                             exe_time = temptime + error_time / 2
                             rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
@@ -197,10 +206,6 @@ class LauncherModule():
             rexetime = value['rexetime']
             errortime = value['errortime']
             loadresult = value['loadresult']
-            # if self.module_start:
-            #     cases = self.usedcases
-            # else:
-            #     cases = self.mousedcases
             if exetime:
                 writer.writerow([key, dict1[key], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
@@ -210,8 +215,8 @@ class LauncherModule():
             if errortime:
                 writer.writerow(
                     ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
-            if loadresult:
-                writer.writerow(['', '', '上一次匹配度'] + loadresult)
+            # if loadresult:
+            #     writer.writerow(['', '', '上一次匹配度'] + loadresult)
 
             # 可用内存
             memory = value['memory']
@@ -228,12 +233,11 @@ class LauncherModule():
 
 
 if __name__ == "__main__":
-    print "fffffffffffffff"
     print sys.argv[1]
     threads = []
     all_connect_devices = adbkit.devices()
-    print sys.argv[2]
     for device in all_connect_devices:
+        print device
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
             LauncherModule(adb, sys.argv[2]).parsers()

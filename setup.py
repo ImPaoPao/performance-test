@@ -60,7 +60,8 @@ if sys.argv[1] == 'py2exe':
         'logo.ico',
         'v.txt',
         'readme.txt',
-        'testcase.ini'
+        'testcase.ini',
+        'modulecase.txt'
     ]))
     data_files.append(('module', glob(join('module', '*'))))
     data_files.append(('freememory', glob(join('freememory', '*'))))

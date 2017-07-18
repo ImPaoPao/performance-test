@@ -525,45 +525,15 @@ class LauncherModule(Executor):
     def selsynChanged(self, state):
         print u'核心模块:', state
         self.checkboxToggled1(self.selsyn, state)
-        # for i in range(self.list.count()):
-        #     metname = str(self.list.item(i).data(1).toPyObject())
-        #     if metname in center_module:
-        #         if self.list.item(i).checkState() != state:
-        #             self.list.item(i).setCheckState(state)
-        # print u'选中:', len(self.usedcases.keys())
 
     def selotherChanged(self, state):
         print u'其它不包含挂件和核心:', state
         self.checkboxToggled1(self.selother, state)
-        # if self.list.item(0).checkState() == state:
-        #     print u'和全选状态一样，不做任何操作'
-        #     return
-        # for i in range(self.list.count()):
-        #     metname = str(self.list.item(i).data(1).toPyObject())
-        #     if metname == 'selall':
-        #         continue
-        #     if 'Pendant' not in metname and metname not in center_module:
-        #         if self.list.item(i).checkState() != state:
-        #             self.list.item(i).setCheckState(state)
-        # print u'选中:', len(self.usedcases.keys())
 
     def selpendantChanged(self, state):
         print u'挂件:', state
         self.checkboxToggled1(self.selpendant, state)
-        # if self.list.item(0).checkState() == state:
-        #     print u'和全选状态一样，不做任何操作'
-        #     return
-        # for i in range(self.list.count()):
-        #     metname = str(self.list.item(i).data(1).toPyObject())
-        #     if 'Pendant' in metname:
-        #         if self.list.item(i).checkState() != state:
-        #             self.list.item(i).setCheckState(state)
-        # print u'选中:', len(self.usedcases.keys())
-        # print len(self.usedcases.keys()),self.list.count()
-        # if len(self.usedcases.keys())==self.list.count()-1:
-        #     self.list.item(0).setCheckState(Qt.Checked)
-        # if len(self.usedcases.keys())==0:
-        #     self.list.item(0).setCheckState(Qt.Unchecked)
+
 
     # 页面切换速度
     def selm1Changed(self, state):

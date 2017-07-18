@@ -154,11 +154,12 @@ class ChildWindow(QWidget):
 
         splitter1 = QSplitter(Qt.Vertical)
         splitter2 = QSplitter(Qt.Horizontal)
-        splitter1.addWidget(self.devinfo)
 
-        mwidget = QWidget()
-        mwidget.setLayout(self.createSelectLayout())
-        splitter2.addWidget(mwidget)
+        splitter1.addWidget(self.devinfo)
+        #mwidget = QWidget()
+        #mwidget.setLayout(self.createSelectLayout())
+
+        splitter2.addWidget(self.createSelectLayout())
         splitter2.addWidget(self.message)
         splitter1.addWidget(splitter2)
         layout = QVBoxLayout()
@@ -179,11 +180,16 @@ class ChildWindow(QWidget):
     def updateResultButton(self, path):
         self.reportButton.setEnabled(True)
 
-    def executeBuildTest(self):
+    def executeBuildSettings(self):
         self.login = False
         self.datatype = True
         self.getlog = False
-        if BuildSetupWizard(self).exec_() and self.checkDict:
+        temp = BuildSetupWizard(self).exec_()
+        if temp:
+            self.okButton.setEnabled(True)
+
+    def executeBuildTest(self):
+        if self.checkDict:
             self.t = SetupExecuteThread(self.adb, executor=self.checkDict, login=self.login,
                                         datatype=self.datatype, getlog=self.getlog, workout=self.workout)
             self.t.logged.connect(self.showMessage)
@@ -206,14 +212,18 @@ class ChildWindow(QWidget):
         self.message.append(line)
 
     def createSelectLayout(self):
-        self.listWidget = QListWidget(self)
-        for i in self.executor.keys():
-            item = QListWidgetItem(self.executor.get(i).title())
-            item.setCheckState(Qt.Unchecked)
-            item.setData(1, QVariant(i))
-            self.listWidget.addItem(item)
-        self.okButton = QPushButton(u'运行')
+        # self.listWidget = QListWidget(self)
+        # for i in self.executor.keys():
+        #     print i,self.executor.get(i)
+        #     item = QListWidgetItem(self.executor.get(i).title())
+        #     item.setCheckState(Qt.Unchecked)
+        #     item.setData(1, QVariant(i))
+        #     self.listWidget.addItem(item)
+        self.settingButton = QPushButton(u'参数设置')
+        self.settingButton.clicked.connect(self.buttonClicked)
+        self.okButton = QPushButton(u'开始测试')
         self.okButton.clicked.connect(self.buttonClicked)
+        self.okButton.setEnabled(False)
         self.selallButton = QPushButton(u'全选')
         self.selallButton.clicked.connect(self.buttonClicked)
         self.disallButton = QPushButton(u'反选')
@@ -222,26 +232,29 @@ class ChildWindow(QWidget):
         self.reportButton.clicked.connect(self.buttonClicked)
         self.reportButton.setEnabled(False)
         buttonBox = QDialogButtonBox(Qt.Vertical)
+        buttonBox.addButton(self.settingButton, QDialogButtonBox.ActionRole)
         buttonBox.addButton(self.okButton, QDialogButtonBox.ActionRole)
-        buttonBox.addButton(self.selallButton, QDialogButtonBox.ActionRole)
-        buttonBox.addButton(self.disallButton, QDialogButtonBox.ActionRole)
+        # buttonBox.addButton(self.selallButton, QDialogButtonBox.ActionRole)
+        # buttonBox.addButton(self.disallButton, QDialogButtonBox.ActionRole)
         buttonBox.addButton(self.reportButton, QDialogButtonBox.ActionRole)
-
-        layout = QHBoxLayout()
-        layout.addWidget(self.listWidget)
-        layout.addWidget(buttonBox)
-        return layout
+        #layout = QHBoxLayout()
+        # layout.addWidget(self.listWidget)
+        # layout.addWidget(buttonBox)
+        return buttonBox
 
     def buttonClicked(self):
         sender = self.sender()
+        if sender==self.settingButton:
+            self.checkDict = self.executor
+            self.executeBuildSettings()
         if sender == self.okButton:
             if self.reportButton.isEnabled():
                 self.reportButton.setEnabled(False)
-            self.checkDict = {}
-            for i in range(self.listWidget.count()):
-                item = self.listWidget.item(i)
-                if item.checkState() == Qt.Checked:
-                    self.checkDict[i] = copy.copy(self.executor.get(item.data(1).toPyObject()))
+            self.checkDict = self.executor
+            # for i in range(self.listWidget.count()):
+            #     item = self.listWidget.item(i)
+                # if item.checkState() == Qt.Checked:
+                # self.checkDict[i] = copy.copy(self.executor.get(item.data(1).toPyObject()))
             self.executeBuildTest()
         elif sender == self.selallButton:
             for i in range(self.listWidget.count()):

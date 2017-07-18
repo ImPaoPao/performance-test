@@ -77,7 +77,6 @@ class QueryPackageThread(QThread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-
         self.initUI()
         self.update()
 
@@ -99,7 +98,7 @@ class MainWindow(QMainWindow):
 
         self.readSettings()
 
-        self.setWindowTitle(u'自动化测试平台开发版')
+        self.setWindowTitle(u'性能测试工具')
         self.setWindowIcon(QIcon('logo.png'))
         self.setUnifiedTitleAndToolBarOnMac(True)
 
@@ -126,7 +125,19 @@ class MainWindow(QMainWindow):
                     serialnos.append(device['serialno'])
                 item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
                 serialno = item if ok and item else None
-
+            # deviceDialog = DeviceDialog(self)
+            # if deviceDialog.exec_():
+            #     print '=========='
+            # temp =  QMainWindow(self)
+            # temp.setWindowModality(Qt.WindowModal)
+            # temp.show()
+            # temp.resize(200,200)
+            # deviceDialog.resize(200, 200)
+            # deviceLayout = QHBoxLayout()
+            # deviceLayout.addWidget(QLabel(u'我是标题？？？？'))
+            # deviceLayout.addWidget(QLabel(u'我是设备列表？？？？'))
+            # deviceDialog.setLayout(deviceLayout)
+            # deviceDialog.exec_()
             if serialno:
                 self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
                 self.cdt = ConnectDeviceThread(serialno)
@@ -351,3 +362,27 @@ class MainWindow(QMainWindow):
     def setActiveSubWindow(self, window):
         if window:
             self.mdiArea.setActiveSubWindow(window)
+
+
+class DeviceDialog(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        # self.resize(200, 200)
+        deviceLayout = QHBoxLayout()
+        deviceLayout.addWidget(QLabel(u'我是标题？？？？'))
+        deviceLayout.addWidget(QLabel(u'我是设备列表？？？？'))
+
+        buttonBox = QDialogButtonBox(parent=self)
+        buttonBox.setOrientation(Qt.Horizontal)
+        buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
+        buttonBox.accepted.connect(self.accept)
+        buttonBox.rejected.connect(self.reject)
+        self.setLayout(deviceLayout)
+
+    def accept(self):
+        super(DeviceDialog, self).accept()
+        print 'ok'
+
+    def reject(self):
+        super(DeviceDialog, self).reject()
+        print 'cancel'

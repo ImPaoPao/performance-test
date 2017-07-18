@@ -123,11 +123,12 @@ class MainWindow(QMainWindow):
                 serialnos = []
                 for device in devices:
                     serialnos.append(device['serialno'])
-                item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
-                serialno = item if ok and item else None
-            # deviceDialog = DeviceDialog(self)
-            # if deviceDialog.exec_():
-            #     print '=========='
+                # item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
+                # serialno = item if ok and item else None
+                self.checkedDevices = []
+                deviceDialog = DeviceDialog(self,serialnos)
+                print deviceDialog.exec_()
+                print '=========='
             # temp =  QMainWindow(self)
             # temp.setWindowModality(Qt.WindowModal)
             # temp.show()
@@ -138,12 +139,12 @@ class MainWindow(QMainWindow):
             # deviceLayout.addWidget(QLabel(u'我是设备列表？？？？'))
             # deviceDialog.setLayout(deviceLayout)
             # deviceDialog.exec_()
-            if serialno:
-                self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
-                self.cdt = ConnectDeviceThread(serialno)
-                self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
-                self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
-                self.cdt.start()
+            # if serialno:
+            #     self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+            #     self.cdt = ConnectDeviceThread(serialno)
+            #     self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+            #     self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+            #     self.cdt.start()
         else:
             QMessageBox.information(self, u'提示', u'无法获取在线设备列表，请连接设备并打开USB调试后重试')
 
@@ -235,59 +236,6 @@ class MainWindow(QMainWindow):
                                         statusTip=u'连接在线的设备',
                                         triggered=self.connectDevice)
 
-        # self.loginAccountsAct = QAction(QIcon('images/lock.png'), u'登录帐号', self,
-        #                                 shortcut='Ctrl+L',
-        #                                 statusTip=u'登录预置的应用帐号',
-        #                                 triggered=self.loginAccounts)
-        # self.importDataAct = QAction(QIcon('images/data.png'), u'导入数据', self,
-        #                              shortcut='Ctrl+I',
-        #                              statusTip=u'导入预置的用户数据',
-        #                              triggered=self.importData)
-        #
-        # self.closeAct = QAction("Cl&ose", self,
-        #                         statusTip="Close the active window",
-        #                         triggered=self.mdiArea.closeActiveSubWindow)
-        # self.closeAllAct = QAction("Close &All", self,
-        #                            statusTip="Close all the windows",
-        #                            triggered=self.mdiArea.closeAllSubWindows)
-        # self.tileAct = QAction("&Tile", self,
-        #                        statusTip="Tile the windows",
-        #                        triggered=self.mdiArea.tileSubWindows)
-        # self.cascadeAct = QAction("&Cascade", self,
-        #                           statusTip="Cascade the windows",
-        #                           triggered=self.mdiArea.cascadeSubWindows)
-        # self.nextAct = QAction("Ne&xt", self,
-        #                        shortcut=QKeySequence.NextChild,
-        #                        statusTip="Move the focus to the next window",
-        #                        triggered=self.mdiArea.activateNextSubWindow)
-        # self.previousAct = QAction("Pre&vious", self,
-        #                            shortcut=QKeySequence.PreviousChild,
-        #                            statusTip="Move the focus to the previous window",
-        #                            triggered=self.mdiArea.activatePreviousSubWindow)
-        # self.separatorAct = QAction(self)
-        # self.separatorAct.setSeparator(True)
-        #
-        # self.uploadFuncTestCaseAct = QAction(u'基本功能测试用例(&B)', self,
-        #                                      statusTip=u'上传基本功能测试用例',
-        #                                      triggered=self.uploadFuncTestCase)
-        # self.uploadPerfTestCaseAct = QAction(u'性能测试用例(&P)', self,
-        #                                      statusTip=u'上传性能测试用例',
-        #                                      triggered=self.uploadPerfTestCase)
-        # self.logAnalyseToolAct = QAction(u'log分析', self,
-        #                                  statusTip=u'自动化分析log定位问题',
-        #                                  triggered=self.executeLogAnalyseTool)
-        # self.logStatToolAct = QAction(u'log统计', self,
-        #                               statusTip=u'统计log标记出现次数',
-        #                               triggered=self.executeLogStatTool)
-        # self.rebootClassifyAct = QAction(u'重启分类', self,
-        #                                  statusTip=u'分析重启原因',
-        #                                  triggered=self.executeRebootTool)
-        # self.compatAct = QAction(u'第三方兼容性分析', self,
-        #                          statusTip=u'分析兼容问题原因',
-        #                          triggered=self.executeCompatTool)
-        # self.uiRunnerAct = QAction(u'UiRunner调试器', self,
-        #                            statusTip=u'调试单个UIRunner用例',
-        #                            triggered=self.executeuiRunnerTool)
 
         # self.updateAct = QAction(u'升级', self,
         #                          triggered=self.update)
@@ -301,25 +249,6 @@ class MainWindow(QMainWindow):
         self.deviceMenu = self.menuBar().addMenu(u'设备(&D)')
         self.deviceMenu.addAction(self.connectDeviceAct)
 
-        # self.runMenu = self.menuBar().addMenu(u'运行(&R)')
-        # self.runMenu.addAction(self.loginAccountsAct)
-        # self.runMenu.addAction(self.importDataAct)
-        # self.runMenu.addSeparator()
-
-        # self.windowMenu = self.menuBar().addMenu(u'窗口(&W)')
-        # self.updateWindowMenu()
-        # self.windowMenu.aboutToShow.connect(self.updateWindowMenu)
-        #
-        # self.toolMenu = self.menuBar().addMenu(u'工具(&T)')
-        # self.uploadMenu = self.toolMenu.addMenu(u'上传(&U)')
-        # self.uploadMenu.addAction(self.uploadFuncTestCaseAct)
-        # self.uploadMenu.addAction(self.uploadPerfTestCaseAct)
-        # self.logAnalysisMenu = self.toolMenu.addMenu(u'日志分析(&A)')
-        # self.toolMenu.addAction(self.logAnalyseToolAct)
-        # self.toolMenu.addAction(self.logStatToolAct)
-        # self.toolMenu.addAction(self.rebootClassifyAct)
-        # self.toolMenu.addAction(self.compatAct)
-        # self.toolMenu.addAction(self.uiRunnerAct)
 
         self.helpMenu = self.menuBar().addMenu(u'帮助(&H)')
         # self.helpMenu.addAction(self.updateAct)
@@ -329,12 +258,7 @@ class MainWindow(QMainWindow):
 
     def createToolBars(self):
         pass
-        # self.deviceToolBar = self.addToolBar('Device')
-        # self.deviceToolBar.addAction(self.connectDeviceAct)
-        #
-        # self.runToolBar = self.addToolBar('Run')
-        # self.runToolBar.addAction(self.loginAccountsAct)
-        # self.runToolBar.addAction(self.importDataAct)
+
 
     def createStatusBar(self):
         self.statusLabel = QLabel()
@@ -365,24 +289,30 @@ class MainWindow(QMainWindow):
 
 
 class DeviceDialog(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        # self.resize(200, 200)
-        deviceLayout = QHBoxLayout()
-        deviceLayout.addWidget(QLabel(u'我是标题？？？？'))
-        deviceLayout.addWidget(QLabel(u'我是设备列表？？？？'))
+    def __init__(self,parent ,serialnos):
+        QDialog.__init__(self,parent)
+        self.serialnos = serialnos
+        self.initUi()
 
+    def initUi(self):
+        self.setWindowTitle(u'设备列表')
+        deviceLayout = QVBoxLayout()
+        deviceLayout.addWidget(QLabel(u'请选择要连接的设备:'))
+        self.listWidget = QListWidget(self)
+        for i in self.serialnos:
+            item = QListWidgetItem(i)
+            item.setCheckState(Qt.Unchecked)
+            item.setData(1, QVariant(i))
+            self.listWidget.addItem(item)
+        deviceLayout.addWidget(self.listWidget)
         buttonBox = QDialogButtonBox(parent=self)
         buttonBox.setOrientation(Qt.Horizontal)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
         buttonBox.accepted.connect(self.accept)
         buttonBox.rejected.connect(self.reject)
+        deviceLayout.addWidget(buttonBox)
         self.setLayout(deviceLayout)
+        print 'self',self
+        print '%%%%%%',self.parent().checkedDevices
+        return 'abcdef'
 
-    def accept(self):
-        super(DeviceDialog, self).accept()
-        print 'ok'
-
-    def reject(self):
-        super(DeviceDialog, self).reject()
-        print 'cancel'

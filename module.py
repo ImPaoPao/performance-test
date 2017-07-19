@@ -303,7 +303,7 @@ class LauncherModule(Executor):
         self.radio1.setChecked(self.module_start)
         self.radio1.toggled[bool].connect(self.radio1Toggled)
         self.radio2 = QRadioButton(u'核心模块页面切换速度')
-        self.radio1.setChecked(not self.module_start)
+        self.radio2.setChecked(not self.module_start)
         self.radio2.toggled[bool].connect(self.radio2Toggled)
 
         self.checbox3 = QCheckBox(u'冷启动')

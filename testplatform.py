@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):
         self.statusLabel.clear()
         mdiChild = self.createMdiChild(adb, packages)
         mdiChild.show()
-        print 'onPackageQuery =========== '
+        # print 'onPackageQuery =========== '
         self.oneDeviceCreateChildWindowDone.emit("pp")
         # self.parent().createMidChildDone.emit(True)
 

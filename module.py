@@ -101,7 +101,7 @@ class LauncherModule(Executor):
 
     def __init__(self, child):
         super(LauncherModule, self).__init__(child)
-        print 'init ===================init '
+        # print 'init ===================init '
         self.module_start = True  # 模块启动
         self.usedpkgs = dict([x for x in self.packages.items() if x[1].get('activities')])
         self.temppkgs = copy.copy(self.usedpkgs)
@@ -121,7 +121,7 @@ class LauncherModule(Executor):
             self.log(u'开始执行 ' + unicode(self.mousedcases[data]['label']) + ',执行 ' + str(self.count) + ' 次')
 
     def parsers(self):
-        print u'datas::', self.work_out
+        # print u'datas::', self.work_out
         dir_dict = {}
         work_dir = os.path.join(self.work_out, self.id())
         for root, dirs, files in os.walk(work_dir):
@@ -144,10 +144,10 @@ class LauncherModule(Executor):
         package_list = []
         if self.module_start:
             cases = self.usedcases
-            print u'模块启动选中:', len(self.usedcases.keys())
+            # print u'模块启动选中:', len(self.usedcases.keys())
         else:
             cases = self.mousedcases
-            print u'页面切换选中:', len(self.mousedcases.keys())
+            # print u'页面切换选中:', len(self.mousedcases.keys())
         for key, value in cases.items():
             package_list.append(" ".join(str(i) for i in
                                          ['com.eebbk.test.performance', value['clsname'], key, key, self.count,
@@ -169,7 +169,7 @@ class LauncherModule(Executor):
                 tree = ET.parse(result)
                 root = tree.getroot()
             except Exception as e:
-                print(u'读取xml文件异常')
+                # print(u'读取xml文件异常')
                 data[key] = {'exetime': [0], 'rexetime': [0], 'runtime': [0], 'refreshresult': [0], 'memory': [0],
                              'loadresult': [0], 'errortime': [0]}
                 continue
@@ -258,9 +258,9 @@ class LauncherModule(Executor):
         csvfile.close()
 
     def setup(self):
-        print 'setup=====================',self.module_start
+        # print 'setup=====================',self.module_start
         page = super(LauncherModule, self).setup()
-        page.setButtonText(QWizard.FinishButton,u'保存')
+        page.setButtonText(QWizard.FinishButton, u'保存')
         page.setButtonText(QWizard.CancelButton, u'取消')
         mfile = os.path.join(workdir, 'testcase.ini')
         mofile = os.path.join(workdir, 'modulecase.txt')
@@ -485,12 +485,12 @@ class LauncherModule(Executor):
                 self.usedcases[pkg] = self.tempcases.get(pkg)
             else:
                 self.usedcases.pop(pkg, 'None')
-        print u'选中：', len(self.usedcases.keys())
+                # print u'选中：', len(self.usedcases.keys())
 
     def radio1Toggled(self, checked):
-        print 'radio1:',checked,self.module_start
+        # print 'radio1:',checked,self.module_start
         if checked:
-            print 'radio1 checked ',checked
+            # print 'radio1 checked ',checked
             self.module_start = True
             self.buttonwidget.setEnabled(checked)
             self.buttonwidget2.setDisabled(checked)
@@ -499,9 +499,9 @@ class LauncherModule(Executor):
             self.list2.setDisabled(checked)
 
     def radio2Toggled(self, checked):
-        print 'radio2:', checked, self.module_start
+        # print 'radio2:', checked, self.module_start
         if checked:
-            print 'radio2 checked ',checked
+            # print 'radio2 checked ',checked
             self.module_start = False
             self.buttonwidget.setDisabled(checked)
             self.buttonwidget2.setEnabled(checked)
@@ -510,13 +510,13 @@ class LauncherModule(Executor):
             self.list2.setEnabled(checked)
 
     def checbox3Toggled(self, state):
-        print 'checbox3', state
+        # print 'checbox3', state
         if state:
             self.mtype = True
         self.checbox4.setChecked(not state)
 
     def checbox4Toggled(self, state):
-        print 'checbox4', state
+        # print 'checbox4', state
         if state:
             self.mtype = False
         self.checbox3.setChecked(not state)
@@ -528,58 +528,57 @@ class LauncherModule(Executor):
             self.edit1.undo()
 
     def selallChanged(self, state):
-        print u'全选:', state
+        # print u'全选:', state
         for i in range(self.list.count()):
             self.list.item(i).setCheckState(state)
 
     def selsynChanged(self, state):
-        print u'核心模块:', state
+        # print u'核心模块:', state
         self.checkboxToggled1(self.selsyn, state)
 
     def selotherChanged(self, state):
-        print u'其它不包含挂件和核心:', state
+        # print u'其它不包含挂件和核心:', state
         self.checkboxToggled1(self.selother, state)
 
     def selpendantChanged(self, state):
-        print u'挂件:', state
+        # print u'挂件:', state
         self.checkboxToggled1(self.selpendant, state)
-
 
     # 页面切换速度
     def selm1Changed(self, state):
-        print 'selm1Changed', state
+        # print 'selm1Changed', state
         self.checkboxToggled('com.eebbk.synchinese', state)
 
     def selm2Changed(self, state):
-        print 'selm2Changed'
+        # print 'selm2Changed'
         self.checkboxToggled('com.eebbk.synmath', state)
 
     def selm3Changed(self, state):
-        print 'selm3Changed'
+        # print 'selm3Changed'
         self.checkboxToggled('com.eebbk.syncenglish', state)
 
     def selm4Changed(self, state):
-        print 'selm4Changed'
+        # print 'selm4Changed'
         self.checkboxToggled('com.eebbk.bbkmiddlemarket', state)
 
     def selm5Changed(self, state):
-        print 'selm5Changed'
+        # print 'selm5Changed'
         self.checkboxToggled('com.eebbk.questiondatabase', state)
 
     def selm6Changed(self, state):
-        print 'selm6Changed'
+        # print 'selm6Changed'
         self.checkboxToggled('com.eebbk.vtraining', state)
 
     def selm7Changed(self, state):
-        print 'selm7Changed'
+        # print 'selm7Changed'
         self.checkboxToggled('com.eebbk.vision', state)
 
     def selm8Changed(self, state):
-        print 'selm8Changed'
+        # print 'selm8Changed'
         self.checkboxToggled('com.eebbk.synstudy', state)
 
     def selm9Changed(self, state):
-        print 'selm9Changed'
+        # print 'selm9Changed'
         self.checkboxToggled('com.eebbk.englishtalk', state)
 
     def checkboxToggled(self, pkg, state):
@@ -590,8 +589,8 @@ class LauncherModule(Executor):
             if self.motempcases[metname]['pkg'] == pkg:
                 if self.list2.item(i).checkState() != state:
                     self.list2.item(i).setCheckState(state)
-        print u'选中:', len(self.mousedcases.keys())
-        print len(self.mousedcases.keys()), self.list2.count()
+        # print u'选中:', len(self.mousedcases.keys())
+        # print len(self.mousedcases.keys()), self.list2.count()
         if len(self.mousedcases.keys()) == self.list2.count() - 1:
             self.list2.item(0).setCheckState(Qt.Checked)
         if len(self.mousedcases.keys()) == 0:
@@ -612,8 +611,8 @@ class LauncherModule(Executor):
                 if 'Pendant' not in metname and metname not in center_module and metname != 'selall':
                     if self.list.item(i).checkState() != state:
                         self.list.item(i).setCheckState(state)
-        print u'选中:', len(self.usedcases.keys())
-        print len(self.usedcases.keys()), self.list.count()
+        # print u'选中:', len(self.usedcases.keys())
+        # print len(self.usedcases.keys()), self.list.count()
         if len(self.usedcases.keys()) == self.list.count() - 1:
             self.list.item(0).setCheckState(Qt.Checked)
         if len(self.usedcases.keys()) == 0:

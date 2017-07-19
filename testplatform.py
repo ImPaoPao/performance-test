@@ -75,6 +75,7 @@ class QueryPackageThread(QThread):
 
 
 class MainWindow(QMainWindow):
+    oneDeviceCreateChildWindowDone = pyqtSignal(str)
     def __init__(self):
         super(MainWindow, self).__init__()
         self.initUI()
@@ -117,28 +118,53 @@ class MainWindow(QMainWindow):
 
     def onDeviceQuery(self, devices):
         if devices:
+            # serialno = devices[0]['serialno']
+            # if serialno:
+            #     self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+            #     self.cdt = ConnectDeviceThread(serialno)
+            #     self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+            #     self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+            #     self.cdt.start()
             if len(devices) == 1:
                 serialno = devices[0]['serialno']
+                if serialno:
+                    self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+                    self.cdt = ConnectDeviceThread(serialno)
+                    self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+                    self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+                    self.cdt.start()
             else:
                 serialnos = []
                 for device in devices:
                     serialnos.append(device['serialno'])
+                    if device['serialno'] =='8FEX4ZFOZX':
+                        serialno = device['serialno']
+                        if serialno:
+                            self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+                            self.cdt = ConnectDeviceThread(serialno)
+                            self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+                            self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+                            #self.oneDeviceCreateChildWindowDone.connect(self.deviceCreateChildDone)
+                            self.cdt.start()
                 # item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
                 # serialno = item if ok and item else None
-                self.checkedDevices = []
-                deviceDialog = DeviceDialog(self,serialnos)
-                print deviceDialog.exec_()
-                print '=========='
-            # temp =  QMainWindow(self)
-            # temp.setWindowModality(Qt.WindowModal)
-            # temp.show()
-            # temp.resize(200,200)
-            # deviceDialog.resize(200, 200)
-            # deviceLayout = QHBoxLayout()
-            # deviceLayout.addWidget(QLabel(u'我是标题？？？？'))
-            # deviceLayout.addWidget(QLabel(u'我是设备列表？？？？'))
-            # deviceDialog.setLayout(deviceLayout)
-            # deviceDialog.exec_()
+                # self.checkedDevices = []
+                # deviceDialog = DeviceDialog(self,serialnos)
+                # if deviceDialog.exec_():
+                #     for serialno in self.checkedDevices:
+                #         if serialno:
+                #             self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+                #             self.cdt = ConnectDeviceThread(serialno)
+                #             self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+                #             self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+                #             self.cdt.start()
+                #             print self ,'((((((((((((((((((((((((('
+                #             print self.createMidChildDone,'ggggggggggggggg'
+
+                        # t = threading.Thread(target=run, args=(adb, device['serialno'], 'module'))
+                        # t.setDaemon(True)
+                        # threads.append(t)
+                        # t.start()
             # if serialno:
             #     self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
             #     self.cdt = ConnectDeviceThread(serialno)
@@ -148,6 +174,9 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.information(self, u'提示', u'无法获取在线设备列表，请连接设备并打开USB调试后重试')
 
+    def  deviceCreateChildDone(self,str):
+        print '**************'
+        print str
     def onDeviceConnect(self, serialno, adb=None):
         if adb:
             self.qpt = QueryPackageThread(adb)
@@ -160,6 +189,9 @@ class MainWindow(QMainWindow):
         self.statusLabel.clear()
         mdiChild = self.createMdiChild(adb, packages)
         mdiChild.show()
+        print 'onPackageQuery =========== '
+        self.oneDeviceCreateChildWindowDone.emit("pp")
+        # self.parent().createMidChildDone.emit(True)
 
     # def onUpdateQuery(self, locver, newver):
     #     y = lambda x: [int(i) for i in x.split('.')]
@@ -292,6 +324,7 @@ class DeviceDialog(QDialog):
     def __init__(self,parent ,serialnos):
         QDialog.__init__(self,parent)
         self.serialnos = serialnos
+        self.checkedDevices =self.parent().checkedDevices
         self.initUi()
 
     def initUi(self):
@@ -304,6 +337,7 @@ class DeviceDialog(QDialog):
             item.setCheckState(Qt.Unchecked)
             item.setData(1, QVariant(i))
             self.listWidget.addItem(item)
+        self.listWidget.itemChanged.connect(self.itemChanged)
         deviceLayout.addWidget(self.listWidget)
         buttonBox = QDialogButtonBox(parent=self)
         buttonBox.setOrientation(Qt.Horizontal)
@@ -314,5 +348,13 @@ class DeviceDialog(QDialog):
         self.setLayout(deviceLayout)
         print 'self',self
         print '%%%%%%',self.parent().checkedDevices
-        return 'abcdef'
 
+    def itemChanged(self, item):
+        serialno = str(item.data(1).toPyObject())
+        if item.checkState() == Qt.Checked:
+            if serialno not in self.checkedDevices:
+                self.checkedDevices.append(serialno)
+        else:
+            if serialno in self.checkedDevices:
+                self.checkedDevices.remove(serialno)
+        print u'选中：', self.checkedDevices

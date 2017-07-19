@@ -101,6 +101,7 @@ class LauncherModule(Executor):
 
     def __init__(self, child):
         super(LauncherModule, self).__init__(child)
+        print 'init ===================init '
         self.module_start = True  # 模块启动
         self.usedpkgs = dict([x for x in self.packages.items() if x[1].get('activities')])
         self.temppkgs = copy.copy(self.usedpkgs)
@@ -257,7 +258,10 @@ class LauncherModule(Executor):
         csvfile.close()
 
     def setup(self):
+        print 'setup=====================',self.module_start
         page = super(LauncherModule, self).setup()
+        page.setButtonText(QWizard.FinishButton,u'保存')
+        page.setButtonText(QWizard.CancelButton, u'取消')
         mfile = os.path.join(workdir, 'testcase.ini')
         mofile = os.path.join(workdir, 'modulecase.txt')
         self.usedcases = {}
@@ -299,6 +303,7 @@ class LauncherModule(Executor):
         self.radio1.setChecked(self.module_start)
         self.radio1.toggled[bool].connect(self.radio1Toggled)
         self.radio2 = QRadioButton(u'核心模块页面切换速度')
+        self.radio1.setChecked(not self.module_start)
         self.radio2.toggled[bool].connect(self.radio2Toggled)
 
         self.checbox3 = QCheckBox(u'冷启动')
@@ -483,8 +488,10 @@ class LauncherModule(Executor):
         print u'选中：', len(self.usedcases.keys())
 
     def radio1Toggled(self, checked):
-        self.module_start = checked
+        print 'radio1:',checked,self.module_start
         if checked:
+            print 'radio1 checked ',checked
+            self.module_start = True
             self.buttonwidget.setEnabled(checked)
             self.buttonwidget2.setDisabled(checked)
             # self.listGroup.setEnabled(checked)
@@ -492,7 +499,10 @@ class LauncherModule(Executor):
             self.list2.setDisabled(checked)
 
     def radio2Toggled(self, checked):
+        print 'radio2:', checked, self.module_start
         if checked:
+            print 'radio2 checked ',checked
+            self.module_start = False
             self.buttonwidget.setDisabled(checked)
             self.buttonwidget2.setEnabled(checked)
             # self.listGroup.setDisabled(checked)

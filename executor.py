@@ -34,13 +34,13 @@ class BuildSetupWizard(QWizard):
             if page:
                 self.addPage(page)
 
-    def stateToggled(self, state):
-        sender = self.sender()
-
-        if sender == self.loginBbkAccount:
-            self.parentWidget().login = state
-        elif sender == self.importBookData:
-            self.parentWidget().datatype = state
+    # def stateToggled(self, state):
+    #     sender = self.sender()
+    #
+    #     if sender == self.loginBbkAccount:
+    #         self.parentWidget().login = state
+    #     elif sender == self.importBookData:
+    #         self.parentWidget().datatype = state
 
         #self.parentWidget().datatype
         #self.parentWidget().login
@@ -179,14 +179,18 @@ class ChildWindow(QWidget):
 
     def updateResultButton(self, path):
         self.reportButton.setEnabled(True)
+        self.okButton.setText(u'开始测试')
+        self.okButton.setEnabled(True)
+        self.settingButton.setEnabled(True)
 
     def executeBuildSettings(self):
         self.login = False
         self.datatype = True
         self.getlog = False
-        temp = BuildSetupWizard(self).exec_()
-        if temp:
+        # temp = BuildSetupWizard(self).exec_()
+        if BuildSetupWizard(self).exec_():
             self.okButton.setEnabled(True)
+
 
     def executeBuildTest(self):
         if self.checkDict:
@@ -249,7 +253,12 @@ class ChildWindow(QWidget):
             self.executeBuildSettings()
         if sender == self.okButton:
             if self.reportButton.isEnabled():
-                self.reportButton.setEnabled(False)
+                self.reportButton.setDisabled(True)
+            if self.settingButton.isEnabled():
+                self.settingButton.setDisabled(True)
+            self.okButton.setText(u'执行中...')
+            self.okButton.setDisabled(True)
+
             self.checkDict = self.executor
             # for i in range(self.listWidget.count()):
             #     item = self.listWidget.item(i)

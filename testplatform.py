@@ -9,7 +9,7 @@ import adbkit
 import executor
 from common import workdir
 from tools import get_packages
-
+import threading
 
 class QueryDeviceThread(QThread):
     queryDeviceDone = pyqtSignal(tuple)
@@ -118,17 +118,10 @@ class MainWindow(QMainWindow):
 
     def onDeviceQuery(self, devices):
         if devices:
-            # serialno = devices[0]['serialno']
-            # if serialno:
-            #     self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
-            #     self.cdt = ConnectDeviceThread(serialno)
-            #     self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
-            #     self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
-            #     self.cdt.start()
             if len(devices) == 1:
                 serialno = devices[0]['serialno']
                 if serialno:
-                    self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+                    self.statusLabel.setText(u'正在连接设备 {0} '.format(serialno))
                     self.cdt = ConnectDeviceThread(serialno)
                     self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
                     self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
@@ -137,17 +130,8 @@ class MainWindow(QMainWindow):
                 serialnos = []
                 for device in devices:
                     serialnos.append(device['serialno'])
-                    if device['serialno'] =='8FEX4ZFOZX':
-                        serialno = device['serialno']
-                        if serialno:
-                            self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
-                            self.cdt = ConnectDeviceThread(serialno)
-                            self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
-                            self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
-                            #self.oneDeviceCreateChildWindowDone.connect(self.deviceCreateChildDone)
-                            self.cdt.start()
-                # item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
-                # serialno = item if ok and item else None
+                item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
+                serialno = item if ok and item else None
                 # self.checkedDevices = []
                 # deviceDialog = DeviceDialog(self,serialnos)
                 # if deviceDialog.exec_():
@@ -158,25 +142,17 @@ class MainWindow(QMainWindow):
                 #             self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
                 #             self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
                 #             self.cdt.start()
-                #             print self ,'((((((((((((((((((((((((('
-                #             print self.createMidChildDone,'ggggggggggggggg'
 
-                        # t = threading.Thread(target=run, args=(adb, device['serialno'], 'module'))
-                        # t.setDaemon(True)
-                        # threads.append(t)
-                        # t.start()
-            # if serialno:
-            #     self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
-            #     self.cdt = ConnectDeviceThread(serialno)
-            #     self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
-            #     self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
-            #     self.cdt.start()
+                if serialno:
+                    self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+                    self.cdt = ConnectDeviceThread(serialno)
+                    self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+                    self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+                    self.cdt.start()
+
         else:
             QMessageBox.information(self, u'提示', u'无法获取在线设备列表，请连接设备并打开USB调试后重试')
 
-    def  deviceCreateChildDone(self,str):
-        print '**************'
-        print str
     def onDeviceConnect(self, serialno, adb=None):
         if adb:
             self.qpt = QueryPackageThread(adb)
@@ -189,18 +165,6 @@ class MainWindow(QMainWindow):
         self.statusLabel.clear()
         mdiChild = self.createMdiChild(adb, packages)
         mdiChild.show()
-        # print 'onPackageQuery =========== '
-        self.oneDeviceCreateChildWindowDone.emit("pp")
-        # self.parent().createMidChildDone.emit(True)
-
-    # def onUpdateQuery(self, locver, newver):
-    #     y = lambda x: [int(i) for i in x.split('.')]
-    #     if y(newver) > y(locver) and QMessageBox.question(self, u'升级',
-    #                                                       u'<p><b>发现新版本!</b></p><p>是否要从当前版本 {0} 升级至新版本 {1}</p>'.format(
-    #                                                           locver, newver),
-    #                                                       QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
-    #         subprocess.Popen('\"{0}\" start'.format(os.path.join(workdir, 'PlatformUpdate')))
-    #         sys.exit(2)
 
     def loginAccounts(self):
         if self.activeMdiChild():
@@ -210,10 +174,6 @@ class MainWindow(QMainWindow):
         if self.activeMdiChild():
             self.activeMdiChild().importData()
 
-    # def update(self):
-    #     self.qut = QueryUpdateThread()
-    #     self.qut.queryUpdateDone.connect(self.onUpdateQuery)
-    #     self.qut.start()
 
     def about(self):
         with open(os.path.join(workdir, 'v.txt'), 'r') as f:
@@ -221,13 +181,10 @@ class MainWindow(QMainWindow):
         QMessageBox.about(self, u'性能测试工具',
                           u'<p>性能测试<p>'
                           u'<p></p>'
-                          u'<p>平台版本：{0}'.format(ver))
+                          u'<p>工具版本：{0}'.format(ver))
 
     def updateMenus(self):
         hasMdiChild = (self.activeMdiChild() is not None)
-        # self.loginAccountsAct.setEnabled(hasMdiChild)
-        # self.importDataAct.setEnabled(hasMdiChild)
-        # self.separatorAct.setVisible(hasMdiChild)
 
     def updateWindowMenu(self):
         self.windowMenu.clear()
@@ -267,26 +224,15 @@ class MainWindow(QMainWindow):
                                         shortcut='Ctrl+Shift+C',
                                         statusTip=u'连接在线的设备',
                                         triggered=self.connectDevice)
-
-
-        # self.updateAct = QAction(u'升级', self,
-        #                          triggered=self.update)
         self.aboutAct = QAction(u'关于', self,
                                 shortcut='F1',
                                 triggered=self.about)
-        # self.aboutQtAct = QAction(u'关于Qt', self,
-        #                           triggered=self.about)
 
     def createMenus(self):
         self.deviceMenu = self.menuBar().addMenu(u'设备(&D)')
         self.deviceMenu.addAction(self.connectDeviceAct)
-
-
         self.helpMenu = self.menuBar().addMenu(u'帮助(&H)')
-        # self.helpMenu.addAction(self.updateAct)
-        # self.helpMenu.addSeparator()
         self.helpMenu.addAction(self.aboutAct)
-        # self.helpMenu.addAction(self.aboutQtAct)
 
     def createToolBars(self):
         pass

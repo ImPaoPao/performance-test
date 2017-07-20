@@ -32,7 +32,7 @@ VtrainingTestCase showVtVideo com.eebbk.vtraining 名师辅导:点击首页视�
 VtrainingTestCase showVtCourse com.eebbk.vtraining 名师辅导:点击选课→科目→课程包封面，加载完成
 VtrainingTestCase showVtMoreList com.eebbk.vtraining 名师辅导:点击首页更多精彩→课程列表页面，加载完成
 VisionTestCase showVisionSettings com.eebbk.vision 视力保护:点击设置按钮→显示设置界面
-VisionTestCase showVisionProtection com.eebbk.vision 视力保护:点击护眼小知识→显示不严小知识界面
+VisionTestCase showVisionProtection com.eebbk.vision 视力保护:点击护眼小知识→显示护眼小知识界面
 QuestionDatabaseTestCase showQdExample com.eebbk.questiondatabase 好题精练:点击智能练习目录→题目加载完成
 QuestionDatabaseTestCase showQdExamExplanation com.eebbk.questiondatabase 好题精练:点击例题讲解目录→题目加载完成
 QuestionDatabaseTestCase showQdRealExamList com.eebbk.questiondatabase 好题精练:点击真题密卷科目→真题目录界面加载完成

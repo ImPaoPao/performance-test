@@ -21,6 +21,7 @@ import module
 
 
 class BuildSetupWizard(QWizard):
+    blogged =  pyqtSignal(unicode, str)
     def __init__(self, parent):
         super(BuildSetupWizard, self).__init__(parent)
         self.initUI()
@@ -30,42 +31,10 @@ class BuildSetupWizard(QWizard):
         self.setGeometry(300, 200, 1000, 600)
         # self.addPage(self.createPreparePage())
         for i in self.parentWidget().checkDict.keys():
+            print self,'----setup wizard------'
             page = self.parentWidget().checkDict.get(i).setup()
             if page:
                 self.addPage(page)
-
-    # def stateToggled(self, state):
-    #     sender = self.sender()
-    #
-    #     if sender == self.loginBbkAccount:
-    #         self.parentWidget().login = state
-    #     elif sender == self.importBookData:
-    #         self.parentWidget().datatype = state
-
-        #self.parentWidget().datatype
-        #self.parentWidget().login
-
-        # def createPreparePage(self):
-        #     page = QWizardPage()
-        #     page.setTitle(u'测试准备')
-        #     page.setSubTitle(u'选择测试开始前的准备动作。')
-        #     page.setFinalPage(False)
-        #
-        #     self.importBookData = QCheckBox(u'导入三个同步课本资源')
-        #     self.loginBbkAccount = QCheckBox(u'登录BBK账号(部分模块需要登录账号)')
-        #     self.importBookData.setChecked(self.parentWidget().datatype)
-        #     self.loginBbkAccount.setChecked(self.parentWidget().login)
-        #     self.importBookData.toggled[bool].connect(self.stateToggled)
-        #     self.loginBbkAccount.toggled[bool].connect(self.stateToggled)
-        #     self.importBookData.setEnabled(False)
-        #     self.loginBbkAccount.setEnabled(False)
-        #
-        #     layout = QVBoxLayout()
-        #     layout.addWidget(self.importBookData)
-        #     layout.addWidget(self.loginBbkAccount)
-        #     page.setLayout(layout)
-        #     return page
-
 
 class SetupExecuteThread(QThread):
     logged = pyqtSignal(unicode, str)
@@ -102,12 +71,13 @@ class SetupExecuteThread(QThread):
 
 
 class ChildWindow(QWidget):
+    clogged = pyqtSignal(unicode, str)
     def __init__(self, adb, packages):
         super(ChildWindow, self).__init__()
 
         self.adb = adb
         self.packages = packages
-
+        self.clogged.connect(self.showMessage)
         self.info = collections.OrderedDict()
         self.info['序列号'] = get_prop(self.adb, 'ro.serialno')
         self.info['型号'] = get_prop(self.adb, 'ro.product.model')
@@ -134,7 +104,6 @@ class ChildWindow(QWidget):
         self.executor = collections.OrderedDict()
         for i, cls in enumerate(runner.Executor.__subclasses__()):
             self.executor[i] = cls(self)
-
         self.initUI()
 
     def initUI(self):
@@ -179,17 +148,21 @@ class ChildWindow(QWidget):
 
     def updateResultButton(self, path):
         self.reportButton.setEnabled(True)
-        self.okButton.setText(u'开始测试')
+        # self.okButton.setText(u'再次执行')
         self.okButton.setEnabled(True)
         self.settingButton.setEnabled(True)
+        self.settingButton.setText(u'重置参数')
 
     def executeBuildSettings(self):
+        # logged  = pyqtSignal(unicode, str)
         self.login = False
         self.datatype = True
         self.getlog = False
         # temp = BuildSetupWizard(self).exec_()
         if BuildSetupWizard(self).exec_():
+            self.clogged.emit(u'参数设置完成,点击"开始测试"按钮，启动...','black')
             self.okButton.setEnabled(True)
+            self.settingButton.setText(u'重置参数')
 
 
     def executeBuildTest(self):
@@ -258,7 +231,6 @@ class ChildWindow(QWidget):
                 self.settingButton.setDisabled(True)
             self.okButton.setText(u'执行中...')
             self.okButton.setDisabled(True)
-
             self.checkDict = self.executor
             # for i in range(self.listWidget.count()):
             #     item = self.listWidget.item(i)

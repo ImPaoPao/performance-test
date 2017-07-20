@@ -9,7 +9,7 @@ import adbkit
 import executor
 from common import workdir
 from tools import get_packages
-import threading
+
 
 class QueryDeviceThread(QThread):
     queryDeviceDone = pyqtSignal(tuple)
@@ -49,33 +49,36 @@ class QueryPackageThread(QThread):
         testpkgs = [line[8:].strip() for line in
                     self.adb.adb_readlines('shell pm list packages -s | findstr com.e*bbk')]
         packages = dict([x for x in packages.items() if x[0] in testpkgs])
-        # pkg {'label':***,'version':version}
         self.queryPackageDone.emit(self.adb, packages)
 
 
-# class QueryUpdateThread(QThread):
-#     queryUpdateDone = pyqtSignal(str, str)
-#
-#     def __init__(self):
-#         super(QueryUpdateThread, self).__init__()
-#
-#     def run(self):
-#         remote = getconfig('distdir').encode('gb2312')
-#         exefile = 'PlatformUpdate.exe' if sys.platform == 'win32' else 'PlatformUpdate'
-#
-#         if os.path.exists(remote):
-#             with zipfile.ZipFile(os.path.join(remote, 'dist.zip')) as zf:
-#                 newver = zf.open('v.txt').readline().strip()
-#                 with open(os.path.join(workdir, exefile), 'wb') as f:
-#                     f.write(zf.read(exefile))
-#             with open(os.path.join(workdir, 'v.txt'), 'r') as f:
-#                 locver = f.readline().strip()
-#
-#             self.queryUpdateDone.emit(locver, newver)
+# 初始化自动连接多台设备
+class InitDeviceUiThread(QThread):
+    initConnectDeviceDone = pyqtSignal(adbkit.Adb, dict)
+    initDeviceDone = pyqtSignal(str)
+    initDeviceListFail = pyqtSignal(tuple)
+    def __init__(self):
+        super(InitDeviceUiThread, self).__init__()
+
+    def run(self):
+        devices = adbkit.devices()
+        if devices:
+            for device in devices:
+                serialno = device['serialno']
+                self.initDeviceDone.emit(serialno)
+                self.adb = adbkit.Adb(adbkit.Device(serialno=serialno))
+                packages = get_packages(self.adb)
+                testpkgs = [line[8:].strip() for line in
+                            self.adb.adb_readlines('shell pm list packages -s | findstr com.e*bbk')]
+                packages = dict([x for x in packages.items() if x[0] in testpkgs])
+                self.initConnectDeviceDone.emit(self.adb, packages)
+        else:
+            self.initDeviceListFail.emit(devices)
 
 
 class MainWindow(QMainWindow):
     oneDeviceCreateChildWindowDone = pyqtSignal(str)
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.initUI()
@@ -103,6 +106,22 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon('logo.png'))
         self.setUnifiedTitleAndToolBarOnMac(True)
 
+        # 初始化设备连接,自动连接全部设备
+        self.idut = InitDeviceUiThread()
+        self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
+        self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
+        self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
+        self.idut.start()
+
+    def initDeviceDoneInfo(self, serialno):
+        self.statusLabel.setText(u'正在连接设备 {0} '.format(serialno))
+
+    def initDeviceListFailInfo(self, serialnos):
+        if serialnos:
+            pass
+        else:
+            QMessageBox.information(self, u'提示', u'无法获取在线设备，请连接设备并打开USB调试后重试')
+
     def closeEvent(self, event):
         self.mdiArea.closeAllSubWindows()
         if self.mdiArea.currentSubWindow():
@@ -111,10 +130,41 @@ class MainWindow(QMainWindow):
             self.writeSettings()
             event.accept()
 
+    def initConnectDevice(self):
+        self.qdt = QueryDeviceThread()
+        self.qdt.queryDeviceDone.connect(self.initDeviceQuery)
+        self.qdt.start()
+
     def connectDevice(self):
         self.qdt = QueryDeviceThread()
         self.qdt.queryDeviceDone.connect(self.onDeviceQuery)
         self.qdt.start()
+
+    def initDeviceQuery(self, devices):
+        if devices:
+            if len(devices) == 1:
+                serialno = devices[0]['serialno']
+                if serialno:
+                    self.statusLabel.setText(u'正在连接设备 {0} '.format(serialno))
+                    self.cdt = ConnectDeviceThread(serialno)
+                    self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+                    self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+                    self.cdt.start()
+            else:
+                serialnos = []
+                for device in devices:
+                    serialnos.append(device['serialno'])
+                item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
+                serialno = item if ok and item else None
+                if serialno:
+                    self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
+                    self.cdt = ConnectDeviceThread(serialno)
+                    self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
+                    self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
+                    self.cdt.start()
+
+        else:
+            QMessageBox.information(self, u'提示', u'无法获取在线设备，请连接设备并打开USB调试后重试')
 
     def onDeviceQuery(self, devices):
         if devices:
@@ -132,17 +182,6 @@ class MainWindow(QMainWindow):
                     serialnos.append(device['serialno'])
                 item, ok = QInputDialog.getItem(self, u'选择设备', u'设备列表：', serialnos, 0, False)
                 serialno = item if ok and item else None
-                # self.checkedDevices = []
-                # deviceDialog = DeviceDialog(self,serialnos)
-                # if deviceDialog.exec_():
-                #     for serialno in self.checkedDevices:
-                #         if serialno:
-                #             self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
-                #             self.cdt = ConnectDeviceThread(serialno)
-                #             self.cdt.connectDeviceDone.connect(self.onDeviceConnect)
-                #             self.cdt.connectDeviceFail.connect(self.onDeviceConnect)
-                #             self.cdt.start()
-
                 if serialno:
                     self.statusLabel.setText(u'正在连接设备 {0}'.format(serialno))
                     self.cdt = ConnectDeviceThread(serialno)
@@ -162,9 +201,11 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, u'提示', u'无法连接设备 {0}，请确保该设备唯一在线且处于空闲状态'.format(serialno))
 
     def onPackageQuery(self, adb, packages):
+        print 'onPackagesQuery before '
         self.statusLabel.clear()
         mdiChild = self.createMdiChild(adb, packages)
         mdiChild.show()
+        print 'onPackagesQuery end '
 
     def loginAccounts(self):
         if self.activeMdiChild():
@@ -173,7 +214,6 @@ class MainWindow(QMainWindow):
     def importData(self):
         if self.activeMdiChild():
             self.activeMdiChild().importData()
-
 
     def about(self):
         with open(os.path.join(workdir, 'v.txt'), 'r') as f:
@@ -237,7 +277,6 @@ class MainWindow(QMainWindow):
     def createToolBars(self):
         pass
 
-
     def createStatusBar(self):
         self.statusLabel = QLabel()
         self.statusBar().addPermanentWidget(self.statusLabel)
@@ -267,10 +306,10 @@ class MainWindow(QMainWindow):
 
 
 class DeviceDialog(QDialog):
-    def __init__(self,parent ,serialnos):
-        QDialog.__init__(self,parent)
+    def __init__(self, parent, serialnos):
+        QDialog.__init__(self, parent)
         self.serialnos = serialnos
-        self.checkedDevices =self.parent().checkedDevices
+        self.checkedDevices = self.parent().checkedDevices
         self.initUi()
 
     def initUi(self):
@@ -292,8 +331,6 @@ class DeviceDialog(QDialog):
         buttonBox.rejected.connect(self.reject)
         deviceLayout.addWidget(buttonBox)
         self.setLayout(deviceLayout)
-        print 'self',self
-        print '%%%%%%',self.parent().checkedDevices
 
     def itemChanged(self, item):
         serialno = str(item.data(1).toPyObject())

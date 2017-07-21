@@ -107,11 +107,11 @@ class MainWindow(QMainWindow):
         self.setUnifiedTitleAndToolBarOnMac(True)
 
         # 初始化设备连接,自动连接全部设备
-        self.idut = InitDeviceUiThread()
-        self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
-        self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
-        self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
-        self.idut.start()
+        # self.idut = InitDeviceUiThread()
+        # self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
+        # self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
+        # self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
+        # self.idut.start()
 
     def initDeviceDoneInfo(self, serialno):
         self.statusLabel.setText(u'正在连接设备 {0} '.format(serialno))
@@ -201,11 +201,11 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, u'提示', u'无法连接设备 {0}，请确保该设备唯一在线且处于空闲状态'.format(serialno))
 
     def onPackageQuery(self, adb, packages):
-        print 'onPackagesQuery before '
+        #print 'onPackagesQuery before '
         self.statusLabel.clear()
         mdiChild = self.createMdiChild(adb, packages)
         mdiChild.show()
-        print 'onPackagesQuery end '
+        #print 'onPackagesQuery end '
 
     def loginAccounts(self):
         if self.activeMdiChild():
@@ -340,4 +340,4 @@ class DeviceDialog(QDialog):
         else:
             if serialno in self.checkedDevices:
                 self.checkedDevices.remove(serialno)
-        print u'选中：', self.checkedDevices
+        # print u'选中：', self.checkedDevices

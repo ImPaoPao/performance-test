@@ -43,4 +43,5 @@ BbkMiddleMarketTestCase showBbkMClassCh com.eebbk.bbkmiddlemarket 应用商店:�
 BbkMiddleMarketTestCase showBbkMSelfInfo com.eebbk.bbkmiddlemarket 应用商店:个人中心未登录，点击头像→个人中心页面加载完成
 BbkMiddleMarketTestCase showBbkMCopyright com.eebbk.bbkmiddlemarket 应用商店:点击版权声明→页面加载完成
 BbkMiddleMarketTestCase showBbkMDownloadList com.eebbk.bbkmiddlemarket 应用商店:下载10个应用，点击下载中心→下载列表加载完成
-#BbkLauncherTestCase loadBbkLauncher com.bbk.studyos.launcher 桌面加载:(设置清除桌面数据后)点击HOME->桌面加载完成
+SynStudyTestCase refreshSynStudy com.eebbk.synstudy 学科同步:刷新书本
+BbkLauncherTestCase loadBbkLauncher com.bbk.studyos.launcher 桌面加载:(设置清除桌面数据后)点击HOME->桌面加载完成

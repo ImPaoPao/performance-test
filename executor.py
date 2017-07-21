@@ -148,7 +148,7 @@ class ChildWindow(QWidget):
 
     def updateResultButton(self, path):
         self.reportButton.setEnabled(True)
-        # self.okButton.setText(u'再次执行')
+        self.okButton.setText(u'开始测试')
         self.okButton.setEnabled(True)
         self.settingButton.setEnabled(True)
         self.settingButton.setText(u'重置参数')

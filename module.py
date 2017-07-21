@@ -162,15 +162,15 @@ class LauncherModule(Executor):
                             self.mocases[pkg].append(metname)
                         else:
                             self.mocases[pkg] = [metname]
-        for key, value in self.mocases.items():
-            print '******************', key, len(value)
+        # for key, value in self.mocases.items():
+        #     print '******************', key, len(value)
         self.tempcases = copy.copy(self.usedcases)
         self.motempcases = copy.copy(self.mousedcases)
-        print 'init==============='
-        print 'usedcases:', len(self.usedcases.keys())
-        print 'tempusecases :', len(self.tempcases.keys())
-        print 'mousedcases:', len(self.mousedcases.keys())
-        print 'motemp:', len(self.motempcases.keys())
+        # print 'init==============='
+        # print 'usedcases:', len(self.usedcases.keys())
+        # print 'tempusecases :', len(self.tempcases.keys())
+        # print 'mousedcases:', len(self.mousedcases.keys())
+        # print 'motemp:', len(self.motempcases.keys())
 
     def title(self):
         return u'启动速度'
@@ -322,11 +322,11 @@ class LauncherModule(Executor):
         csvfile.close()
 
     def setup(self):
-        print  '----module insetup ------'
-        print 'usedcases:', len(self.usedcases.keys())
-        print 'tempusecases :', len(self.tempcases.keys())
-        print 'mousedcases:', len(self.mousedcases.keys())
-        print 'motemp:', len(self.motempcases.keys())
+        # print  '----module insetup ------'
+        # print 'usedcases:', len(self.usedcases.keys())
+        # print 'tempusecases :', len(self.tempcases.keys())
+        # print 'mousedcases:', len(self.mousedcases.keys())
+        # print 'motemp:', len(self.motempcases.keys())
         page = super(LauncherModule, self).setup()
         page.setButtonText(QWizard.FinishButton, u'保存')
         page.setButtonText(QWizard.CancelButton, u'取消')
@@ -391,6 +391,11 @@ class LauncherModule(Executor):
         self.selm8 = QCheckBox(u'学科同步')
         self.selm9 = QCheckBox(u'英语听说')
 
+        # 临时选择
+
+        ###
+
+
         buttonlayout2.addWidget(self.selm1, 2, 1)
         buttonlayout2.addWidget(self.selm2, 3, 1)
         buttonlayout2.addWidget(self.selm3, 1, 1)
@@ -412,23 +417,16 @@ class LauncherModule(Executor):
         self.itemGroup = QGroupBox(u'启动速度测试参数')
         self.itemGroup.setLayout(itemLayout)
 
+
+
+
+
         self.list = QListWidget(page.wizard())
-        self.list.itemChanged.connect(self.itemChanged)
         self.list2 = QListWidget(page.wizard())
-        self.list2.itemChanged.connect(self.itemChanged2)
-        self.list.setEnabled(self.module_start)
-        self.list2.setDisabled(self.module_start)
-
-        # self.selallin = QListWidgetItem(u'全选')
-        # self.selallin.setCheckState(Qt.Checked)
-        # self.selallin.setData(1, QVariant('selall'))
-        # self.list.addItem(self.selallin)
-
-        # self.selallmodule = QListWidgetItem(u'全选')
-        # self.selallmodule.setCheckState(Qt.Checked)
-        # self.selallmodule.setData(1, QVariant('selallmodule'))
-        # self.list2.addItem(self.selallmodule)
-
+        self.selallmodule = QListWidgetItem(u'全选')
+        self.list2.addItem(self.selallmodule)
+        self.selallin = QListWidgetItem(u'全选')
+        self.list.addItem(self.selallin)
         for key in self.tempcases.keys():
             label = self.tempcases[key]['label'].replace("\n", "")
             item = QListWidgetItem(unicode(label))
@@ -448,6 +446,19 @@ class LauncherModule(Executor):
                 item.setCheckState(Qt.Unchecked)
             item.setData(1, QVariant(key))
             self.list2.addItem(item)
+
+        #
+        self.selallin.setCheckState(Qt.Checked if self.list.count()-1==len(self.usedcases.keys()) else Qt.Unchecked)
+        self.selallin.setData(1, QVariant('selall'))
+        #
+        self.selallmodule.setCheckState(Qt.Checked if self.list2.count()-1==len(self.mousedcases.keys()) else Qt.Unchecked)
+        self.selallmodule.setData(1, QVariant('selallmodule'))
+
+
+        self.list.itemChanged.connect(self.itemChanged)
+        self.list2.itemChanged.connect(self.itemChanged2)
+        self.list.setEnabled(self.module_start)
+        self.list2.setDisabled(self.module_start)
 
         self.selsyn.setChecked(self.selsynChecked)
         self.selpendant.setChecked(self.selpendantChecked)
@@ -496,8 +507,15 @@ class LauncherModule(Executor):
         return page
 
     def itemChanged2(self, item):
-        pkg = str(item.data(1).toPyObject())
-        if pkg == 'selallmodule':
+        metname = str(item.data(1).toPyObject())
+        if metname == 'selallmodule':
+            # if item.checkState() ==Qt.Unchecked:
+            #     print 'if ',len(self.mousedcases.keys())
+            #     # if len(self.mousedcases.keys())!=0 and self.list2.count()-1 != len(self.mousedcases.keys()):
+            #     if self.list2.count() - 1 == len(self.mousedcases.keys()):
+            #         pass
+            #     else:
+            #         print u'非点击全选触发'
             for i in range(self.list2.count()):
                 self.list2.item(i).setCheckState(item.checkState())
             self.selm1.setChecked(item.checkState())
@@ -509,15 +527,74 @@ class LauncherModule(Executor):
             self.selm7.setChecked(item.checkState())
             self.selm8.setChecked(item.checkState())
             self.selm9.setChecked(item.checkState())
+            print len(self.mousedcases.keys())
         else:
+            pkg = self.motempcases[metname]['pkg']
             if item.checkState() == Qt.Checked:
-                self.mousedcases[pkg] = self.motempcases.get(pkg)
+                self.mousedcases[metname] = self.motempcases.get(metname)
+                count = 0
+                for m, value in self.mousedcases.items():
+                    if value['pkg'] == pkg:
+                        count += 1
+                if len(self.mocases[pkg]) == count:
+                    if pkg == 'com.eebbk.synchinese':
+                        self.selm1.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.synmath':
+                        self.selm2.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.syncenglish':
+                        self.selm3.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.bbkmiddlemarket':
+                        self.selm4.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.questiondatabase':
+                        self.selm5.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.vtraining':
+                        self.selm6.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.vision':
+                        self.selm7.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.synstudy':
+                        self.selm8.setCheckState(Qt.Checked)
+                    if pkg == 'com.eebbk.englishtalk':
+                        self.selm9.setCheckState(Qt.Checked)
             else:
-                self.mousedcases.pop(pkg, 'None')
+                self.mousedcases.pop(metname, 'None')
+                if pkg == 'com.eebbk.synchinese':
+                    if self.selm1.isChecked():
+                        self.selm1.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.synmath':
+                    if self.selm2.isChecked():
+                        self.selm2.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.syncenglish':
+                    if self.selm3.isChecked():
+                        self.selm3.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.bbkmiddlemarket':
+                    if self.selm4.isChecked():
+                        self.selm4.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.questiondatabase':
+                    if self.selm5.isChecked():
+                        self.selm5.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.vtraining':
+                    if self.selm6.isChecked():
+                        self.selm6.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.vision':
+                    if self.selm7.isChecked():
+                        self.selm7.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.synstudy':
+                    if self.selm8.isChecked():
+                        self.selm8.setCheckState(Qt.Unchecked)
+                if pkg == 'com.eebbk.englishtalk':
+                    if self.selm9.isChecked():
+                        self.selm9.setCheckState(Qt.Unchecked)
+
+            print 'end:', len(self.mousedcases.keys())
+
+            if len(self.mousedcases.keys()) == self.list2.count() - 1:
+                self.list2.item(0).setCheckState(Qt.Checked)
+            if len(self.mousedcases.keys()) == 0:
+                self.list2.item(0).setCheckState(Qt.Unchecked)
 
     def itemChanged(self, item):
-        pkg = str(item.data(1).toPyObject())
-        if pkg == 'selall':
+        metname = str(item.data(1).toPyObject())
+        if metname == 'selall':
             for i in range(self.list.count()):
                 self.list.item(i).setCheckState(item.checkState())
             self.selsyn.setChecked(item.checkState())
@@ -525,10 +602,14 @@ class LauncherModule(Executor):
             self.selpendant.setChecked(item.checkState())
         else:
             if item.checkState() == Qt.Checked:
-                self.usedcases[pkg] = self.tempcases.get(pkg)
+                self.usedcases[metname] = self.tempcases.get(metname)
             else:
-                self.usedcases.pop(pkg, 'None')
-                # print u'选中：', len(self.usedcases.keys())
+                self.usedcases.pop(metname, 'None')
+        print len(self.usedcases.keys()) == self.list.count() - 1
+        if len(self.usedcases.keys()) == self.list.count() - 1:
+            self.list.item(0).setCheckState(Qt.Checked)
+        if len(self.usedcases.keys()) == 0:
+            self.list.item(0).setCheckState(Qt.Unchecked)
 
     def radio1Toggled(self, checked):
         # print 'radio1:',checked,self.module_start
@@ -677,6 +758,15 @@ class LauncherModule(Executor):
         self.checkboxToggled('com.eebbk.englishtalk', state)
 
     def checkboxToggled(self, pkg, state):
+        if not state:
+            count = 0
+            for key, value in self.mousedcases.items():
+                if value['pkg'] == pkg:
+                    count += 1
+            if len(self.mocases[pkg]) == count:
+                pass
+            else:
+                return
         for i in range(self.list2.count()):
             metname = str(self.list2.item(i).data(1).toPyObject())
             if metname == 'selallmodule':
@@ -684,12 +774,13 @@ class LauncherModule(Executor):
             if self.motempcases[metname]['pkg'] == pkg:
                 if self.list2.item(i).checkState() != state:
                     self.list2.item(i).setCheckState(state)
-        # print u'选中:', len(self.mousedcases.keys())
-        # print len(self.mousedcases.keys()), self.list2.count()
-        # if len(self.mousedcases.keys()) == self.list2.count() - 1:
-        #     self.list2.item(0).setCheckState(Qt.Checked)
-        # if len(self.mousedcases.keys()) == 0:
-        #     self.list2.item(0).setCheckState(Qt.Unchecked)
+        print u'选中:', len(self.mousedcases.keys())
+        print len(self.mousedcases.keys()), self.list2.count()
+        if len(self.mousedcases.keys()) == self.list2.count() - 1:
+            self.list2.item(0).setCheckState(Qt.Checked)
+        if len(self.mousedcases.keys()) == 0:
+            self.list2.item(0).setCheckState(Qt.Unchecked)
+
 
     def checkboxToggled1(self, sender, state):
         for i in range(self.list.count()):
@@ -706,9 +797,9 @@ class LauncherModule(Executor):
                 if 'Pendant' not in metname and metname not in center_module and metname != 'selall':
                     if self.list.item(i).checkState() != state:
                         self.list.item(i).setCheckState(state)
-        # print u'选中:', len(self.usedcases.keys())
-        # print len(self.usedcases.keys()), self.list.count()
-        # if len(self.usedcases.keys()) == self.list.count() - 1:
-        #     self.list.item(0).setCheckState(Qt.Checked)
-        # if len(self.usedcases.keys()) == 0:
-        #     self.list.item(0).setCheckState(Qt.Unchecked)
+        print u'选中:', len(self.usedcases.keys())
+        print len(self.usedcases.keys()), self.list.count()
+        if len(self.usedcases.keys()) == self.list.count() - 1:
+            self.list.item(0).setCheckState(Qt.Checked)
+        if len(self.usedcases.keys()) == 0:
+            self.list.item(0).setCheckState(Qt.Unchecked)

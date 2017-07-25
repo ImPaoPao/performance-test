@@ -10,7 +10,7 @@ out/
 # Sqlite database files
 *.sqlite3
 *.zip
-*.rar
+#*.rar
 build/
 dist/
 # Log files

@@ -5,6 +5,7 @@ import datetime
 import os
 import sys
 import time
+from collections import OrderedDict
 
 import adbkit
 
@@ -179,8 +180,8 @@ class LauncherModule():
                                 rexe_time = get_exetime(starttime, refreshtime)
                                 data[key]['errortime'].append(error_time)
                             else:
-                                exe_time = temptime  # + error_time / 4
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
+                                exe_time = temptime  + error_time / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time  * 3 / 4
                                 data[key]['errortime'].append(error_time)
                         else:
                             exe_time = temptime + error_time / 2
@@ -200,44 +201,114 @@ class LauncherModule():
         writer = csv.writer(csvfile, dialect='excel')
         writer.writerow(
             ['ID', '应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
-        for key, value in data.items():
-            # 启动时间
-            exetime = value['exetime']
-            rexetime = value['rexetime']
-            errortime = value['errortime']
-            loadresult = value['loadresult']
+        # for key, value in data.items():
+        #     # 启动时间
+        #     exetime = value['exetime']
+        #     rexetime = value['rexetime']
+        #     errortime = value['errortime']
+        #     loadresult = value['loadresult']
+        #     if exetime:
+        #         writer.writerow([key, dict1[key], '点击-页面出现'] + exetime + [
+        #             sum(exetime) / (len(exetime) if exetime else 1)])
+        #     if rexetime:
+        #         writer.writerow(
+        #             ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+        #     if errortime:
+        #         writer.writerow(
+        #             ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+        #     # if loadresult:
+        #     #     writer.writerow(['', '', '上一次匹配度'] + loadresult)
+        #
+        #     # 可用内存
+        #     memory = value['memory']
+        #     if memory:
+        #         add = 0
+        #         for item in memory:
+        #             if item:
+        #                 add += float(item.split(' ')[0].strip())
+        #         avg = add / len(memory)
+        #         print avg
+        #         print memory
+        #         writer.writerow(['', ''] + memory + [avg])
+        # csvfile.close()
+        # if self.module_start:
+        #     cases = self.usedcases
+        # else:
+        #     cases = self.mousedcases
+
+        mfile = os.path.join(r'D:\bbk-test-center\performance-test', 'testcase.ini')
+        mofile = os.path.join(r'D:\bbk-test-center\performance-test', 'modulecase.txt')
+        self.mocases = OrderedDict()
+        self.cases = OrderedDict()
+        self.usedcases = OrderedDict()
+        self.mousedcases = OrderedDict()
+        if os.path.exists(mfile):
+            with open(mfile, 'rb') as f:
+                for line in f:
+                    if line.startswith('#'):
+                        continue
+                    line = line.strip('')
+                    list = line.split(' ')
+                    clsname = list[0]
+                    metname = list[1]
+                    pkg = list[2]
+                    label = list[3]
+                    # if pkg in self.temppkgs.keys():
+                    self.usedcases[metname] = {'label': label, 'pkg': pkg, 'clsname': clsname}
+        if os.path.exists(mofile):
+            with open(mofile, 'rb') as f:
+                for line in f:
+                    if line.startswith('#'):
+                        continue
+                    line = line.strip('')
+                    list = line.split(' ')
+                    clsname = list[0]
+                    metname = list[1]
+                    pkg = list[2]
+                    label = list[3]
+                    # if pkg in self.temppkgs.keys():
+                    self.mousedcases[metname] = {'label': label, 'pkg': pkg, 'clsname': clsname}
+
+
+        cases = self.mousedcases
+
+        for key in cases.keys():
+            if key in data.keys():
+                value = data[key]
+                exetime = value['exetime']
+                rexetime = value['rexetime']
+                errortime = value['errortime']
+                loadresult = value['loadresult']
+            else:
+                exetime = rexetime = errortime = loadresult =[0]
             if exetime:
-                writer.writerow([key, dict1[key], '点击-页面出现'] + exetime + [
+                writer.writerow([key, cases[key]['label'], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
             if rexetime:
                 writer.writerow(
                     ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
-            if errortime:
-                writer.writerow(
-                    ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+            # if errortime:
+            #     writer.writerow(
+            #         ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             # if loadresult:
             #     writer.writerow(['', '', '上一次匹配度'] + loadresult)
-
             # 可用内存
-            memory = value['memory']
-            if memory:
-                add = 0
-                for item in memory:
-                    if item:
-                        add += float(item.split(' ')[0].strip())
-                avg = add / len(memory)
-                print avg
-                print memory
-                writer.writerow(['', ''] + memory + [avg])
+            # memory = value['memory']
+            # if memory:
+            #     add = 0
+            #     for item in memory:
+            #         if item:
+            #             add += float(item.split(' ')[0].strip())
+            #     avg = add / len(memory)
+            #     writer.writerow(['', ''] + memory + [avg])
         csvfile.close()
-
 
 if __name__ == "__main__":
     print sys.argv[1]
     threads = []
     all_connect_devices = adbkit.devices()
     for device in all_connect_devices:
-        print device
+
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
             LauncherModule(adb, sys.argv[2]).parsers()

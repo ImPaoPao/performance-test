@@ -107,11 +107,11 @@ class MainWindow(QMainWindow):
         self.setUnifiedTitleAndToolBarOnMac(True)
 
         # 初始化设备连接,自动连接全部设备
-        # self.idut = InitDeviceUiThread()
-        # self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
-        # self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
-        # self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
-        # self.idut.start()
+        self.idut = InitDeviceUiThread()
+        self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
+        self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
+        self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
+        self.idut.start()
 
     def initDeviceDoneInfo(self, serialno):
         self.statusLabel.setText(u'正在连接设备 {0} '.format(serialno))
@@ -225,34 +225,6 @@ class MainWindow(QMainWindow):
 
     def updateMenus(self):
         hasMdiChild = (self.activeMdiChild() is not None)
-
-    def updateWindowMenu(self):
-        self.windowMenu.clear()
-        self.windowMenu.addAction(self.closeAct)
-        self.windowMenu.addAction(self.closeAllAct)
-        self.windowMenu.addSeparator()
-        self.windowMenu.addAction(self.tileAct)
-        self.windowMenu.addAction(self.cascadeAct)
-        self.windowMenu.addSeparator()
-        self.windowMenu.addAction(self.nextAct)
-        self.windowMenu.addAction(self.previousAct)
-        self.windowMenu.addAction(self.separatorAct)
-
-        windows = self.mdiArea.subWindowList()
-        self.separatorAct.setVisible(len(windows) != 0)
-
-        for i, window in enumerate(windows):
-            child = window.widget()
-
-            text = '%d %s' % (i + 1, child.userFriendlyCurrentDevice())
-            if i < 9:
-                text = '&' + text
-
-            action = self.windowMenu.addAction(text)
-            action.setCheckable(True)
-            action.setChecked(child is self.activeMdiChild())
-            action.triggered.connect(self.windowMapper.map)
-            self.windowMapper.setMapping(action, window)
 
     def createMdiChild(self, adb, packages):
         mdiChild = executor.ChildWindow(adb, packages)

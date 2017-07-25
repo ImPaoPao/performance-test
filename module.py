@@ -102,7 +102,6 @@ class LauncherModule(Executor):
 
     def __init__(self, child):
         super(LauncherModule, self).__init__(child)
-        print 'module ===================init '
         self.module_start = True  # 模块启动
         self.usedpkgs = dict([x for x in self.packages.items() if x[1].get('activities')])
         self.temppkgs = copy.copy(self.usedpkgs)
@@ -187,6 +186,10 @@ class LauncherModule(Executor):
     def parsers(self):
         # print u'datas::', self.work_out
         dir_dict = {}
+        # if self.module_start:
+        #     dir_dict = self.usedcases
+        # else:
+        #     dir_dict = self.mousedcases
         work_dir = os.path.join(self.work_out, self.id())
         for root, dirs, files in os.walk(work_dir):
             for name in files:
@@ -269,8 +272,8 @@ class LauncherModule(Executor):
                                 rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
                                 data[key]['errortime'].append(error_time / 2)
                             else:
-                                exe_time = temptime  # + error_time / 4
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time  # * 3 / 4
+                                exe_time = temptime + error_time / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
                                 data[key]['errortime'].append(error_time)
                         else:
                             exe_time = temptime + error_time / 2
@@ -290,15 +293,19 @@ class LauncherModule(Executor):
         writer = csv.writer(csvfile, dialect='excel')
         writer.writerow(
             ['ID', '用例名', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
-        for key, value in data.items():
-            exetime = value['exetime']
-            rexetime = value['rexetime']
-            errortime = value['errortime']
-            loadresult = value['loadresult']
-            if self.module_start:
-                cases = self.usedcases
+        if self.module_start:
+            cases = self.usedcases
+        else:
+            cases = self.mousedcases
+        for key in cases.keys():
+            if key in data.keys():
+                value = data[key]
+                exetime = value['exetime']
+                rexetime = value['rexetime']
+                errortime = value['errortime']
+                loadresult = value['loadresult']
             else:
-                cases = self.mousedcases
+                exetime = rexetime = errortime = loadresult = [0]
             if exetime:
                 writer.writerow([key, cases[key]['label'], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
@@ -310,15 +317,15 @@ class LauncherModule(Executor):
                     ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if loadresult:
                 writer.writerow(['', '', '上一次匹配度'] + loadresult)
-            # 可用内存
-            memory = value['memory']
-            if memory:
-                add = 0
-                for item in memory:
-                    if item:
-                        add += float(item.split(' ')[0].strip())
-                avg = add / len(memory)
-                writer.writerow(['', ''] + memory + [avg])
+                # 可用内存
+                # memory = value['memory']
+                # if memory:
+                #     add = 0
+                #     for item in memory:
+                #         if item:
+                #             add += float(item.split(' ')[0].strip())
+                #     avg = add / len(memory)
+                #     writer.writerow(['', ''] + memory + [avg])
         csvfile.close()
 
     def setup(self):
@@ -417,10 +424,6 @@ class LauncherModule(Executor):
         self.itemGroup = QGroupBox(u'启动速度测试参数')
         self.itemGroup.setLayout(itemLayout)
 
-
-
-
-
         self.list = QListWidget(page.wizard())
         self.list2 = QListWidget(page.wizard())
         self.selallmodule = QListWidgetItem(u'全选')
@@ -448,12 +451,12 @@ class LauncherModule(Executor):
             self.list2.addItem(item)
 
         #
-        self.selallin.setCheckState(Qt.Checked if self.list.count()-1==len(self.usedcases.keys()) else Qt.Unchecked)
+        self.selallin.setCheckState(Qt.Checked if self.list.count() - 1 == len(self.usedcases.keys()) else Qt.Unchecked)
         self.selallin.setData(1, QVariant('selall'))
         #
-        self.selallmodule.setCheckState(Qt.Checked if self.list2.count()-1==len(self.mousedcases.keys()) else Qt.Unchecked)
+        self.selallmodule.setCheckState(
+            Qt.Checked if self.list2.count() - 1 == len(self.mousedcases.keys()) else Qt.Unchecked)
         self.selallmodule.setData(1, QVariant('selallmodule'))
-
 
         self.list.itemChanged.connect(self.itemChanged)
         self.list2.itemChanged.connect(self.itemChanged2)
@@ -527,7 +530,7 @@ class LauncherModule(Executor):
             self.selm7.setChecked(item.checkState())
             self.selm8.setChecked(item.checkState())
             self.selm9.setChecked(item.checkState())
-            print len(self.mousedcases.keys())
+            # print len(self.mousedcases.keys())
         else:
             pkg = self.motempcases[metname]['pkg']
             if item.checkState() == Qt.Checked:
@@ -584,8 +587,8 @@ class LauncherModule(Executor):
                 if pkg == 'com.eebbk.englishtalk':
                     if self.selm9.isChecked():
                         self.selm9.setCheckState(Qt.Unchecked)
-
-            print 'end:', len(self.mousedcases.keys())
+            #
+            # print 'end:', len(self.mousedcases.keys())
 
             if len(self.mousedcases.keys()) == self.list2.count() - 1:
                 self.list2.item(0).setCheckState(Qt.Checked)
@@ -603,9 +606,42 @@ class LauncherModule(Executor):
         else:
             if item.checkState() == Qt.Checked:
                 self.usedcases[metname] = self.tempcases.get(metname)
+                count1 = count2 = count3 = 0
+                temp1 = temp2 = temp3 = 0
+                for m in self.tempcases.keys():
+                    if m in center_module:
+                        if m in self.usedcases.keys():
+                            count1 += 1
+                        temp1 += 1
+                    if 'Pendant' not in m and m not in center_module and m != 'selall':
+                        if m in self.usedcases.keys():
+                            count3 += 1
+                        temp3 += 1
+                    if 'Pendant' in m:
+                        if m in self.usedcases.keys():
+                            count2 += 1
+                        temp2 += 1
+                # print count1, count2, count3
+                # print '*********************'
+                if temp1 == count1:
+                    self.selsyn.setCheckState(Qt.Checked)
+                if temp2 == count2:
+                    self.selpendant.setCheckState(Qt.Checked)
+                if temp3 == count3:
+                    self.selother.setCheckState(Qt.Checked)
             else:
                 self.usedcases.pop(metname, 'None')
-        print len(self.usedcases.keys()) == self.list.count() - 1
+                if metname in center_module:
+                    if self.selsyn.isChecked():
+                        self.selsyn.setCheckState(Qt.Unchecked)
+                if 'Pendant' not in metname and metname not in center_module and metname != 'selall':
+                    if self.selother.isChecked():
+                        self.selother.setCheckState(Qt.Unchecked)
+                if 'Pendant' in metname:
+                    if self.selpendant.isChecked():
+                        self.selpendant.setCheckState(Qt.Unchecked)
+
+        # print len(self.usedcases.keys()) == self.list.count() - 1
         if len(self.usedcases.keys()) == self.list.count() - 1:
             self.list.item(0).setCheckState(Qt.Checked)
         if len(self.usedcases.keys()) == 0:
@@ -774,15 +810,41 @@ class LauncherModule(Executor):
             if self.motempcases[metname]['pkg'] == pkg:
                 if self.list2.item(i).checkState() != state:
                     self.list2.item(i).setCheckState(state)
-        print u'选中:', len(self.mousedcases.keys())
-        print len(self.mousedcases.keys()), self.list2.count()
+        # print u'选中:', len(self.mousedcases.keys())
+        # print len(self.mousedcases.keys()), self.list2.count()
         if len(self.mousedcases.keys()) == self.list2.count() - 1:
             self.list2.item(0).setCheckState(Qt.Checked)
         if len(self.mousedcases.keys()) == 0:
             self.list2.item(0).setCheckState(Qt.Unchecked)
 
-
     def checkboxToggled1(self, sender, state):
+        if not state:
+            count1 = count2 = count3 = 0
+            temp1 = temp2 = temp3 = 0
+            for m in self.tempcases.keys():
+                if m in center_module:
+                    if m in self.usedcases.keys():
+                        count1 += 1
+                    temp1 += 1
+                if 'Pendant' not in m and m not in center_module and m != 'selall':
+                    if m in self.usedcases.keys():
+                        count3 += 1
+                    temp3 += 1
+                if 'Pendant' in m:
+                    if m in self.usedcases.keys():
+                        count2 += 1
+                    temp2 += 1
+            # print count1, count2, count3
+            # print '*********************'
+            if count1 == temp1:
+                pass
+            elif count2 == temp2:
+                pass
+            elif count3 == temp3:
+                pass
+            else:
+                return
+
         for i in range(self.list.count()):
             metname = str(self.list.item(i).data(1).toPyObject())
             if sender == self.selpendant:
@@ -797,8 +859,8 @@ class LauncherModule(Executor):
                 if 'Pendant' not in metname and metname not in center_module and metname != 'selall':
                     if self.list.item(i).checkState() != state:
                         self.list.item(i).setCheckState(state)
-        print u'选中:', len(self.usedcases.keys())
-        print len(self.usedcases.keys()), self.list.count()
+        # print u'选中:', len(self.usedcases.keys())
+        # print len(self.usedcases.keys()), self.list.count()
         if len(self.usedcases.keys()) == self.list.count() - 1:
             self.list.item(0).setCheckState(Qt.Checked)
         if len(self.usedcases.keys()) == 0:

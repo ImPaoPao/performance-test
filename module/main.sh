@@ -27,6 +27,7 @@ case $1 in
 			test_type=${params[6]}
 			sys_num=${params[7]}
 			app_num=${params[8]}
+			#if [${test_count} -gt 0];then
 			mkdir -p ${datadir}/${test_number}
 			echo ${test_method} >> ${trackfile}
 			mkdir -p ${workout}/${test_number}

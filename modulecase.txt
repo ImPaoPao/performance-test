@@ -28,7 +28,7 @@ VtrainingTestCase showVtTeacherInfo com.eebbk.vtraining 名师辅导:点击名�
 VtrainingTestCase showVtRanking com.eebbk.vtraining 名师辅导:我的界面，点击排行榜→排行榜页面，加载完成
 VtrainingTestCase showVtJoinCourse com.eebbk.vtraining 名师辅导:已加入5个课程，进入我的界面，点击已加入课程→列表内容加载完成
 VtrainingTestCase showVtDownloadCourse com.eebbk.vtraining 名师辅导:已下载5个课程，进入我的界面，点击已下载课程→列表内容加载完成
-VtrainingTestCase showVtVideo com.eebbk.vtraining 名师辅导:点击首页视频缩略图→视频播放加载完成
+#VtrainingTestCase showVtVideo com.eebbk.vtraining 名师辅导:点击首页视频缩略图→视频播放加载完成
 VtrainingTestCase showVtCourse com.eebbk.vtraining 名师辅导:点击选课→科目→课程包封面，加载完成
 VtrainingTestCase showVtMoreList com.eebbk.vtraining 名师辅导:点击首页更多精彩→课程列表页面，加载完成
 VisionTestCase showVisionSettings com.eebbk.vision 视力保护:点击设置按钮→显示设置界面

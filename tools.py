@@ -23,8 +23,8 @@ def echo_to_file(adb, lines, path, append=True):
 
 
 def get_packages(adb):
-    # adb.install(os.path.join(workdir, 'TestKit.apk'))
-    # adb.install(os.path.join(workdir, 'TestKitTest.apk'))
+    adb.install(os.path.join(workdir, 'TestKit.apk'))
+    adb.install(os.path.join(workdir, 'TestKitTest.apk'))
     packages = {}
     p = re.compile('INSTRUMENTATION_STATUS: stream=({.*})')
     cmd_str = 'am instrument -w -r   -e class com.eebbk.test.kit.PackageManagerProxy#getPackageList com.eebbk.test.kit.test/android.support.test.runner.AndroidJUnitRunner'

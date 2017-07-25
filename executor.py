@@ -31,7 +31,6 @@ class BuildSetupWizard(QWizard):
         self.setGeometry(300, 200, 1000, 600)
         # self.addPage(self.createPreparePage())
         for i in self.parentWidget().checkDict.keys():
-            print self,'----setup wizard------'
             page = self.parentWidget().checkDict.get(i).setup()
             if page:
                 self.addPage(page)

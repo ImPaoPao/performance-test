@@ -102,6 +102,7 @@ class LauncherModule(Executor):
 
     def __init__(self, child):
         super(LauncherModule, self).__init__(child)
+        print 'launcher module init ---------------'
         self.module_start = True  # 模块启动
         self.usedpkgs = dict([x for x in self.packages.items() if x[1].get('activities')])
         self.temppkgs = copy.copy(self.usedpkgs)
@@ -190,7 +191,8 @@ class LauncherModule(Executor):
         #     dir_dict = self.usedcases
         # else:
         #     dir_dict = self.mousedcases
-        work_dir = os.path.join(self.work_out, self.id())
+
+        work_dir = os.path.join(self.workout, self.id())
         for root, dirs, files in os.walk(work_dir):
             for name in files:
                 if name == 'result.xml':
@@ -204,7 +206,7 @@ class LauncherModule(Executor):
                         dir_dict[os.path.basename(root)] = ''
         data = self.parser_files(dir_dict)
         self.csv_generate(data, self.id())
-        self.log(self.title() + u'报告路径:' + self.work_out)
+        self.log(self.title() + u'报告路径:' + self.workout)
 
     def import_script(self):
         super(LauncherModule, self).import_script()
@@ -266,6 +268,13 @@ class LauncherModule(Executor):
                         else:
                             temptime = get_exetime(starttime, loadtime)
                             error_time = 0
+                        # print self.adb.device['device'],'============='
+                        # if self.adb.device['device'] == 'S1S':
+                        #     print 's1ss1s1s1s1s1=========='
+                        #     exe_time = temptime
+                        #     rexe_time = get_exetime(starttime, refreshtime)
+                        #     data[key]['errortime'].append(error_time)
+                        # else:
                         if int(loadresult) <= 10:
                             if key == 'launchVision':
                                 exe_time = temptime + error_time / 2
@@ -288,15 +297,18 @@ class LauncherModule(Executor):
         return data
 
     def csv_generate(self, data, filename):
-        csvfile = file(os.path.join(self.work_out, filename + '.csv'), 'wb')
+        csvfile = file(os.path.join(self.workout, filename + '.csv'), 'wb')
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
-        writer.writerow(
-            ['ID', '用例名', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         if self.module_start:
             cases = self.usedcases
+            writer.writerow(
+                ['ID', '用例名', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         else:
             cases = self.mousedcases
+            writer.writerow(
+                ['ID', '模块', '应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次',
+                 '平均值'])
         for key in cases.keys():
             if key in data.keys():
                 value = data[key]
@@ -307,25 +319,41 @@ class LauncherModule(Executor):
             else:
                 exetime = rexetime = errortime = loadresult = [0]
             if exetime:
-                writer.writerow([key, cases[key]['label'], '点击-页面出现'] + exetime + [
-                    sum(exetime) / (len(exetime) if exetime else 1)])
+                case_list = cases[key]['label'].split(':')
+                if self.module_start:
+                    writer.writerow([key, case_list[0], '点击-页面出现'] + exetime + [
+                        sum(exetime) / (len(exetime) if exetime else 1)])
+                else:
+                    writer.writerow([key, case_list[0], case_list[1] if len(case_list) > 1 else case_list[0],
+                                     '点击-页面出现'] + exetime + [sum(exetime) / (len(exetime) if exetime else 1)])
             if rexetime:
-                writer.writerow(
-                    ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+                if self.module_start:
+                    writer.writerow(
+                        ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+                else:
+                    writer.writerow(
+                        ['', '', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
             if errortime:
-                writer.writerow(
-                    ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+                if self.module_start:
+                    writer.writerow(
+                        ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+                else:
+                    writer.writerow(
+                        ['', '', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if loadresult:
-                writer.writerow(['', '', '上一次匹配度'] + loadresult)
-                # 可用内存
-                # memory = value['memory']
-                # if memory:
-                #     add = 0
-                #     for item in memory:
-                #         if item:
-                #             add += float(item.split(' ')[0].strip())
-                #     avg = add / len(memory)
-                #     writer.writerow(['', ''] + memory + [avg])
+                if self.module_start:
+                    writer.writerow(['', '', '上一次匹配度'] + loadresult)
+                else:
+                    writer.writerow(['', '', '', '上一次匹配度'] + loadresult)
+                    # 可用内存
+                    # memory = value['memory']
+                    # if memory:
+                    #     add = 0
+                    #     for item in memory:
+                    #         if item:
+                    #             add += float(item.split(' ')[0].strip())
+                    #     avg = add / len(memory)
+                    #     writer.writerow(['', ''] + memory + [avg])
         csvfile.close()
 
     def setup(self):

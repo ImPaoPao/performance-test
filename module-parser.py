@@ -111,6 +111,7 @@ class LauncherModule():
         print u'应用内部切换时间解析'
         print 'parsers app module'
         print self.work_out
+        print self.adb.device['device']
         dir_dict = {}
         work_dir = os.path.join(self.work_out, 'module')
         for root, dirs, files in os.walk(work_dir):
@@ -200,7 +201,7 @@ class LauncherModule():
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
         writer.writerow(
-            ['ID', '应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
+            ['ID', '模块','应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         # for key, value in data.items():
         #     # 启动时间
         #     exetime = value['exetime']
@@ -282,16 +283,19 @@ class LauncherModule():
             else:
                 exetime = rexetime = errortime = loadresult =[0]
             if exetime:
-                writer.writerow([key, cases[key]['label'], '点击-页面出现'] + exetime + [
+                temp = cases[key]['label']
+                temp_list = temp.split(':')
+                print temp_list
+                writer.writerow([key, temp_list[0],temp_list[1] if len(temp_list)>1 else temp_list[0], '点击-页面出现'] + exetime + [
                     sum(exetime) / (len(exetime) if exetime else 1)])
             if rexetime:
                 writer.writerow(
-                    ['', '', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
-            # if errortime:
-            #     writer.writerow(
-            #         ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
-            # if loadresult:
-            #     writer.writerow(['', '', '上一次匹配度'] + loadresult)
+                    ['', '','', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+            if errortime:
+                writer.writerow(
+                    ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+            if loadresult:
+                writer.writerow(['', '', '上一次匹配度'] + loadresult)
             # 可用内存
             # memory = value['memory']
             # if memory:

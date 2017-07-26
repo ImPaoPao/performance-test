@@ -21,9 +21,10 @@ class Executor(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, child):
+        print 'Executor init ============='
         self.child = child
         self.adb = child.adb
-        self.work_out = child.workout
+        # self.work_out = child.workout
         self.packages = child.packages
         self.work_dir = WORK_DIR
         print 'init:', self.work_dir
@@ -57,8 +58,9 @@ class Executor(object):
     def start(self, *args):
         self.shell(('start',) + args + ('>' if DEBUG else '\\>', '%s/nohup.txt' % self.data_work_path), True)
 
-    def execute(self, log):
+    def execute(self, log,workout):
         self.log = log
+        self.workout =workout
         log(u'正在导入 %s 测试脚本' % self.title())
         print u'正在导入 %s 测试脚本' % self.id()
         self.import_script()
@@ -102,22 +104,22 @@ class Executor(object):
         self.adb.shell('chmod 755 %s/busybox' % self.data_work_path)
 
     def export_result(self):
-        print u'导出测试数据: ', self.work_out
-        if not os.path.exists(self.work_out):
-            os.makedirs(self.work_out)
+        print u'导出测试数据: ', self.workout
+        if not os.path.exists(self.workout):
+            os.makedirs(self.workout)
             time.sleep(3)
         self.adb.shell('{0}/busybox tar -C {0} -zcvf {0}/out.tar.gz out'.format(self.data_work_path))
-        tar_file_path = os.path.join(self.work_out, '%s.tar.gz' % self.id())
+        tar_file_path = os.path.join(self.workout, '%s.tar.gz' % self.id())
         print '%s/out.tar.gz' % self.data_work_path
         print 'tar_file_path: ', tar_file_path
         self.adb.pull('%s/out.tar.gz' % self.data_work_path, tar_file_path)
         if os.path.exists(tar_file_path):
             with tarfile.open(tar_file_path) as tar:
                 for name in tar.getnames():
-                    tar.extract(name, self.work_out)
-            src_file_path = os.path.join(self.work_out, 'out')
+                    tar.extract(name, self.workout)
+            src_file_path = os.path.join(self.workout, 'out')
             if os.path.exists(src_file_path):
-                dst_file_path = os.path.join(self.work_out, self.id())
+                dst_file_path = os.path.join(self.workout, self.id())
                 shutil.rmtree(dst_file_path, True)
                 os.rename(src_file_path, dst_file_path)
 

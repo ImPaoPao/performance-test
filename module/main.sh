@@ -34,7 +34,7 @@ case $1 in
 			am instrument -w -r  -e number ${test_number} -e mpackage ${source_package} -e type ${test_type} -e appnum ${app_num} -e class ${test_package}.${test_case}\#${test_method} -e count ${test_count} com.eebbk.test.performance.test/android.support.test.runner.AndroidJUnitRunner>${workout}/${test_number}/instrument.txt
 			#kill -9 ${lpid}
 			#kill -9 ${tpid}
-			cp -f ${datadir}/${test_number}/* ${workout}/${test_number}
+			cp -rf ${datadir}/${test_number}/* ${workout}/${test_number}
 			#cp -f /sdcard/log.txt ${workout}/${test_number}
 			#cp -f /sdcard/top.txt ${workout}/${test_number}
 			sleep 5

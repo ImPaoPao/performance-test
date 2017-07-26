@@ -41,6 +41,7 @@ class SetupExecuteThread(QThread):
 
     def __init__(self, adb, **args):
         super(SetupExecuteThread, self).__init__()
+        print 'setup init -------thread '
         self.adb = adb
         self.login = args.get('login')
         self.datatype = args.get('datatype')
@@ -61,7 +62,7 @@ class SetupExecuteThread(QThread):
             pass
         if self.executor:
             for item in self.executor.values():
-                item.execute(self.log)
+                item.execute(self.log,self.workout)
         self.log(u'所有任务完成，共耗时{0}秒'.format(round(time.time() - start, 3)))
         self.setupExecuteDone.emit(self.workout)
 
@@ -86,19 +87,19 @@ class ChildWindow(QWidget):
         self.info['制造商'] = get_prop(self.adb, 'ro.product.manufacturer')
         self.info['平台'] = get_prop(self.adb, 'ro.board.platform')
 
-        self.workout = os.path.join(workdir, 'out')
-        if not os.path.exists(self.workout):
-            os.mkdir(self.workout)
-        self.workout = os.path.join(self.workout, self.info['序列号'])
-        if not os.path.exists(self.workout):
-            os.mkdir(self.workout)
-        self.workout = os.path.join(self.workout, self.info['版本号'])
-        if not os.path.exists(self.workout):
-            os.mkdir(self.workout)
-        # 开始时间
-        self.workout = os.path.join(self.workout, time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
-        if not os.path.exists(self.workout):
-            os.mkdir(self.workout)
+        # self.workout = os.path.join(workdir, 'out')
+        # if not os.path.exists(self.workout):
+        #     os.mkdir(self.workout)
+        # self.workout = os.path.join(self.workout, self.info['序列号'])
+        # if not os.path.exists(self.workout):
+        #     os.mkdir(self.workout)
+        # self.workout = os.path.join(self.workout, self.info['版本号'])
+        # if not os.path.exists(self.workout):
+        #     os.mkdir(self.workout)
+        # # 开始时间
+        # self.workout = os.path.join(self.workout, time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+        # if not os.path.exists(self.workout):
+        #     os.mkdir(self.workout)
 
         self.executor = collections.OrderedDict()
         for i, cls in enumerate(runner.Executor.__subclasses__()):
@@ -166,6 +167,23 @@ class ChildWindow(QWidget):
 
     def executeBuildTest(self):
         if self.checkDict:
+            # self.workout = os.path.join(self.workout, time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+            # if not os.path.exists(self.workout):
+            #     os.mkdir(self.workout)
+            self.workout = os.path.join(workdir, 'out')
+            if not os.path.exists(self.workout):
+                os.mkdir(self.workout)
+            self.workout = os.path.join(self.workout, self.info['序列号'])
+            if not os.path.exists(self.workout):
+                os.mkdir(self.workout)
+            self.workout = os.path.join(self.workout, self.info['版本号'])
+            if not os.path.exists(self.workout):
+                os.mkdir(self.workout)
+            # 开始时间
+            self.workout = os.path.join(self.workout, time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+            if not os.path.exists(self.workout):
+                os.mkdir(self.workout)
+
             self.t = SetupExecuteThread(self.adb, executor=self.checkDict, login=self.login,
                                         datatype=self.datatype, getlog=self.getlog, workout=self.workout)
             self.t.logged.connect(self.showMessage)

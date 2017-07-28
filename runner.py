@@ -9,25 +9,27 @@ from abc import ABCMeta, abstractmethod
 
 from PyQt4.QtGui import QWizardPage
 
-# from common import workdir, DATA_LOCAL_TMP
-from tools import echo_to_file
+from tools import echo_to_file, find_file
 
 DEBUG = platform.system() == 'Windows'
 WORK_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 DATA_LOCAL_TMP = '/data/local/tmp'
 
 
+def stop(child):
+    if child.executor:
+        for item in child.executor.values():
+            item.stop()
+
+
 class Executor(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, child):
-        # print 'Executor init ============='
         self.child = child
         self.adb = child.adb
-        # self.work_out = child.workout
         self.packages = child.packages
         self.work_dir = WORK_DIR
-        # print 'init:', self.work_dir
         self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
 
     def setup(self):
@@ -58,9 +60,9 @@ class Executor(object):
     def start(self, *args):
         self.shell(('start',) + args + ('>' if DEBUG else '\\>', '%s/nohup.txt' % self.data_work_path), True)
 
-    def execute(self, log,workout):
+    def execute(self, log, workout):
         self.log = log
-        self.workout =workout
+        self.workout = workout
         log(u'正在导入 %s 测试脚本' % self.title())
         print u'正在导入 %s 测试脚本' % self.id()
         self.import_script()
@@ -90,7 +92,11 @@ class Executor(object):
         self.parsers()
 
     def stop(self):
-        pass
+        line = find_file(self.adb, '%s/busybox' % self.data_work_path)
+        if not line:
+            self.import_script()
+        self.log(u'终止任务......请等待一下......')
+        self.shell(('stop',)).wait()
 
     def shell(self, args, nohup=False):
         pattern = '{0}{1}/busybox nohup sh {1}/main.sh {2}{0}' if nohup else '{0}sh {1}/main.sh {2}{0}'

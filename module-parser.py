@@ -306,13 +306,18 @@ class LauncherModule():
             #     avg = add / len(memory)
             #     writer.writerow(['', ''] + memory + [avg])
         csvfile.close()
-
+import re
 if __name__ == "__main__":
     print sys.argv[1]
     threads = []
     all_connect_devices = adbkit.devices()
     for device in all_connect_devices:
-
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
-            LauncherModule(adb, sys.argv[2]).parsers()
+            path = '/data/local/tmp/module/busybox'
+            line = adb.shell_readline('ls -F %s' % path)
+            print '(((((((((((((((((((((((((((((('
+            print  re.search('(^(-|l-)|({0}|{0}@|{0}\*)$)'.format(os.path.split(path)[-1]), line)
+
+            #
+            # LauncherModule(adb, sys.argv[2]).parsers()

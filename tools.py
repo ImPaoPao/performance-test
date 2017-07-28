@@ -22,6 +22,11 @@ def echo_to_file(adb, lines, path, append=True):
         adb.shell('touch %s' % path)
 
 
+def find_file(adb, path):
+    line = adb.shell_readline('ls -F %s' % path)
+    return re.search('(^(-|l-)|({0}|{0}@|{0}\*)$)'.format(os.path.split(path)[-1]), line)
+
+
 def get_packages(adb):
     adb.install(os.path.join(workdir, 'TestKit.apk'))
     adb.install(os.path.join(workdir, 'TestKitTest.apk'))

@@ -48,6 +48,7 @@ class QueryPackageThread(QThread):
         packages = get_packages(self.adb)
         testpkgs = [line[8:].strip() for line in
                     self.adb.adb_readlines('shell pm list packages | findstr com.e*bbk.')]
+
         packages = dict([x for x in packages.items() if x[0] in testpkgs])
         self.queryPackageDone.emit(self.adb, packages)
 
@@ -107,11 +108,11 @@ class MainWindow(QMainWindow):
         self.setUnifiedTitleAndToolBarOnMac(True)
 
         # 初始化设备连接,自动连接全部设备
-        self.idut = InitDeviceUiThread()
-        self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
-        self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
-        self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
-        self.idut.start()
+        # self.idut = InitDeviceUiThread()
+        # self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
+        # self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
+        # self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
+        # self.idut.start()
 
     def initDeviceDoneInfo(self, serialno):
         self.statusLabel.setText(u'正在连接设备 {0} '.format(serialno))

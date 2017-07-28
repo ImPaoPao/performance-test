@@ -5,23 +5,22 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 import collections
-import copy
 import os
 import time
+from common import workdir
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
+from runner import stop
 import runner
-from common import workdir
 from tools import get_prop
-
-import subprocess
 
 import module
 
 
 class BuildSetupWizard(QWizard):
-    blogged =  pyqtSignal(unicode, str)
+    blogged = pyqtSignal(unicode, str)
+
     def __init__(self, parent):
         super(BuildSetupWizard, self).__init__(parent)
         self.initUI()
@@ -35,13 +34,14 @@ class BuildSetupWizard(QWizard):
             if page:
                 self.addPage(page)
 
+
 class SetupExecuteThread(QThread):
     logged = pyqtSignal(unicode, str)
     setupExecuteDone = pyqtSignal(str)
+    setupExecuteIng = pyqtSignal()
 
     def __init__(self, adb, **args):
         super(SetupExecuteThread, self).__init__()
-        # print 'setup init -------thread '
         self.adb = adb
         self.login = args.get('login')
         self.datatype = args.get('datatype')
@@ -56,13 +56,12 @@ class SetupExecuteThread(QThread):
             # self.log(u'登录BBK账号')
             # login_bbk_account(self.adb)
             pass
-
         if self.datatype:
             # self.log(u'导入书本资源数据')
             pass
         if self.executor:
             for item in self.executor.values():
-                item.execute(self.log,self.workout)
+                item.execute(self.log, self.workout)
         self.log(u'所有任务完成，共耗时{0}秒'.format(round(time.time() - start, 3)))
         self.setupExecuteDone.emit(self.workout)
 
@@ -72,6 +71,7 @@ class SetupExecuteThread(QThread):
 
 class ChildWindow(QWidget):
     clogged = pyqtSignal(unicode, str)
+
     def __init__(self, adb, packages):
         super(ChildWindow, self).__init__()
 
@@ -125,8 +125,8 @@ class ChildWindow(QWidget):
         splitter2 = QSplitter(Qt.Horizontal)
 
         splitter1.addWidget(self.devinfo)
-        #mwidget = QWidget()
-        #mwidget.setLayout(self.createSelectLayout())
+        # mwidget = QWidget()
+        # mwidget.setLayout(self.createSelectLayout())
 
         splitter2.addWidget(self.createSelectLayout())
         splitter2.addWidget(self.message)
@@ -148,28 +148,25 @@ class ChildWindow(QWidget):
 
     def updateResultButton(self, path):
         self.reportButton.setEnabled(True)
-        self.okButton.setText(u'开始测试')
+        self.okButton.setText(u'运行')
         self.okButton.setEnabled(True)
         self.settingButton.setEnabled(True)
-        self.settingButton.setText(u'重置参数')
+        self.settingButton.setText(u'重置')
+        if self.stopButton.isEnabled():
+            self.stopButton.setDisabled(True)
+        self.stopButton.setText(u'终止')
 
     def executeBuildSettings(self):
-        # logged  = pyqtSignal(unicode, str)
         self.login = False
         self.datatype = True
         self.getlog = False
-        # temp = BuildSetupWizard(self).exec_()
         if BuildSetupWizard(self).exec_():
-            self.clogged.emit(u'参数设置完成,点击"开始测试"按钮，启动...','black')
+            self.clogged.emit(u'设置完成,点击"运行"按钮，启动...', 'black')
             self.okButton.setEnabled(True)
-            self.settingButton.setText(u'重置参数')
-
+            self.settingButton.setText(u'重置')
 
     def executeBuildTest(self):
         if self.checkDict:
-            # self.workout = os.path.join(self.workout, time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
-            # if not os.path.exists(self.workout):
-            #     os.mkdir(self.workout)
             self.workout = os.path.join(workdir, 'out')
             if not os.path.exists(self.workout):
                 os.mkdir(self.workout)
@@ -213,9 +210,9 @@ class ChildWindow(QWidget):
         #     item.setCheckState(Qt.Unchecked)
         #     item.setData(1, QVariant(i))
         #     self.listWidget.addItem(item)
-        self.settingButton = QPushButton(u'参数设置')
+        self.settingButton = QPushButton(u'设置')
         self.settingButton.clicked.connect(self.buttonClicked)
-        self.okButton = QPushButton(u'开始测试')
+        self.okButton = QPushButton(u'运行')
         self.okButton.clicked.connect(self.buttonClicked)
         self.okButton.setEnabled(False)
         self.selallButton = QPushButton(u'全选')
@@ -225,20 +222,25 @@ class ChildWindow(QWidget):
         self.reportButton = QPushButton(u'查看报告')
         self.reportButton.clicked.connect(self.buttonClicked)
         self.reportButton.setEnabled(False)
-        buttonBox = QDialogButtonBox(Qt.Vertical)
-        buttonBox.addButton(self.settingButton, QDialogButtonBox.ActionRole)
-        buttonBox.addButton(self.okButton, QDialogButtonBox.ActionRole)
+        self.stopButton = QPushButton(u'终止')
+        self.stopButton.clicked.connect(self.buttonClicked)
+
+        self.buttonBox = QDialogButtonBox(Qt.Vertical)
+        self.buttonBox.addButton(self.settingButton, QDialogButtonBox.ActionRole)
+        self.buttonBox.addButton(self.okButton, QDialogButtonBox.ActionRole)
         # buttonBox.addButton(self.selallButton, QDialogButtonBox.ActionRole)
         # buttonBox.addButton(self.disallButton, QDialogButtonBox.ActionRole)
-        buttonBox.addButton(self.reportButton, QDialogButtonBox.ActionRole)
-        #layout = QHBoxLayout()
+        self.buttonBox.addButton(self.reportButton, QDialogButtonBox.ActionRole)
+        self.buttonBox.addButton(self.stopButton, QDialogButtonBox.ActionRole)
+        self.stopButton.setDisabled(True)
+        # layout = QHBoxLayout()
         # layout.addWidget(self.listWidget)
         # layout.addWidget(buttonBox)
-        return buttonBox
+        return self.buttonBox
 
     def buttonClicked(self):
         sender = self.sender()
-        if sender==self.settingButton:
+        if sender == self.settingButton:
             self.checkDict = self.executor
             self.executeBuildSettings()
         if sender == self.okButton:
@@ -246,13 +248,15 @@ class ChildWindow(QWidget):
                 self.reportButton.setDisabled(True)
             if self.settingButton.isEnabled():
                 self.settingButton.setDisabled(True)
-            self.okButton.setText(u'执行中...')
+            self.okButton.setText(u'运行...')
             self.okButton.setDisabled(True)
             self.checkDict = self.executor
+            if not self.stopButton.isEnabled():
+                self.stopButton.setEnabled(True)
             # for i in range(self.listWidget.count()):
             #     item = self.listWidget.item(i)
-                # if item.checkState() == Qt.Checked:
-                # self.checkDict[i] = copy.copy(self.executor.get(item.data(1).toPyObject()))
+            # if item.checkState() == Qt.Checked:
+            # self.checkDict[i] = copy.copy(self.executor.get(item.data(1).toPyObject()))
             self.executeBuildTest()
         elif sender == self.selallButton:
             for i in range(self.listWidget.count()):
@@ -262,3 +266,7 @@ class ChildWindow(QWidget):
                 self.listWidget.item(i).setCheckState(Qt.Unchecked)
         elif sender == self.reportButton:
             QDesktopServices.openUrl(QUrl.fromLocalFile(self.workout))
+        elif sender == self.stopButton:
+            self.stopButton.setText(u'终止...')
+            self.stopButton.setDisabled(True)
+            stop(self)

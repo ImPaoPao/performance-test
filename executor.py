@@ -41,7 +41,7 @@ class SetupExecuteThread(QThread):
 
     def __init__(self, adb, **args):
         super(SetupExecuteThread, self).__init__()
-        print 'setup init -------thread '
+        # print 'setup init -------thread '
         self.adb = adb
         self.login = args.get('login')
         self.datatype = args.get('datatype')

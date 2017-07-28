@@ -271,7 +271,7 @@ class LauncherModule():
                     self.mousedcases[metname] = {'label': label, 'pkg': pkg, 'clsname': clsname}
 
 
-        cases = self.mousedcases
+        cases = self.usedcases
 
         for key in cases.keys():
             if key in data.keys():

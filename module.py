@@ -102,7 +102,7 @@ class LauncherModule(Executor):
 
     def __init__(self, child):
         super(LauncherModule, self).__init__(child)
-        print 'launcher module init ---------------'
+        # print 'launcher module init ---------------'
         self.module_start = True  # 模块启动
         self.usedpkgs = dict([x for x in self.packages.items() if x[1].get('activities')])
         self.temppkgs = copy.copy(self.usedpkgs)

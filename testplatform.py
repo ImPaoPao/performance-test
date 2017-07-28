@@ -47,7 +47,7 @@ class QueryPackageThread(QThread):
     def run(self):
         packages = get_packages(self.adb)
         testpkgs = [line[8:].strip() for line in
-                    self.adb.adb_readlines('shell pm list packages -s | findstr com.e*bbk')]
+                    self.adb.adb_readlines('shell pm list packages | findstr com.e*bbk.')]
         packages = dict([x for x in packages.items() if x[0] in testpkgs])
         self.queryPackageDone.emit(self.adb, packages)
 
@@ -69,7 +69,7 @@ class InitDeviceUiThread(QThread):
                 self.adb = adbkit.Adb(adbkit.Device(serialno=serialno))
                 packages = get_packages(self.adb)
                 testpkgs = [line[8:].strip() for line in
-                            self.adb.adb_readlines('shell pm list packages -s | findstr com.e*bbk')]
+                            self.adb.adb_readlines('shell pm list packages | findstr com.e*bbk.')]
                 packages = dict([x for x in packages.items() if x[0] in testpkgs])
                 self.initConnectDeviceDone.emit(self.adb, packages)
         else:

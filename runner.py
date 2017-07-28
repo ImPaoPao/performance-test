@@ -21,13 +21,13 @@ class Executor(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, child):
-        print 'Executor init ============='
+        # print 'Executor init ============='
         self.child = child
         self.adb = child.adb
         # self.work_out = child.workout
         self.packages = child.packages
         self.work_dir = WORK_DIR
-        print 'init:', self.work_dir
+        # print 'init:', self.work_dir
         self.data_work_path = '%s/%s' % (DATA_LOCAL_TMP, self.id())
 
     def setup(self):

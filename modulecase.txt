@@ -1,6 +1,6 @@
 #com.eebbk.test.performance SynChineseTestCase launchSynChinese launchSynChinese 10 com.eebbk.synchinese 0 0 0
 #SynChineseTestCase synChineseRefresh com.eebbk.synchinese 显示标题样本
-SynChineseTestCase synChineseRefresh com.eebbk.synchinese 同步语文:书架界面10本书，点击刷新→刷新完成 同步语文
+SynChineseTestCase synChineseRefresh1 com.eebbk.synchinese 同步语文:书架界面10本书，点击刷新→刷新完成 同步语文
 SynChineseTestCase addChineseBook  com.eebbk.synchinese 同步语文:点击添加按钮→下载界面加载完成
 SynChineseTestCase showSynChineseBook com.eebbk.synchinese 同步语文:显示书本目录
 SynChineseTestCase showDetailsSynChineseBook com.eebbk.synchinese 同步语文:点击教辅目录→进入课本详情

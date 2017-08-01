@@ -36,6 +36,7 @@ case $1 in
 			#kill -9 ${tpid}
 			sleep 3
 			cp -f ${datadir}/${test_number}/* ${workout}/${test_number}
+			cp -f ${datadir}/${test_number}/result.xml ${workout}/${test_number}
 			#cp -f /sdcard/log.txt ${workout}/${test_number}
 			#cp -f /sdcard/top.txt ${workout}/${test_number}
 			sleep 5

@@ -227,6 +227,7 @@ class LauncherModule(Executor):
     def parser_files(self, file_dict):
         data = {}
         for key, value in file_dict.items():
+            print key, '================='
             result = value
             data[key] = {'exetime': [], 'rexetime': [], 'runtime': [], 'refreshresult': [], 'memory': [],
                          'loadresult': [], 'errortime': []}
@@ -261,33 +262,83 @@ class LauncherModule(Executor):
                         refreshtime = segment.get('refreshtime')
                         loadresult = segment.get('loadresult')
                         refreshresult = segment.get('refreshresult')
-
                         if lasttime is not '':
                             temptime = get_exetime(starttime, lasttime)
                             error_time = get_exetime(lasttime, loadtime)
                         else:
                             temptime = get_exetime(starttime, loadtime)
                             error_time = 0
-                        # print self.adb.device['device'],'============='
-                        # if self.adb.device['device'] == 'S1S':
-                        #     print 's1ss1s1s1s1s1=========='
-                        #     exe_time = temptime
-                        #     rexe_time = get_exetime(starttime, refreshtime)
-                        #     data[key]['errortime'].append(error_time)
-                        # else:
-                        if int(loadresult) <= 10:
-                            if key == 'launchVision':
-                                exe_time = temptime + error_time / 2
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
-                                data[key]['errortime'].append(error_time / 2)
+                        # 两张误差较小时
+                        if 0 < error_time * 1000 < 100:
+                            # 截图时间比较小的 针对类似S1S H9S这种 前一张匹配度很小时取倒数第二次的时间。
+                            print u'时间差比较小的........'
+                            if int(loadresult) < 5:
+                                print u'小于5'
+                                if key == 'launchVision':
+                                    print u'视力保护'
+                                    exe_time = temptime
+                                    rexe_time = get_exetime(starttime, refreshtime) - error_time
+                                    data[key]['errortime'].append(error_time)
+                                else:
+                                    print 'else=: ',key
+                                    exe_time = temptime - error_time
+                                    rexe_time = get_exetime(starttime, refreshtime) - 2 * error_time
+                                    data[key]['errortime'].append(error_time)
+                            elif int(loadresult) <= 10:
+                                print u'大于5'
+                                exe_time = temptime-error_time/2
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time*3/2
+                                data[key]['errortime'].append(error_time)
                             else:
-                                exe_time = temptime + error_time / 4
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                                print u'大于10'
+                                exe_time = temptime
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time
                                 data[key]['errortime'].append(error_time)
                         else:
-                            exe_time = temptime + error_time / 2
-                            rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
-                            data[key]['errortime'].append(error_time / 2)
+                            print u'误差大的......'
+                            # 适配S3类似截图时差比较大的
+                            if int(loadresult) < 5:
+                                print u'小于5'
+                                exe_time = temptime
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time
+                                data[key]['errortime'].append(error_time)
+                            elif int(loadresult) <= 10:
+                                print u'小于等于10'
+                                # if key == 'launchVision':
+                                #     print u'视力保护'
+                                exe_time = temptime + error_time / 2
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                data[key]['errortime'].append(error_time)
+                                # else:
+                                #     exe_time = temptime + error_time / 4
+                                #     rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                                    # exe_time = temptime + error_time*3 / 8
+                                    # rexe_time = get_exetime(starttime, refreshtime) - error_time *5/8
+                                    # data[key]['errortime'].append(error_time)
+                            else:
+                                print u'大于10'
+                                # if key == 'launchVision':
+                                #     print u'视力保护'
+                                exe_time = temptime + error_time * 3 / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 4
+                                data[key]['errortime'].append(error_time)
+                                # else:
+                                #     exe_time = temptime + error_time / 2
+                                #     rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                #     data[key]['errortime'].append(error_time / 2)
+                                    # if int(loadresult) < 10:
+                                    #     if key == 'launchVision':
+                                    #         exe_time = temptime + error_time / 2
+                                    #         rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                    #         data[key]['errortime'].append(error_time / 2)
+                                    #     else:
+                                    #         exe_time = temptime + error_time / 4
+                                    #         rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                                    #         data[key]['errortime'].append(error_time)
+                                    # else:
+                                    #     exe_time = temptime + error_time / 2
+                                    #     rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                    #     data[key]['errortime'].append(error_time / 2)
                         run_time = get_exetime(starttime, endtime)
                         data[key]['exetime'].append(exe_time)
                         data[key]['rexetime'].append(rexe_time)

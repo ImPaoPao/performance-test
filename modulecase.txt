@@ -6,10 +6,10 @@ SynChineseTestCase showSynChineseBook com.eebbk.synchinese 同步语文:显示�
 SynChineseTestCase showDetailsSynChineseBook com.eebbk.synchinese 同步语文:点击教辅目录→进入课本详情
 SynChineseTestCase syncChineseAccessDict com.eebbk.synchinese 同步语文:点击查字词→调转到词典界面
 SyncMathTestCase addMathBook com.eebbk.synmath 同步数学:点击添加按钮→下载界面加载完成
-SyncMathTestCase showSynMathBook com.eebbk.synmath 同步数学:点击书本→书本目录加载完成
-SyncMathTestCase changeSynMathBook com.eebbk.synmath 同步数学:进入课本目录界面，点击左边换书按钮→书架界面显示完成
-SyncMathTestCase showExplanationSynMathContent com.eebbk.synmath 同步数学:进入课本目录界面，点击动画讲解→动画讲解界面加载完成
-SyncMathTestCase downloadExplanatinSynMathContent com.eebbk.synmath 同步数学:进入课本目录界面，点击动画讲解右边的下载按钮→下载页面加载完成
+SyncMathTestCase showSynMathBook com.eebbk.synmath 同步数学:点击书本→书本目录加载完成 0.5
+SyncMathTestCase changeSynMathBook com.eebbk.synmath 同步数学:进入课本目录界面，点击左边换书按钮→书架界面显示完成 0.5
+SyncMathTestCase showExplanationSynMathContent com.eebbk.synmath 同步数学:进入课本目录界面，点击动画讲解→动画讲解界面加载完成 1.3
+SyncMathTestCase downloadExplanatinSynMathContent com.eebbk.synmath 同步数学:进入课本目录界面，点击动画讲解右边的下载按钮→下载页面加载完成 0.4
 SyncMathTestCase refreshSynMath com.eebbk.synmath 同步数学:书架界面10本书，点击刷新→刷新完成
 SyncMathTestCase showDetailsSynMathBook com.eebbk.synmath 同步数学:点击教辅目录→进入课本详情
 SyncMathTestCase showExplanationSynMathBook com.eebbk.synmath 同步数学:书本内容界面，点击左上角目录按钮，点击知识讲解→知识讲解内容加载完成

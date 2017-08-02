@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import codecs
+import copy
 import csv
 import datetime
 import os
@@ -109,9 +110,6 @@ class LauncherModule():
 
     def parsers(self):
         print u'应用内部切换时间解析'
-        print 'parsers app module'
-        print self.work_out
-        print self.adb.device['device']
         dir_dict = {}
         work_dir = os.path.join(self.work_out, 'module')
         for root, dirs, files in os.walk(work_dir):
@@ -175,19 +173,84 @@ class LauncherModule():
                         else:
                             temptime = get_exetime(starttime, loadtime)
                             error_time = 0
-                        if int(loadresult) <= 10:
-                            if key =='launchVision':
-                                exe_time = temptime + error_time
-                                rexe_time = get_exetime(starttime, refreshtime)
+                        # 两张误差较小时
+                        print error_time
+                        if 0 < error_time * 1000 < 100:
+                            # 截图时间比较小的 针对类似S1S H9S这种 前一张匹配度很小时取倒数第二次的时间。
+                            print u'时间差比较小的........'
+                            if int(loadresult) < 5:
+                                print u'小于5'
+                                if key == 'launchVision':
+                                    print u'视力保护'
+                                    exe_time = temptime
+                                    rexe_time = get_exetime(starttime, refreshtime) - error_time
+                                    data[key]['errortime'].append(error_time)
+                                else:
+                                    print 'else=: ',key
+                                    exe_time = temptime - error_time
+                                    rexe_time = get_exetime(starttime, refreshtime) - 2 * error_time
+                                    data[key]['errortime'].append(error_time)
+                            elif int(loadresult) <= 10:
+                            # else :
+                                print u'大于5'
+                                exe_time = temptime-error_time/2
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time*3/2
                                 data[key]['errortime'].append(error_time)
                             else:
-                                exe_time = temptime  + error_time / 4
-                                rexe_time = get_exetime(starttime, refreshtime) - error_time  * 3 / 4
+                                exe_time = temptime
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time
                                 data[key]['errortime'].append(error_time)
                         else:
-                            exe_time = temptime + error_time / 2
-                            rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
-                            data[key]['errortime'].append(error_time / 2)
+                            print u'误差大的......'
+                            # 适配S3类似截图时差比较大的
+                            if int(loadresult) <= 5:
+                                print u'小于5'
+                                if key == 'launchVision':
+                                    print u'视力保护'
+                                    exe_time = temptime + error_time * 1 / 4
+                                    rexe_time = get_exetime(starttime, refreshtime) - error_time*3 / 4
+                                    data[key]['errortime'].append(error_time)
+                                else:
+                                    exe_time = temptime
+                                    rexe_time = get_exetime(starttime, refreshtime) - error_time
+                                    data[key]['errortime'].append(error_time)
+                            elif int(loadresult) <= 10:
+                                print u'小于等于10'
+                                # if key == 'launchVision':
+                                #     print u'视力保护'
+                                exe_time = temptime + error_time / 2
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                data[key]['errortime'].append(error_time)
+                                # else:
+                                #     exe_time = temptime + error_time / 4
+                                #     rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                                #     # exe_time = temptime + error_time*3 / 8
+                                #     # rexe_time = get_exetime(starttime, refreshtime) - error_time *5/8
+                                #     data[key]['errortime'].append(error_time)
+                            else:
+                                print u'大于10'
+                                # if key == 'launchVision':
+                                #     print u'视力保护'
+                                exe_time = temptime + error_time * 3 / 4
+                                rexe_time = get_exetime(starttime, refreshtime) - error_time / 4
+                                data[key]['errortime'].append(error_time)
+                                # else:
+                                #     exe_time = temptime + error_time / 2
+                                #     rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                #     data[key]['errortime'].append(error_time / 2)
+                                # if int(loadresult) < 10:
+                                #     if key == 'launchVision':
+                                #         exe_time = temptime + error_time / 2
+                                #         rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                #         data[key]['errortime'].append(error_time / 2)
+                                #     else:
+                                #         exe_time = temptime + error_time / 4
+                                #         rexe_time = get_exetime(starttime, refreshtime) - error_time * 3 / 4
+                                #         data[key]['errortime'].append(error_time)
+                                # else:
+                                #     exe_time = temptime + error_time / 2
+                                #     rexe_time = get_exetime(starttime, refreshtime) - error_time / 2
+                                #     data[key]['errortime'].append(error_time / 2)
                         run_time = get_exetime(starttime, endtime)
                         data[key]['exetime'].append(exe_time)
                         data[key]['rexetime'].append(rexe_time)
@@ -201,7 +264,7 @@ class LauncherModule():
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
         writer.writerow(
-            ['ID', '模块','应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
+            ['ID', '模块', '应用名称', '测试项目', '第一次', '第二次', '第三次', '第四次', '第五次', '第六次', '第七次', '第八次', '第九次', '第十次', '平均值'])
         # for key, value in data.items():
         #     # 启动时间
         #     exetime = value['exetime']
@@ -270,7 +333,6 @@ class LauncherModule():
                     # if pkg in self.temppkgs.keys():
                     self.mousedcases[metname] = {'label': label, 'pkg': pkg, 'clsname': clsname}
 
-
         cases = self.usedcases
 
         for key in cases.keys():
@@ -281,32 +343,37 @@ class LauncherModule():
                 errortime = value['errortime']
                 loadresult = value['loadresult']
             else:
-                exetime = rexetime = errortime = loadresult =[0]
+                exetime = rexetime = errortime = loadresult = [0]
             if exetime:
+                tempexetime = copy.copy(exetime)
+                tempexetime.remove(max(tempexetime))
                 temp = cases[key]['label']
                 temp_list = temp.split(':')
-                print temp_list
-                writer.writerow([key, temp_list[0],temp_list[1] if len(temp_list)>1 else temp_list[0], '点击-页面出现'] + exetime + [
-                    sum(exetime) / (len(exetime) if exetime else 1)])
-            if rexetime:
                 writer.writerow(
-                    ['', '','', '点击-页面内容加载完'] + rexetime + [sum(rexetime) / (len(rexetime) if rexetime else 1)])
+                    [key, temp_list[0], temp_list[1] if len(temp_list) > 1 else temp_list[0], '点击-页面出现'] + exetime + [
+                        sum(tempexetime) / (len(tempexetime) if tempexetime else 1)])
+            if rexetime:
+                tempretime = copy.copy(rexetime)
+                tempretime.remove(max(tempretime))
+                writer.writerow(
+                    ['', '', '', '点击-页面内容加载完'] + rexetime + [sum(tempretime) / (len(tempretime) if tempretime else 1)])
             if errortime:
                 writer.writerow(
-                    ['', '', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
+                    ['', '','', '最大可能误差'] + errortime + [sum(errortime) / (len(errortime) if errortime else 1)])
             if loadresult:
-                writer.writerow(['', '', '上一次匹配度'] + loadresult)
-            # 可用内存
-            # memory = value['memory']
-            # if memory:
-            #     add = 0
-            #     for item in memory:
-            #         if item:
-            #             add += float(item.split(' ')[0].strip())
-            #     avg = add / len(memory)
-            #     writer.writerow(['', ''] + memory + [avg])
+                writer.writerow(['', '','', '上一次匹配度'] + loadresult)
+                # 可用内存
+                # memory = value['memory']
+                # if memory:
+                #     add = 0
+                #     for item in memory:
+                #         if item:
+                #             add += float(item.split(' ')[0].strip())
+                #     avg = add / len(memory)
+                #     writer.writerow(['', ''] + memory + [avg])
         csvfile.close()
-import re
+
+
 if __name__ == "__main__":
     print sys.argv[1]
     threads = []
@@ -314,10 +381,8 @@ if __name__ == "__main__":
     for device in all_connect_devices:
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
-            path = '/data/local/tmp/module/busybox'
-            line = adb.shell_readline('ls -F %s' % path)
-            print '(((((((((((((((((((((((((((((('
-            print  re.search('(^(-|l-)|({0}|{0}@|{0}\*)$)'.format(os.path.split(path)[-1]), line)
-
-            #
-            # LauncherModule(adb, sys.argv[2]).parsers()
+            # path = '/data/local/tmp/module/busybox'
+            # line = adb.shell_readline('ls -F %s' % path)
+            # print '(((((((((((((((((((((((((((((('
+            # print  re.search('(^(-|l-)|({0}|{0}@|{0}\*)$)'.format(os.path.split(path)[-1]), line)
+            LauncherModule(adb, sys.argv[2]).parsers()

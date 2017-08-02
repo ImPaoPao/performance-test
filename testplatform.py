@@ -108,11 +108,11 @@ class MainWindow(QMainWindow):
         self.setUnifiedTitleAndToolBarOnMac(True)
 
         # 初始化设备连接,自动连接全部设备
-        # self.idut = InitDeviceUiThread()
-        # self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
-        # self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
-        # self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
-        # self.idut.start()
+        self.idut = InitDeviceUiThread()
+        self.idut.initConnectDeviceDone.connect(self.onPackageQuery)
+        self.idut.initDeviceDone.connect(self.initDeviceDoneInfo)
+        self.idut.initDeviceListFail.connect(self.initDeviceListFailInfo)
+        self.idut.start()
 
     def initDeviceDoneInfo(self, serialno):
         self.statusLabel.setText(u'正在连接设备 {0} '.format(serialno))

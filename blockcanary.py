@@ -114,12 +114,19 @@ class ModuleMonitor():
         alignment = xlwt.Alignment()  # 创建居中
         alignment.horz = xlwt.Alignment.HORZ_CENTER  # 可取值: HORZ_GENERAL, HORZ_LEFT, HORZ_CENTER, HORZ_RIGHT, HORZ_FILLED, HORZ_JUSTIFIED, HORZ_CENTER_ACROSS_SEL, HORZ_DISTRIBUTED
         alignment.vert = xlwt.Alignment.VERT_CENTER  # 可取值: VERT_TOP, VERT_CENTER, VERT_BOTTOM, VERT_JUSTIFIED, VERT_DISTRIBUTED
+        badBG = xlwt.Pattern()
+        badBG.pattern = badBG.SOLID_PATTERN
+        badBG.pattern_fore_colour = 1
+
         style0 = xlwt.XFStyle()  # 创建样式
         style0.alignment = alignment  # 给样式添加文字居中属性
-        style0.font.height = 430  # 设置字体大小
+        style0.font.height = 200  # 设置字体大小
+        style0.pattern = badBG
         # # ----------设置列宽高--------------
         col1 = sheet2.col(0)  # 获取第0列
-        col1.width = 380 * 100  # 设置第0列的宽为380，高为20
+        col1.width = 100 * 400  # 设置第0列的宽为380，高为20
+
+        styleBlueBkg = xlwt.easyxf('pattern: pattern solid, fore_colour ocean_blue; font: bold on;')
         # # ----------合并单元格-----------
         # sheet.write_merge(4, 6, 0, 1, '测试合并行和列数据', style)  # 合并第4到6行的0列和第1列，并将样式添加进去，注意：excel的行和列都是从0开始
         # sheet.write(0, 0, '姓名', style)  # 给第0行的第0列插入值，并添加样式
@@ -143,14 +150,14 @@ class ModuleMonitor():
         print os.path.join(self.work_out, csv_file + '.csv')
         reader = csv.reader(csvfile)
         l = 0
-        for line in reader:#line  行
-            r = 0#列
+        for line in reader:  # line  行
+            r = 0  # 列
             for i in line:
-                sheet2.write(l, r, i)
+                sheet2.write(l, r, i, style0)
                 r = r + 1
             l = l + 1
         excel_filename = str(csv_file.split(".")[0]) + ".xls"
-        xlsf.save(os.path.join(self.work_out,excel_filename))
+        xlsf.save(os.path.join(self.work_out, excel_filename))
 
 
 if __name__ == "__main__":

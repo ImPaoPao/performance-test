@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import codecs
+import copy
 import csv
 import glob
 import os
-import sys
-
+import xlsxwriter
 import xlwt
-
-import adbkit
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
 try:
@@ -87,6 +85,9 @@ class ModuleMonitor():
         self.csv_generate(data, str(os.getpid()))
         # self.execel_generate(data, str(os.getpid()))
         self.csv_to_xls(str(os.getpid()))
+        # self.csv_generate(data, 'temp')
+        # # self.execel_generate(data, str(os.getpid()))
+        # self.csv_to_xls('temp')
 
     def csv_generate(self, data, filename):
         csvfile = file(os.path.join(self.work_out, filename + '.csv'), 'wb')
@@ -99,72 +100,117 @@ class ModuleMonitor():
                  value['stacktrace'], key])
         csvfile.close()
 
-    # def execel_generate(self, data, filename):
-    #     print u'生成execel文件'
-
-
-
     def csv_to_xls(self, csv_file):
         print u'csv 转换为execel 带图表'
+        block_process = {}  # 统计进程及卡顿次数
         xlsf = xlwt.Workbook(encoding='utf-8')
         sheet1 = xlsf.add_sheet(u'结果统计')
-        sheet2 = xlsf.add_sheet(u'卡顿信息')
+        sheet2 = xlsf.add_sheet(u'卡顿信息', cell_overwrite_ok=True)
 
-        # sheet = xlsf.add_sheet(u'格式设置')
-        alignment = xlwt.Alignment()  # 创建居中
-        alignment.horz = xlwt.Alignment.HORZ_CENTER  # 可取值: HORZ_GENERAL, HORZ_LEFT, HORZ_CENTER, HORZ_RIGHT, HORZ_FILLED, HORZ_JUSTIFIED, HORZ_CENTER_ACROSS_SEL, HORZ_DISTRIBUTED
-        alignment.vert = xlwt.Alignment.VERT_CENTER  # 可取值: VERT_TOP, VERT_CENTER, VERT_BOTTOM, VERT_JUSTIFIED, VERT_DISTRIBUTED
-        badBG = xlwt.Pattern()
-        badBG.pattern = badBG.SOLID_PATTERN
-        badBG.pattern_fore_colour = 1
+        # Define the header and footer fonts
+        header_font = xlwt.Font()
+        header_font.bold = True
+        header_font.colour_index = 0
+        header_font.height = 300  # 字体大小
 
-        style0 = xlwt.XFStyle()  # 创建样式
-        style0.alignment = alignment  # 给样式添加文字居中属性
-        style0.font.height = 200  # 设置字体大小
-        style0.pattern = badBG
-        # # ----------设置列宽高--------------
-        col1 = sheet2.col(0)  # 获取第0列
-        col1.width = 100 * 400  # 设置第0列的宽为380，高为20
+        normal_font = copy.copy(header_font)
+        normal_font.name = 'Times New Roman'
+        normal_font.height = 200  # 非标题
+        normal_font.bold = False
 
-        styleBlueBkg = xlwt.easyxf('pattern: pattern solid, fore_colour ocean_blue; font: bold on;')
-        # # ----------合并单元格-----------
-        # sheet.write_merge(4, 6, 0, 1, '测试合并行和列数据', style)  # 合并第4到6行的0列和第1列，并将样式添加进去，注意：excel的行和列都是从0开始
-        # sheet.write(0, 0, '姓名', style)  # 给第0行的第0列插入值，并添加样式
-        # sheet.write(0, 1, '年龄', style)  # 给第0行的第1列插入值，并添加样式
-        # sheet.write(0, 2, '性别', style)  # 给第0行的第2列插入值，并添加样式
-        # # 创建一个测试数据列表
-        # stu_list = [{}, {"name": "张三", "age": 23, "gender": "男"}, {"name": "李四", "age": 22, "gender": "男"},
-        #             {"name": "王五", "age": 25, "gender": "男"}]
-        # # 循环插入值
-        # for index, x in enumerate(stu_list):
-        #     if index != 0:
-        #         sheet.write(index, 0, x["name"], style)
-        #         sheet.write(index, 1, x["age"], style)
-        #         sheet.write(index, 2, x["gender"], style)
-        # xlsf.save('demo1.xls')
+        # 文本位置
+        header_alignment = xlwt.Alignment()  # 创建居中
+        header_alignment.horz = xlwt.Alignment.HORZ_CENTER  # 可取值: HORZ_GENERAL, HORZ_LEFT, HORZ_CENTER, HORZ_RIGHT, HORZ_FILLED, HORZ_JUSTIFIED, HORZ_CENTER_ACROSS_SEL, HORZ_DISTRIBUTED
+        header_alignment.vert = xlwt.Alignment.VERT_CENTER  # 可取值: VERT_TOP, VERT_CENTER, VERT_BOTTOM, VERT_JUSTIFIED, VERT_DISTRIBUTED
 
+        normal_alignment = xlwt.Alignment()  # 创建居中
+        normal_alignment.horz = xlwt.Alignment.HORZ_LEFT  # 可取值: HORZ_GENERAL, HORZ_LEFT, HORZ_CENTER, HORZ_RIGHT, HORZ_FILLED, HORZ_JUSTIFIED, HORZ_CENTER_ACROSS_SEL, HORZ_DISTRIBUTED
+        normal_alignment.vert = xlwt.Alignment.VERT_CENTER  # 可取值: VERT_TOP, VERT_CENTER, VERT_BOTTOM, VERT_JUSTIFIED, VERT_DISTRIBUTED
 
-        # csvfile = file(os.path.join(self.work_out, csv_file + '.csv'), 'wb')
-        print self.work_out
+        # 背景色
+        header_badBG = xlwt.Pattern()
+        header_badBG.pattern = header_badBG.SOLID_PATTERN
+        header_badBG.pattern_fore_colour = 170
+
+        # 边界线
+        borders = xlwt.Borders()
+        borders.left = 1
+        borders.right = 1
+        borders.top = 1
+        borders.bottom = 1
+        borders.bottom_colour = 0x3A
+
+        header_style = xlwt.XFStyle()  # 创建样式
+
+        normal_style_trace = xlwt.easyxf('align: wrap on')
+        normal_style_trace.font = normal_font
+        normal_style_trace.borders = borders
+
+        normal_style = copy.copy(normal_style_trace)
+        normal_style.alignment = normal_alignment
+
+        # 背景色
+        header_style.font = header_font
+        header_style.alignment = header_alignment
+        header_style.pattern = header_badBG
+        header_style.borders = borders
+
+        sheet2.col(0).width = 256 * 14
+        sheet2.col(1).width = 256 * 14
+        sheet2.col(2).width = 256 * 40
+        sheet2.col(3).width = 256 * 14
+        sheet2.col(4).width = 256 * 40
+        sheet2.col(5).width = 256 * 80
+        sheet2.col(6).width = 256 * 40
+
+        # 标题行设置高度
+        tall_style = xlwt.easyxf('font:height 720;')
+        row0 = sheet2.row(0)
+        row0.set_style(tall_style)
+
         csvfile = open(os.path.join(self.work_out, csv_file + '.csv'), "rb")
-        print os.path.join(self.work_out, csv_file + '.csv')
         reader = csv.reader(csvfile)
         l = 0
-        for line in reader:  # line  行
-            r = 0  # 列
+        for line in reader:
+            r = 0
             for i in line:
-                sheet2.write(l, r, i, style0)
+                if l == 0:
+                    sheet2.write(0, r, i, header_style)  # 标题行
+                else:
+                    if r == 2:
+                        block_process[i] = block_process.get(i, 0) + 1  # 统计进程名字和出现卡顿的次数
+                    if r == 5:  # tracestack 自动换行
+                        sheet2.write(l, r, i, normal_style_trace)
+                    else:
+                        sheet2.write(l, r, i, normal_style)
                 r = r + 1
             l = l + 1
+
+        l = 1
+        sheet1.write(0, 0, u'进程', header_style)
+        sheet1.write(0, 1, u'卡顿次数', header_style)
+        sheet1.col(0).width = 256 * 40
+        sheet1.col(1).width = 256 * 14
+        for key, value in block_process.items():
+            sheet1.write(l, 0, key, normal_style)
+            sheet1.write(l, 1, value, normal_style)
+            l += 1
+
+        workbook = xlsxwriter.Workbook('chart.xlsx')
+        worksheet = workbook.add_worksheet()
+
+        chart = workbook.add_chart({'type': 'bar'})
+        # Configure the chart. In simplest case we add one or more data series.
+        chart.add_series(
+            {'values': '=Sheet1!$B$2:$B$5', 'categories': '=Sheet1!$A$2:$A$5', 'data_labels': {'value': True}})
+
+        # Insert the chart into the worksheet.
+        worksheet.insert_chart('F7', chart)
+
+
         excel_filename = str(csv_file.split(".")[0]) + ".xls"
         xlsf.save(os.path.join(self.work_out, excel_filename))
 
 
 if __name__ == "__main__":
-    print sys.argv[1]
-    threads = []
-    all_connect_devices = adbkit.devices()
-    for device in all_connect_devices:
-        if device['serialno'] in sys.argv:
-            adb = adbkit.Adb(device)
-            ModuleMonitor(adb, sys.argv[2]).parsers()
+    block_process = {'pkg1': 1, 'pkg2': 4}

@@ -162,15 +162,8 @@ class LauncherModule(Executor):
                             self.mocases[pkg].append(metname)
                         else:
                             self.mocases[pkg] = [metname]
-        # for key, value in self.mocases.items():
-        #     print '******************', key, len(value)
         self.tempcases = copy.copy(self.usedcases)
         self.motempcases = copy.copy(self.mousedcases)
-        # print 'init==============='
-        # print 'usedcases:', len(self.usedcases.keys())
-        # print 'tempusecases :', len(self.tempcases.keys())
-        # print 'mousedcases:', len(self.mousedcases.keys())
-        # print 'motemp:', len(self.motempcases.keys())
 
     def title(self):
         return u'启动速度'

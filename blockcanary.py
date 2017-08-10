@@ -4,8 +4,15 @@ import copy
 import csv
 import glob
 import os
-import xlsxwriter
+import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
 import xlwt
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+import adbkit
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
 try:
@@ -17,9 +24,10 @@ import re
 
 
 class ModuleMonitor():
-    def __init__(self, adb, work_out):
+    def __init__(self, adb, work_out, child):
         self.adb = adb
         self.work_out = work_out
+        self.child = child
 
     @classmethod
     def id(cls):
@@ -83,11 +91,7 @@ class ModuleMonitor():
                     data[key] = value
                     f.close()
         self.csv_generate(data, str(os.getpid()))
-        # self.execel_generate(data, str(os.getpid()))
         self.csv_to_xls(str(os.getpid()))
-        # self.csv_generate(data, 'temp')
-        # # self.execel_generate(data, str(os.getpid()))
-        # self.csv_to_xls('temp')
 
     def csv_generate(self, data, filename):
         csvfile = file(os.path.join(self.work_out, filename + '.csv'), 'wb')
@@ -191,26 +195,97 @@ class ModuleMonitor():
         sheet1.write(0, 1, u'卡顿次数', header_style)
         sheet1.col(0).width = 256 * 40
         sheet1.col(1).width = 256 * 14
-        for key, value in block_process.items():
-            sheet1.write(l, 0, key, normal_style)
-            sheet1.write(l, 1, value, normal_style)
+        for value in sorted(block_process.items(), key=lambda item: item[1], reverse=True):
+            sheet1.write(l, 0, value[0], normal_style)
+            sheet1.write(l, 1, value[1], normal_style)
             l += 1
-
-        workbook = xlsxwriter.Workbook('chart.xlsx')
-        worksheet = workbook.add_worksheet()
-
-        chart = workbook.add_chart({'type': 'bar'})
-        # Configure the chart. In simplest case we add one or more data series.
-        chart.add_series(
-            {'values': '=Sheet1!$B$2:$B$5', 'categories': '=Sheet1!$A$2:$A$5', 'data_labels': {'value': True}})
-
-        # Insert the chart into the worksheet.
-        worksheet.insert_chart('F7', chart)
-
 
         excel_filename = str(csv_file.split(".")[0]) + ".xls"
         xlsf.save(os.path.join(self.work_out, excel_filename))
+        plt.subplots()
+        index = np.arange(len(block_process.keys()))
+        plt.barh(index, tuple([test[1] for test in sorted(block_process.items(), key=lambda item: item[1])]),
+                 label='times')
+        plt.ylabel(u'进程名称', fontproperties='SimHei')
+        plt.xlabel(u'卡顿次数(单位:次)', fontproperties='SimHei')
+        plt.title(u'性能监控统计', fontproperties='SimHei')
+        for a, b in zip(index, tuple([test[1] for test in sorted(block_process.items(), key=lambda item: item[1])])):
+            plt.text(b + 0.2, a, '%.0f' % b, ha='center', va='bottom', fontsize=7)
+        plt.yticks(index, tuple([test[0] for test in sorted(block_process.items(), key=lambda item: item[1])]))
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.work_out, str(csv_file.split(".")[0]) + ".jpg"))
+
+    def execute(self):
+        print u'执行卡顿监控测试'
+
+    def setup(self):
+        check = QCheckBox(u'继续上一次的Monkey测试')
+        check.toggled[bool].connect(self.retryChecked)
+
+        self.radio1 = QRadioButton(u'整机Monkey测试')
+        self.radio1.toggled[bool].connect(self.radio1Toggled)
+        self.radio3 = QRadioButton(u'整机Monkey测试(安装top50应用且可测第三方应用)')
+        self.radio3.setChecked(self.install)
+        self.radio3.toggled[bool].connect(self.radio3Toggled)
+        self.radio2 = QRadioButton(u'单包Monkey测试')
+        self.radio2.setChecked(self.single)
+        self.radio2.toggled[bool].connect(self.radio2Toggled)
+        self.edit1 = QLineEdit(str(self.seed))
+        self.edit1.setValidator(QIntValidator())
+        self.edit1.textChanged[str].connect(self.edit1Changed)
+        self.edit2 = QLineEdit(str(self.throttle))
+        self.edit2.setValidator(QIntValidator())
+        self.edit2.textChanged[str].connect(self.edit2Changed)
+        self.edit3 = QLineEdit(str(self.count))
+        self.edit3.setValidator(QIntValidator())
+        self.edit3.textChanged[str].connect(self.edit3Changed)
+        gridLayout = QGridLayout()
+        gridLayout.addWidget(QLabel(u'种子数'), 0, 0)
+        gridLayout.addWidget(self.edit1, 0, 1)
+        gridLayout.addWidget(QLabel(u'事件间隔'), 1, 0)
+        gridLayout.addWidget(self.edit2, 1, 1)
+        gridLayout.addWidget(QLabel(u'事件次数'), 2, 0)
+        gridLayout.addWidget(self.edit3, 2, 1)
+        itemLayout = QVBoxLayout()
+        itemLayout.addWidget(self.radio1)
+        itemLayout.addWidget(self.radio3)
+        itemLayout.addWidget(self.radio2)
+
+        itemLayout.addStretch()
+        itemLayout.addLayout(gridLayout)
+        self.itemGroup = QGroupBox(u'Monkey测试参数')
+        self.itemGroup.setLayout(itemLayout)
+        selall = QListWidgetItem(u'全选')
+        selall.setCheckState(Qt.Checked)
+        selall.setData(1, QVariant('selall'))
+        self.list = QListWidget()
+        self.list.itemChanged.connect(self.itemChanged)
+        self.list.addItem(selall)
+        for key in self.temppkgs.keys():
+            item = QListWidgetItem(key)
+            item.setCheckState(Qt.Checked)
+            item.setData(1, QVariant(key))
+            self.list.addItem(item)
+        listLayout = QVBoxLayout()
+        listLayout.addWidget(self.list)
+        self.listGroup = QGroupBox(u'单包Monkey测试可选包名')
+        self.listGroup.setLayout(listLayout)
+
+        itemLayout = QHBoxLayout()
+        itemLayout.addWidget(self.itemGroup)
+        itemLayout.addWidget(self.listGroup)
+        itemLayout.setStretch(0, 1)
+        itemLayout.setStretch(1, 3)
+        layout = QVBoxLayout()
+        layout.addWidget(check)
+        layout.addLayout(itemLayout)
 
 
 if __name__ == "__main__":
-    block_process = {'pkg1': 1, 'pkg2': 4}
+    threads = []
+    all_connect_devices = adbkit.devices()
+    for device in all_connect_devices:
+        if device['serialno'] in sys.argv:
+            adb = adbkit.Adb(device)
+            ModuleMonitor(adb, sys.argv[2]).parsers()

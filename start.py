@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import glob
 import os
 import sys
 
@@ -17,7 +17,17 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    # print 'fffffff'
+    #
+    for filename in os.listdir(r'C:\Users\admin\Desktop\apks-debug\monkey'):
+        print filename
+    #     print os.path.basename(filename)
+        #(os.path.join(r'C:\Users\admin\Desktop\卡顿测试debug应用\apks-debug', '*'))
+    # for apk in apks:
+    #     print os.path.basename(apk)
+    #     print apk
+
     # mfile = r'D:\bbk-test-center\EebbkTestCenter\performance-test\testcase.ini'
     # if os.path.exists(mfile):
     #     with open(r'D:\pendant.txt','wb') as rf:

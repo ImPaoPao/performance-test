@@ -381,8 +381,4 @@ if __name__ == "__main__":
     for device in all_connect_devices:
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
-            # path = '/data/local/tmp/module/busybox'
-            # line = adb.shell_readline('ls -F %s' % path)
-            # print '(((((((((((((((((((((((((((((('
-            # print  re.search('(^(-|l-)|({0}|{0}@|{0}\*)$)'.format(os.path.split(path)[-1]), line)
             LauncherModule(adb, sys.argv[2]).parsers()

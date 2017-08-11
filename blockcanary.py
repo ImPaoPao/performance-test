@@ -5,14 +5,15 @@ import csv
 import glob
 import os
 import sys
-
+import time
+import platform
 import matplotlib.pyplot as plt
 import numpy as np
 import xlwt
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
 
 import adbkit
+from runner import Executor
+from tools import echo_to_file
 
 WORK_OUT = os.path.join(os.path.expanduser('~'), 'eebbk-results')
 try:
@@ -22,12 +23,20 @@ except ImportError:
 
 import re
 
+DEBUG = platform.system() == 'Windows'
 
-class ModuleMonitor():
-    def __init__(self, adb, work_out, child):
-        self.adb = adb
-        self.work_out = work_out
+
+class ModuleMonitor(Executor):
+    def __init__(self, child):
         self.child = child
+        self.adb = child.adb
+        self.work_out = child.workout
+        self.seed = child.seed
+        self.count = child.count
+        self.throttle = child.throttle
+        self.retry = child.retry
+        self.single = child.single
+        self.data_work_path = '%s/%s' % ('/data/local/tmp', self.id())
 
     @classmethod
     def id(cls):
@@ -41,67 +50,74 @@ class ModuleMonitor():
 
     def parsers(self):
         print u'AndroidPerformanceMonitor监控应用UI主线程卡顿情况'
-        work_dir = os.path.join(self.work_out, 'blockcanary')
-        logs = glob.iglob(os.path.join(work_dir, '*.log'))
         data = {}
-        for log in logs:
-            if os.path.exists(log):
-                key = os.path.basename(log)
-                value = {'serialno': 'serialno', 'model': u'机型', 'process': u'进程名', 'stacktrace': u'堆栈信息',
-                         'versionname': u'版本号', 'others': u'其它待解析信息'}
-                with open(log, 'r') as f:
-                    tracenum = 0
-                    for line in f:
-                        m = re.search('versionName = (.*)', line)
-                        if m:
-                            versionName = m.groups()[0]
-                            value['versionname'] = versionName
-                            print versionName
-                            continue
-                        m = re.search('model = (.*)', line)
-                        if m:
-                            model = m.groups()[0]
-                            print model
-                            value['model'] = model
-                            continue
-                        m = re.search('process = (.*)', line)
-                        if m:
-                            process = m.groups()[0]
-                            print process
-                            value['process'] = process
-                            continue
-                        m = re.search('time-start = (.*)', line)
-                        if m:
-                            timestart = m.groups()[0]
-                            print timestart
-                            print 'timestart '
-                            value['timestart'] = timestart
-                            continue
-                        if line.startswith('stack'):
-                            m = re.search('stack = (.*)', line)
-                            if m:
-                                stack = m.groups()[0]
-                                value['stacktrace'] = line
-                                print stack
-                                tracenum += 1
-                                continue
-                        if 1 <= tracenum <= 50:
-                            tracenum += 1
-                            value['stacktrace'] += line
-                    data[key] = value
-                    f.close()
-        self.csv_generate(data, str(os.getpid()))
-        self.csv_to_xls(str(os.getpid()))
+        work_dir = os.path.join(self.work_out, 'blockcanary')
+        for pkg in os.listdir(work_dir):
+            if os.path.isdir(os.path.join(self.work_out, 'blockcanary',pkg)):
+                pkg_dir = os.path.join(work_dir, pkg)
+                logs = glob.iglob(os.path.join(pkg_dir, '*.log'))
+                ldata = {}
+                for log in logs:
+                    if os.path.exists(log):
+                        key = os.path.basename(log)
+                        value = {'serialno': self.adb.device['serialno'], 'model': u'机型', 'process': u'进程名', 'stacktrace': u'堆栈信息',
+                                 'versionname': u'版本号', 'others': u'其它待解析信息'}
+                        with open(log, 'r') as f:
+                            tracenum = 0
+                            for line in f:
+                                m = re.search('versionName = (.*)', line)
+                                if m:
+                                    versionName = m.groups()[0]
+                                    value['versionname'] = versionName
+                                    # print versionName
+                                    continue
+                                m = re.search('model = (.*)', line)
+                                if m:
+                                    model = m.groups()[0]
+                                    # print model
+                                    value['model'] = model
+                                    continue
+                                m = re.search('process = (.*)', line)
+                                if m:
+                                    process = m.groups()[0]
+                                    # print process
+                                    value['process'] = process
+                                    continue
+                                m = re.search('time-start = (.*)', line)
+                                if m:
+                                    timestart = m.groups()[0]
+                                    # print timestart
+                                    # print 'timestart '
+                                    value['timestart'] = timestart
+                                    continue
+                                if line.startswith('stack'):
+                                    m = re.search('stack = (.*)', line)
+                                    if m:
+                                        stack = m.groups()[0]
+                                        value['stacktrace'] = line
+                                        # print stack
+                                        tracenum += 1
+                                        continue
+                                if 1 <= tracenum <= 50:
+                                    tracenum += 1
+                                    value['stacktrace'] += line
+                            ldata[key] = value
+                            f.close()
+                data[pkg] = ldata
+        if data:
+            self.csv_generate(data, str(os.getpid()))
+            self.csv_to_xls(str(os.getpid()))
 
     def csv_generate(self, data, filename):
         csvfile = file(os.path.join(self.work_out, filename + '.csv'), 'wb')
         csvfile.write(codecs.BOM_UTF8)
         writer = csv.writer(csvfile, dialect='excel')
-        writer.writerow(['机型', '序列号', '进程名称', '版本号', '开始时间', '堆栈信息', 'log文件'])
+        writer.writerow(['模块','机型', '序列号', '进程名称', '版本号', '开始时间', '堆栈信息', 'log文件'])
         for key, value in data.items():
-            writer.writerow(
-                [value['model'], value['serialno'], value['process'], value['versionname'], str(value['timestart']),
-                 value['stacktrace'], key])
+            for lkey,lvalue in value.items():
+                writer.writerow(
+                    [key,lvalue['model'], lvalue['serialno'], lvalue['process'], lvalue['versionname'], str(lvalue['timestart']),
+                     lvalue['stacktrace'], lkey])
         csvfile.close()
 
     def csv_to_xls(self, csv_file):
@@ -158,14 +174,14 @@ class ModuleMonitor():
         header_style.alignment = header_alignment
         header_style.pattern = header_badBG
         header_style.borders = borders
-
-        sheet2.col(0).width = 256 * 14
+        sheet2.col(0).width = 256 * 40
         sheet2.col(1).width = 256 * 14
-        sheet2.col(2).width = 256 * 40
-        sheet2.col(3).width = 256 * 14
-        sheet2.col(4).width = 256 * 40
-        sheet2.col(5).width = 256 * 80
-        sheet2.col(6).width = 256 * 40
+        sheet2.col(2).width = 256 * 14
+        sheet2.col(3).width = 256 * 40
+        sheet2.col(4).width = 256 * 14
+        sheet2.col(5).width = 256 * 40
+        sheet2.col(6).width = 256 * 80
+        sheet2.col(7).width = 256 * 40
 
         # 标题行设置高度
         tall_style = xlwt.easyxf('font:height 720;')
@@ -181,9 +197,9 @@ class ModuleMonitor():
                 if l == 0:
                     sheet2.write(0, r, i, header_style)  # 标题行
                 else:
-                    if r == 2:
-                        block_process[i] = block_process.get(i, 0) + 1  # 统计进程名字和出现卡顿的次数
-                    if r == 5:  # tracestack 自动换行
+                    if r == 3:
+                        block_process[line[0]] = block_process.get(line[0], 0) + 1  # 统计进程名字和出现卡顿的次数
+                    if r == 6:  # tracestack 自动换行
                         sheet2.write(l, r, i, normal_style_trace)
                     else:
                         sheet2.write(l, r, i, normal_style)
@@ -216,71 +232,62 @@ class ModuleMonitor():
         plt.tight_layout()
         plt.savefig(os.path.join(self.work_out, str(csv_file.split(".")[0]) + ".jpg"))
 
-    def execute(self):
-        print u'执行卡顿监控测试'
+    def execute(self, log, workout):
+        print u'卡顿监控......'
+        if not self.retry:
+            print u'正常执行测试'
+            self.import_script()
+            self.__kill_track()
+            print u'正在执行 %s 测试' % self.id()
+            self.start()
+            self.adb.shell('touch %s/track' % self.data_work_path)
+            while 1:
+                if self.adb.shell_readline('{0}/busybox tail -1 {0}/track'.format(self.data_work_path)) == 'done':
+                    break
+                p = self.adb.shell_open('{0}/busybox tail -1 -F {0}/track'.format(self.data_work_path))
+                while 1:
+                    line = p.stdout.readline()
+                    if not line or line.strip() == 'done':
+                        break
+                    elif line.strip():
+                        echo_to_file(self.adb, '', '%s/track' % self.data_work_path)
+                        self.track(line.strip())
+                p.terminate()
+                self.__kill_track()
+            self.shell(('done',)).wait()
+        print u'直接导出卡顿测试数据...'
+        self.export_result()
+        self.parsers()
 
-    def setup(self):
-        check = QCheckBox(u'继续上一次的Monkey测试')
-        check.toggled[bool].connect(self.retryChecked)
+    def start(self):
+        params = [str(self.seed), str(self.throttle), str(self.count), str(0), str(1)]
+        super(ModuleMonitor, self).start(' '.join(params))
 
-        self.radio1 = QRadioButton(u'整机Monkey测试')
-        self.radio1.toggled[bool].connect(self.radio1Toggled)
-        self.radio3 = QRadioButton(u'整机Monkey测试(安装top50应用且可测第三方应用)')
-        self.radio3.setChecked(self.install)
-        self.radio3.toggled[bool].connect(self.radio3Toggled)
-        self.radio2 = QRadioButton(u'单包Monkey测试')
-        self.radio2.setChecked(self.single)
-        self.radio2.toggled[bool].connect(self.radio2Toggled)
-        self.edit1 = QLineEdit(str(self.seed))
-        self.edit1.setValidator(QIntValidator())
-        self.edit1.textChanged[str].connect(self.edit1Changed)
-        self.edit2 = QLineEdit(str(self.throttle))
-        self.edit2.setValidator(QIntValidator())
-        self.edit2.textChanged[str].connect(self.edit2Changed)
-        self.edit3 = QLineEdit(str(self.count))
-        self.edit3.setValidator(QIntValidator())
-        self.edit3.textChanged[str].connect(self.edit3Changed)
-        gridLayout = QGridLayout()
-        gridLayout.addWidget(QLabel(u'种子数'), 0, 0)
-        gridLayout.addWidget(self.edit1, 0, 1)
-        gridLayout.addWidget(QLabel(u'事件间隔'), 1, 0)
-        gridLayout.addWidget(self.edit2, 1, 1)
-        gridLayout.addWidget(QLabel(u'事件次数'), 2, 0)
-        gridLayout.addWidget(self.edit3, 2, 1)
-        itemLayout = QVBoxLayout()
-        itemLayout.addWidget(self.radio1)
-        itemLayout.addWidget(self.radio3)
-        itemLayout.addWidget(self.radio2)
+    def __kill_track(self):
+        self.adb.shell('kill -9 {0}{1}/busybox pidof busybox{0}'.format('`' if DEBUG else '\\`', self.data_work_path))
 
-        itemLayout.addStretch()
-        itemLayout.addLayout(gridLayout)
-        self.itemGroup = QGroupBox(u'Monkey测试参数')
-        self.itemGroup.setLayout(itemLayout)
-        selall = QListWidgetItem(u'全选')
-        selall.setCheckState(Qt.Checked)
-        selall.setData(1, QVariant('selall'))
-        self.list = QListWidget()
-        self.list.itemChanged.connect(self.itemChanged)
-        self.list.addItem(selall)
-        for key in self.temppkgs.keys():
-            item = QListWidgetItem(key)
-            item.setCheckState(Qt.Checked)
-            item.setData(1, QVariant(key))
-            self.list.addItem(item)
-        listLayout = QVBoxLayout()
-        listLayout.addWidget(self.list)
-        self.listGroup = QGroupBox(u'单包Monkey测试可选包名')
-        self.listGroup.setLayout(listLayout)
+    def import_script(self):
+        super(ModuleMonitor, self).import_script()
+        if len([1]) > 1:
+            echo_to_file(self.adb, [1], self.data_work_path + '/choice.txt')
 
-        itemLayout = QHBoxLayout()
-        itemLayout.addWidget(self.itemGroup)
-        itemLayout.addWidget(self.listGroup)
-        itemLayout.setStretch(0, 1)
-        itemLayout.setStretch(1, 3)
-        layout = QVBoxLayout()
-        layout.addWidget(check)
-        layout.addLayout(itemLayout)
+    def export_result(self):
+        print self.work_out
+        if not os.path.exists(self.work_out):
+            os.makedirs(self.work_out)
+            time.sleep(3)
+        self.adb.pull('/sdcard/blockcanary/', os.path.join(self.work_out, self.id()))
 
+
+class ExeDemo():
+    def __init__(self,adb,work_out):
+        self.adb = adb
+        self.workout = work_out
+        self.seed = 0
+        self.count = 0
+        self.throttle =0
+        self.retry = 0
+        self.single = 0
 
 if __name__ == "__main__":
     threads = []
@@ -288,4 +295,5 @@ if __name__ == "__main__":
     for device in all_connect_devices:
         if device['serialno'] in sys.argv:
             adb = adbkit.Adb(device)
-            ModuleMonitor(adb, sys.argv[2]).parsers()
+            exedemo = ExeDemo(adb,sys.argv[2])
+            ModuleMonitor(exedemo).parsers()

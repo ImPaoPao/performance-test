@@ -18,22 +18,90 @@ workdir = os.path.dirname(os.path.realpath(sys.argv[0]))
 import copy
 
 
+class BlockExecuteExportThread(QThread):
+    blockExecuteExportThreadDone = pyqtSignal(str)
+    blockExecuteThreadDone= pyqtSignal()
+
+    def __init__(self, child, **args):
+        super(BlockExecuteExportThread, self).__init__()
+        self.child = child
+        self.retry = child.retry
+        self.devices = args.get('devices')
+        self.seed = child.seed
+        self.count = child.count
+        self.throttle = child.throttle
+        self.single = child.single
+
+    def run(self):
+        if self.retry:
+            if self.devices:
+                for device in self.devices:
+                    self.adb = adbkit.Adb(adbkit.Device(serialno=device))
+                    self.info = collections.OrderedDict()
+                    self.info['序列号'] = get_prop(self.adb, 'ro.serialno')
+                    self.info['型号'] = get_prop(self.adb, 'ro.product.model')
+                    self.info['Android版本'] = get_prop(self.adb, 'ro.build.version.release')
+                    self.info['版本号'] = get_prop(self.adb, 'ro.build.version.incremental')
+                    self.info['版本类型'] = get_prop(self.adb, 'ro.build.type')
+                    self.info['制造商'] = get_prop(self.adb, 'ro.product.manufacturer')
+                    self.info['平台'] = get_prop(self.adb, 'ro.board.platform')
+                    self.workout = os.path.join(workdir, 'out')
+                    if not os.path.exists(self.workout):
+                        os.mkdir(self.workout)
+                    self.workout = os.path.join(self.workout, self.info['序列号'])
+                    if not os.path.exists(self.workout):
+                        os.mkdir(self.workout)
+                    self.workout = os.path.join(self.workout, self.info['版本号'])
+                    if not os.path.exists(self.workout):
+                        os.mkdir(self.workout)
+                    # 开始时间
+                    self.workout = os.path.join(self.workout,
+                                                time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+                    if not os.path.exists(self.workout):
+                        os.mkdir(self.workout)
+                    ModuleMonitor(self).execute(None, None)
+                    self.blockExecuteExportThreadDone.emit(self.workout)
+                self.blockExecuteThreadDone.emit()
+
 class BlockExecuteThread(QThread):
-    logged = pyqtSignal(unicode, str)
-    setupExecuteDone = pyqtSignal(str)
+    blockExecuteExportThreadDone = pyqtSignal(str)
 
     def __init__(self, child, **args):
         super(BlockExecuteThread, self).__init__()
-        self.adb = child.adb
-        self.workout = args.get('workout')
+        self.child = child
+        self.seed = child.seed
+        self.count = child.count
+        self.throttle = child.throttle
+        self.retry = child.retry
+        self.single = child.single
+        self.serialno = args.get('serialno')
+        self.adb = adbkit.Adb(adbkit.Device(serialno=self.serialno))
 
     def run(self):
-        ModuleMonitor(self.adb,self.workout)
-        #self.log(u'所有任务完成，共耗时{0}秒'.format(round(time.time() - start, 3)))
-        #self.setupExecuteDone.emit(self.workout)
-
-    def log(self, text, color='black'):
-        self.logged.emit(text, color)
+        self.info = collections.OrderedDict()
+        self.info['序列号'] = get_prop(self.adb, 'ro.serialno')
+        self.info['型号'] = get_prop(self.adb, 'ro.product.model')
+        self.info['Android版本'] = get_prop(self.adb, 'ro.build.version.release')
+        self.info['版本号'] = get_prop(self.adb, 'ro.build.version.incremental')
+        self.info['版本类型'] = get_prop(self.adb, 'ro.build.type')
+        self.info['制造商'] = get_prop(self.adb, 'ro.product.manufacturer')
+        self.info['平台'] = get_prop(self.adb, 'ro.board.platform')
+        self.workout = os.path.join(workdir, 'out')
+        if not os.path.exists(self.workout):
+            os.mkdir(self.workout)
+        self.workout = os.path.join(self.workout, self.info['序列号'])
+        if not os.path.exists(self.workout):
+            os.mkdir(self.workout)
+        self.workout = os.path.join(self.workout, self.info['版本号'])
+        if not os.path.exists(self.workout):
+            os.mkdir(self.workout)
+        # 开始时间
+        self.workout = os.path.join(self.workout,
+                                    time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+        if not os.path.exists(self.workout):
+            os.mkdir(self.workout)
+        ModuleMonitor(self).execute(None, None)
+        self.blockExecuteExportThreadDone.emit(self.workout)
 
 
 class MainWindow(QMainWindow):
@@ -43,8 +111,7 @@ class MainWindow(QMainWindow):
         self.count = 100000
         self.throttle = 100
         self.devices = []
-        self.adbs = []
-        self.retry = False
+        self.retry = True
         self.single = False
         self.initUI()
 
@@ -54,8 +121,6 @@ class MainWindow(QMainWindow):
             for device in devices:
                 serialno = device['serialno']
                 self.devices.append(serialno)
-                # adb = adbkit.Adb(adbkit.Device(serialno=serialno))
-                # self.adbs.append(adb)
         self.tempdevices = copy.copy(self.devices)
         mdiChild = QWidget()
         check = QCheckBox(u'导出上次的卡顿数据(手动操作设备产生的卡顿数据)')
@@ -65,13 +130,15 @@ class MainWindow(QMainWindow):
         headerLayout.addWidget(check)
         headerLayout.addStretch()
         headerLayout.addWidget(self.okButton)
-
+        check.setChecked(self.retry)
         check.toggled[bool].connect(self.retryChecked)
         self.radio1 = QRadioButton(u'整机Monkey')
         self.radio1.setChecked(not self.single)
         self.radio1.toggled[bool].connect(self.radio1Toggled)
         self.radio3 = QRadioButton(u'APPStart工具遍历')
         self.radio3.setEnabled(False)
+        self.radio4 = QRadioButton(u'模块启动&页面切换')
+        self.radio4.setEnabled(False)
         # self.radio3.setChecked(self.install)
         # self.radio3.toggled[bool].connect(self.radio3Toggled)
         self.radio2 = QRadioButton(u'单包Monkey(全部BBK应用)')
@@ -97,10 +164,12 @@ class MainWindow(QMainWindow):
         itemLayout.addWidget(self.radio1)
         itemLayout.addWidget(self.radio2)
         itemLayout.addWidget(self.radio3)
+        itemLayout.addWidget(self.radio4)
 
         itemLayout.addStretch()
         itemLayout.addLayout(gridLayout)
         self.itemGroup = QGroupBox(u'应用卡顿模拟用户操作')
+        self.itemGroup.setEnabled(not self.retry)
         self.itemGroup.setLayout(itemLayout)
         self.list = QListWidget()
         self.list.itemChanged.connect(self.itemChanged)
@@ -178,44 +247,43 @@ class MainWindow(QMainWindow):
     def buttonClicked(self):
         sender = self.sender()
         if sender == self.okButton:
+            self.okButton.setDisabled(True)
+            self.list.setDisabled(True)
+            if self.retry:
+                self.okButton.setText(u'正在导出卡顿报告...稍等片刻...')
+            else:
+                self.okButton.setText(u'运行...')
             self.executeBuildTest()
 
+    def blockExecuteExportThreadDone(self, workout):
+        QDesktopServices.openUrl(QUrl.fromLocalFile(workout))
+
+    def updateExecuteButton(self):
+        self.okButton.setEnabled(True)
+        self.okButton.setText(u'运行')
+        self.list.setEnabled(True)
+
     def executeBuildTest(self):
-        print self.tempdevices
-        print u'选中:', self.devices
         devices = adbkit.devices()
         if self.tempdevices and devices:
             if not self.devices:
                 QMessageBox.question(self, 'Message', u'请选择要执行的设备', QMessageBox.Yes)
             else:
-                for device in self.devices:
-                    adb = adbkit.Adb(adbkit.Device(serialno=device['serialno']))
-                    self.info = collections.OrderedDict()
-                    self.info['序列号'] = get_prop(self.adb, 'ro.serialno')
-                    self.info['型号'] = get_prop(self.adb, 'ro.product.model')
-                    self.info['Android版本'] = get_prop(self.adb, 'ro.build.version.release')
-                    self.info['版本号'] = get_prop(self.adb, 'ro.build.version.incremental')
-                    self.info['版本类型'] = get_prop(self.adb, 'ro.build.type')
-                    self.info['制造商'] = get_prop(self.adb, 'ro.product.manufacturer')
-                    self.info['平台'] = get_prop(self.adb, 'ro.board.platform')
-                    self.workout = os.path.join(workdir, 'out')
-                    if not os.path.exists(self.workout):
-                        os.mkdir(self.workout)
-                    self.workout = os.path.join(self.workout, self.info['序列号'])
-                    if not os.path.exists(self.workout):
-                        os.mkdir(self.workout)
-                    self.workout = os.path.join(self.workout, self.info['版本号'])
-                    if not os.path.exists(self.workout):
-                        os.mkdir(self.workout)
-                    # 开始时间
-                    self.workout = os.path.join(self.workout,
-                                                time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
-                    if not os.path.exists(self.workout):
-                        os.mkdir(self.workout)
+                if self.retry:
+                    self.beet = BlockExecuteExportThread(self, devices=self.devices)
+                    self.beet.blockExecuteExportThreadDone.connect(self.blockExecuteExportThreadDone)
+                    self.beet.blockExecuteThreadDone.connect(self.updateExecuteButton)
+                    self.beet.start()
+                else:
+                    self.threads = []
+                    for device in self.devices:
+                        bet = BlockExecuteThread(self, serialno=device)
+                        self.threads.append(bet)
+                    for thread in self.threads:
+                        thread.blockExecuteExportThreadDone.connect(self.blockExecuteExportThreadDone)
+                        thread.start()
 
-                    self.t = BlockExecuteThread(self)
-                    self.t.setupExecuteDone.connect(self.updateResultButton)
-                    self.t.start()
+                    # self.updateExecuteButton()
 
         else:
             result = QMessageBox.question(self, 'Message', u'请重新插拔USB,确定设备连接正常再点击确定按钮', QMessageBox.Yes)
@@ -231,39 +299,6 @@ class MainWindow(QMainWindow):
                             item.setData(1, QVariant(serialno))
                             self.list.addItem(item)
                         self.tempdevices = copy.copy(self.devices)
-                        # else:
-                        #     QMessageBox.question(self, 'Message', u'设备连接异常...请检查...', QMessageBox.Yes)
-                        # else:
-                        #     result = QMessageBox.question(self, 'Message', u'设备连接异常，请重新连接', QMessageBox.Yes)
-                        # self.info = collections.OrderedDict()
-                        # self.info['序列号'] = get_prop(self.adb, 'ro.serialno')
-                        # self.info['型号'] = get_prop(self.adb, 'ro.product.model')
-                        # self.info['Android版本'] = get_prop(self.adb, 'ro.build.version.release')
-                        # self.info['版本号'] = get_prop(self.adb, 'ro.build.version.incremental')
-                        # self.info['版本类型'] = get_prop(self.adb, 'ro.build.type')
-                        # self.info['制造商'] = get_prop(self.adb, 'ro.product.manufacturer')
-                        # self.info['平台'] = get_prop(self.adb, 'ro.board.platform')
-                        #
-                        # if self.checkDict:
-                        #     self.workout = os.path.join(workdir, 'out')
-                        #     if not os.path.exists(self.workout):
-                        #         os.mkdir(self.workout)
-                        #     self.workout = os.path.join(self.workout, self.info['序列号'])
-                        #     if not os.path.exists(self.workout):
-                        #         os.mkdir(self.workout)
-                        #     self.workout = os.path.join(self.workout, self.info['版本号'])
-                        #     if not os.path.exists(self.workout):
-                        #         os.mkdir(self.workout)
-                        #     # 开始时间
-                        #     self.workout = os.path.join(self.workout, time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
-                        #     if not os.path.exists(self.workout):
-                        #         os.mkdir(self.workout)
-                        #
-                        #     self.t = SetupExecuteThread(self.adb, executor=self.checkDict, login=self.login,
-                        #                                 datatype=self.datatype, getlog=self.getlog, workout=self.workout)
-                        #     self.t.logged.connect(self.showMessage)
-                        #     self.t.setupExecuteDone.connect(self.updateResultButton)
-                        #     self.t.start()
 
 
 if __name__ == "__main__":
